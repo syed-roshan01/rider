@@ -1,0 +1,14 @@
+{
+  "name": "ride-accepter-license",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloud license management for Ride Accepter: keys, device binding, signed tokens, admin dashboard.",
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "test": "node --test license/test/",
+    "test:core": "node --test license/test/core.test.ts",
+    "admin": "node license/src/server.ts",
+    "keys": "node license/src/cli.ts"
+  }
+}

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ride Accepter · License Admin</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<!-- ───────────────────────── login ───────────────────────── -->
+<section id="login" class="login-wrap">
+  <form id="login-form" class="login-card">
+    <div class="brand">
+      <div class="brand-mark">RA</div>
+      <div>
+        <h1>Ride Accepter</h1>
+        <p>License &amp; entitlement administration</p>
+      </div>
+    </div>
+    <label>Admin password
+      <input id="password" type="password" autocomplete="current-password" required />
+    </label>
+    <button class="btn primary block" type="submit">Sign in</button>
+    <p id="login-error" class="error" hidden>Incorrect password</p>
+    <p class="muted small">
+      Every action here is written to the audit log. Keys are shown exactly once at
+      creation and are stored only as a hash + sealed copy.
+    </p>
+  </form>
+</section>
+
+<!-- ───────────────────────── app ───────────────────────── -->
+<main id="app" hidden>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">RA</div>
+      <div>
+        <h1>Ride Accepter</h1>
+        <p>License &amp; entitlement administration</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="keys" class="tab active">License keys</button>
+      <button data-tab="devices" class="tab">Devices</button>
+      <button data-tab="config" class="tab">App control</button>
+      <button data-tab="audit" class="tab">Audit log</button>
+    </nav>
+    <button id="logout" class="btn ghost">Sign out</button>
+  </header>
+
+  <!-- stats -->
+  <section class="stats" id="stats"></section>
+
+  <!-- ── keys ── -->
+  <section data-panel="keys">
+    <div class="card">
+      <div class="card-head">
+        <h2>Issue license keys</h2>
+        <p class="muted">Keys are displayed once at creation. 115-bit entropy, typo-proof checksum.</p>
+      </div>
+      <form id="create-form" class="grid-form">
+        <label>Plan
+          <select id="f-plan">
+            <option value="DAY">1 Day</option>
+            <option value="WEEK">1 Week</option>
+            <option value="HALF_MONTH">15 Days</option>
+            <option value="MONTH" selected>1 Month</option>
+            <option value="YEAR">1 Year</option>
+          </select>
+        </label>
+        <label>Duration (days)
+          <input id="f-days" type="number" min="1" max="3650" value="30" />
+        </label>
+        <label>Max devices
+          <input id="f-devices" type="number" min="1" max="10" value="1" />
+        </label>
+        <label>How many keys
+          <input id="f-count" type="number" min="1" max="500" value="1" />
+        </label>
+        <label class="span2">Device ID(s) from customer's login screen
+          <input id="f-devids" type="text" placeholder="e.g. 7QK2M-3XW8H-PTD4R" />
+          <small class="muted">The key is bound to these at creation — it will not work on any other phone. Comma-separated for multi-device keys.</small>
+        </label>
+        <label class="span2">Note / customer
+          <input id="f-note" type="text" placeholder="e.g. WhatsApp order #1042" />
+        </label>
+        <button class="btn primary span2" type="submit">Generate</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-head row">
+        <div>
+          <h2>Keys</h2>
+          <p class="muted" id="keys-count"></p>
+        </div>
+        <div class="filters">
+          <input id="search" type="search" placeholder="Search prefix, note, plan…" />
+          <select id="status-filter">
+            <option value="">All statuses</option>
+            <option value="unused">Unused</option>
+            <option value="active">Active</option>
+            <option value="expired">Expired</option>
+            <option value="revoked">Revoked</option>
+          </select>
+          <button id="reload" class="btn ghost" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="keys-table">
+          <thead>
+            <tr>
+              <th>Key</th><th>Plan</th><th>Status</th><th>Expires</th>
+              <th>Devices</th><th>Note</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── devices ── -->
+  <section data-panel="devices" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2>Bound devices</h2>
+        <p class="muted">Unbinding frees a device slot — use it when a customer changes phone.</p>
+      </div>
+      <div class="table-wrap">
+        <table id="devices-table">
+          <thead>
+            <tr><th>Device HWID</th><th>Key</th><th>Model</th><th>Integrity</th><th>App ver</th><th>Last seen</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── config ── -->
+  <section data-panel="config" hidden>
+    <div class="card">
+      <div class="card-head">
+        <h2>App control &amp; kill switch</h2>
+        <p class="muted">Pushed to every install on its next <code>/api/v1/config</code> poll.</p>
+      </div>
+      <form id="config-form" class="grid-form">
+        <label class="span2 switch-row">
+          <input id="c-maintenance" type="checkbox" />
+          <span>Maintenance mode — blocks every user at launch</span>
+        </label>
+        <label class="span2">Maintenance message
+          <input id="c-maintmsg" type="text" />
+        </label>
+        <label>Force update below version
+          <input id="c-forcever" type="number" min="0" value="0" />
+        </label>
+        <label>Update download URL
+          <input id="c-download" type="text" placeholder="https://…/RideAccepter.apk" />
+        </label>
+        <label>Update page URL
+          <input id="c-page" type="text" placeholder="https://rideaccepter.in/update" />
+        </label>
+        <label>Blocked versions (comma separated)
+          <input id="c-blocked" type="text" placeholder="12, 13" />
+        </label>
+        <label>Min allowed fare (₹)
+          <input id="c-minfare" type="number" min="0" value="10" />
+        </label>
+        <label>Max allowed fare (₹)
+          <input id="c-maxfare" type="number" min="0" value="5000" />
+        </label>
+        <label class="span2">Dialog message
+          <input id="c-dialog" type="text" />
+        </label>
+        <label>Dialog button text
+          <input id="c-dialogbtn" type="text" />
+        </label>
+        <button class="btn primary" type="submit">Push to all installs</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── audit ── -->
+  <section data-panel="audit" hidden>
+    <div class="card">
+      <div class="card-head row">
+        <div><h2>Audit log</h2><p class="muted">Who did what, and when.</p></div>
+        <button id="audit-reload" class="btn ghost" type="button">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table id="audit-table">
+          <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Detail</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ───────────────────────── modal ───────────────────────── -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-card">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button id="modal-close" class="btn ghost" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>
