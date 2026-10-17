@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+
+    // Vercel transpiles api/*.ts to .js and leaves import speciers untouched,
+    // so the sources use '.js' specifiers. 'bundler' resolution maps those back
+    // to the '.ts' sources for type-checking. Node/Deno trees (supabase/, tools/)
+    // keep their '.ts' specifiers and are excluded below.
+    "moduleResolution": "bundler",
+
+    // TS5097 guard: allows '.ts' specifiers too, so either style type-checks.
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  // NOTE: supabase/functions/_shared/db.ts is deliberately NOT included -- it
+  // imports 'jsr:@supabase/supabase-js@2', a Deno-only specifier that would
+  // fail type-check here. Nothing under api/ imports it; api/_lib/server.ts
+  // talks to Supabase over REST instead.
+  "include": ["api/**/*.ts", "supabase/functions/_shared/license.ts"],
+  "exclude": ["node_modules", "license/", "tools/"]
+}
