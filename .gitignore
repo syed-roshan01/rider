@@ -73,3 +73,6 @@ tools/probe/
 # Supabase CLI local metadata (may hold DB connection strings)
 supabase/.temp/
 
+
+.npm-cache/
+
