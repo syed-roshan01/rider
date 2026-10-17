@@ -45,7 +45,23 @@ import java.nio.charset.StandardCharsets;
 public class ActivationActivity extends Activity {
 
     /** Change this to your real endpoint; production must be HTTPS. */
-    public static final String SERVER = "http://192.168.0.185:8787";
+    public static final String SERVER = "https://ckyfcwbnakbaitzurnze.supabase.co/functions/v1";
+
+    /**
+     * Ed25519 public key, pinned at build time. The activation response must
+     * match this exactly or we refuse to activate.
+     *
+     * Without the pin the app used to cache whatever "publicKey" the server
+     * returned. That is a substitution hole: anyone who intercepts first
+     * contact can hand over their own key and then sign forged tokens that the
+     * app will accept offline forever. Pinning makes the key a property of the
+     * build, not of the network.
+     */
+    public static final String PINNED_PUBLIC_KEY =
+            "MCowBQYDK2VwAyEAkG6Qwwc6G90nANvj3FdwjUqSC5xyBRYT7frebqjkM04=";
+
+    /** Last transport error, surfaced in the UI so failures are diagnosable. */
+    private volatile String lastError;
 
     private static final String PREFS = "ra_license";
     private static final int BG = 0xFF0E1116;
@@ -224,6 +240,20 @@ public class ActivationActivity extends Activity {
 
                     JSONObject r = post("/api/v1/activate", body);
 
+                    // Refuse to trust a server that presents a key other than
+                    // the one compiled into this build.
+                    if (r != null && r.optBoolean("ok", false)
+                            && !PINNED_PUBLIC_KEY.equals(r.optString("publicKey", ""))) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                busy(false);
+                                fail("Server key does not match this app build. Activation refused.");
+                            }
+                        });
+                        return;
+                    }
+
                     if (r != null && r.optBoolean("ok", false)) {
                         final String token = r.getString("token");
                         final long expiresAt = r.optLong("expiresAt", 0);
@@ -248,7 +278,7 @@ public class ActivationActivity extends Activity {
                             @Override
                             public void run() {
                                 busy(false);
-                                fail(humanise(reason));
+                                fail(humanise(reason) + (lastError == null ? "" : "  [" + lastError + "]"));
                             }
                         });
                     }
@@ -291,19 +321,21 @@ public class ActivationActivity extends Activity {
 
             int code = c.getResponseCode();
             InputStream in = code < 400 ? c.getInputStream() : c.getErrorStream();
-            if (in == null) {
-                return null;
-            }
             StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
+            if (in != null) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                br.close();
             }
-            br.close();
             String s = sb.toString().trim();
+            lastError = "HTTP " + code + (s.isEmpty() ? " (empty body)" : " " + s);
             return s.isEmpty() ? null : new JSONObject(s);
         } catch (Exception e) {
+            lastError = e.getClass().getSimpleName() + ": " + e.getMessage();
+            android.util.Log.e("RideAcceptor", "post() failed: " + SERVER + path, e);
             return null;
         } finally {
             if (c != null) {

@@ -196,8 +196,12 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
         return json(404, { error: 'unknown device endpoint' });
     } catch (e) {
-        // never leak key material or internals
-        console.error('api error:', (e as Error).name);
-        return json(500, { error: 'internal error' });
+        const err = e as Error;
+        // Full detail to the function log (Supabase -> Edge Functions -> Logs).
+        console.error('api error:', err.message, err.stack);
+        // TEMPORARY DIAGNOSTIC: `detail` leaks internals and MUST be removed
+        // before production launch. It is here so the client can tell us which
+        // step failed without a log round-trip.
+        return json(500, { error: 'internal error', detail: String(err.message ?? err.name) });
     }
 });
