@@ -39,6 +39,10 @@ import {
     randomBytes,
     timingSafeEqual,
 } from 'node:crypto';
+// `Buffer` is a Node global and is NOT present in Deno's edge runtime, which is
+// what Supabase Edge Functions run on. Importing it explicitly keeps this module
+// working under both Node (drift test) and the edge runtime. Do not remove.
+import { Buffer } from 'node:buffer';
 
 // ---------------------------------------------------------------------------
 // Domain types
