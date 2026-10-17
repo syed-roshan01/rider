@@ -12,7 +12,7 @@
  * source of truth, supabase/functions/_shared/license.ts -- never reimplemented.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { LicenseRecord, PlanType } from '../../../supabase/functions/_shared/license.ts';
+import type { LicenseRecord, PlanType } from '../../../supabase/functions/_shared/license.js';
 import {
     generateKey,
     hashDeviceCode,
@@ -21,8 +21,8 @@ import {
     normalizeKey,
     sealKey,
     PLAN_DAYS,
-} from '../../../supabase/functions/_shared/license.ts';
-import type { DbRow } from '../../_lib/server.ts';
+} from '../../../supabase/functions/_shared/license.js';
+import type { DbRow } from '../../_lib/server.js';
 import {
     audit,
     bodyOf,
@@ -33,7 +33,7 @@ import {
     sbRpc,
     sbRows,
     toLicenseRecord,
-} from '../../_lib/server.ts';
+} from '../../_lib/server.js';
 
 const asPlan = (v: unknown): PlanType =>
     v === 'DAY' || v === 'WEEK' || v === 'HALF_MONTH' || v === 'MONTH' || v === 'YEAR' ? v : 'MONTH';

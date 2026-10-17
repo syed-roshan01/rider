@@ -8,7 +8,7 @@
  * freed completely, exactly like the single store entry it replaces.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { audit, json, requireAdmin, sbRows, sbWrite } from '../../_lib/server.ts';
+import { audit, json, requireAdmin, sbRows, sbWrite } from '../../_lib/server.js';
 
 const ID_RE = /^[a-f0-9]{64}$/;
 

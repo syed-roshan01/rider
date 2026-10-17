@@ -7,8 +7,8 @@
  * are normalised to the store's `at` epoch-ms field.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { AuditEntry, DbRow } from '../_lib/server.ts';
-import { intParam, json, requireAdmin, sbRows, toMs } from '../_lib/server.ts';
+import type { AuditEntry, DbRow } from '../_lib/server.js';
+import { intParam, json, requireAdmin, sbRows, toMs } from '../_lib/server.js';
 
 const TIME_COLUMNS = ['at', 'created_at', 'ts', 'timestamp', 'logged_at'];
 

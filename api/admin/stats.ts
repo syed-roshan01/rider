@@ -7,7 +7,7 @@
  * expiringSoon counts active licences dying within 7 days.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { json, requireAdmin, sbRows, toMs } from '../_lib/server.ts';
+import { json, requireAdmin, sbRows, toMs } from '../_lib/server.js';
 
 const DAY_MS = 86_400_000;
 

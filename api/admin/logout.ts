@@ -5,7 +5,7 @@
  * the ra_admin cookie; the token itself simply ages out at its expiry.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { clearSessionCookie, json, requireAdmin } from '../_lib/server.ts';
+import { clearSessionCookie, json, requireAdmin } from '../_lib/server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
     if (req.method !== 'POST') {

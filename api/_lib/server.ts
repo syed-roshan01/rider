@@ -21,7 +21,7 @@ import type {
     LicenseRecord,
     LicenseStatus,
     PlanType,
-} from '../../supabase/functions/_shared/license.ts';
+} from '../../supabase/functions/_shared/license.js';
 
 // ---------------------------------------------------------------------------
 // shapes mirrored from license/src/store.ts (ported to SQL)

@@ -13,7 +13,7 @@ import {
     json,
     loginRateLimit,
     setSessionCookie,
-} from '../_lib/server.ts';
+} from '../_lib/server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
     if (req.method !== 'POST') {

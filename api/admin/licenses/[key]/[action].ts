@@ -11,8 +11,8 @@
  * supabase/functions/_shared/license.ts -- never reimplemented here.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { unsealKey, type LicenseRecord } from '../../../../supabase/functions/_shared/license.ts';
-import type { DbRow } from '../../../_lib/server.ts';
+import { unsealKey, type LicenseRecord } from '../../../../supabase/functions/_shared/license.js';
+import type { DbRow } from '../../../_lib/server.js';
 import {
     audit,
     bodyOf,
@@ -22,7 +22,7 @@ import {
     sbRows,
     sbWrite,
     toLicenseRecord,
-} from '../../../_lib/server.ts';
+} from '../../../_lib/server.js';
 
 const KEY_RE = /^[a-f0-9]{64}$/;
 const DAY_MS = 86_400_000;

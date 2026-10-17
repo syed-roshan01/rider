@@ -6,7 +6,7 @@
  * and the `config.update` audit line mirror store.setConfig().
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { AppConfig, DbRow } from '../_lib/server.ts';
+import type { AppConfig, DbRow } from '../_lib/server.js';
 import {
     DEFAULT_CONFIG,
     audit,
@@ -15,7 +15,7 @@ import {
     requireAdmin,
     sb,
     sbRows,
-} from '../_lib/server.ts';
+} from '../_lib/server.js';
 
 function toConfig(r: DbRow | null): AppConfig {
     const d = DEFAULT_CONFIG;

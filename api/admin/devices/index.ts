@@ -3,7 +3,7 @@
  * Bare array, matching store.devicesFor() and what app.js iterates.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { json, requireAdmin, sbRows, toDeviceRecord } from '../../_lib/server.ts';
+import { json, requireAdmin, sbRows, toDeviceRecord } from '../../_lib/server.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
     if (req.method !== 'GET') {
