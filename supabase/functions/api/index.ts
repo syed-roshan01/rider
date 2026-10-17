@@ -77,6 +77,8 @@ function route(pathname: string): string {
 Deno.serve(async (req: Request): Promise<Response> => {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
 
+    // Which stage of the request failed, surfaced in the temporary diagnostic.
+    let step = 'route';
     try {
         const url = new URL(req.url);
         const r = route(url.pathname);
@@ -101,6 +103,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
             const deviceCode = String(b.deviceCode ?? '');
             if (!key || !deviceCode) return json(400, { ok: false, reason: 'DEVICE_CODE_REQUIRED' });
 
+            step = 'activate.rpc';
             const result = await activateLicense({
                 keyHash: hashKey(key),
                 deviceCodeHash: hashDeviceCode(deviceCode),
@@ -119,6 +122,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
             const rec = await findLicenseByKeyHash(hashKey(key));
             if (!rec) return json(403, { ok: false, reason: 'UNKNOWN_KEY' });
 
+            step = 'activate.sign';
             const { token, payload } = issueToken(signing(), {
                 jti: randomUUID(),
                 kid: rec.keyPrefix,
@@ -202,6 +206,6 @@ Deno.serve(async (req: Request): Promise<Response> => {
         // TEMPORARY DIAGNOSTIC: `detail` leaks internals and MUST be removed
         // before production launch. It is here so the client can tell us which
         // step failed without a log round-trip.
-        return json(500, { error: 'internal error', detail: String(err.message ?? err.name) });
+        return json(500, { error: 'internal error', detail: String(err.message ?? err.name), step });
     }
 });
