@@ -22,6 +22,9 @@ import type {
     LicenseStatus,
     PlanType,
 } from '../../supabase/functions/_shared/license.js';
+// One-way dependency (panel.ts imports nothing from here -- no cycle):
+// the admin-suite JWT session accepted by requireAdmin.
+import { getSession } from './panel.js';
 
 // ---------------------------------------------------------------------------
 // shapes mirrored from license/src/store.ts (ported to SQL)
@@ -92,6 +95,23 @@ export function bodyOf(req: VercelRequest): DbRow {
         } catch {
             /* fall through */
         }
+    }
+    return {};
+}
+
+/**
+ * Strict variant of bodyOf for the admin-suite routes that mirror zyqora's
+ * bare `await req.json()`: a body that is present but not parseable THROWS,
+ * exactly like req.json() would (those routes answer 'Invalid request' /
+ * { found: false } on it).
+ */
+export function strictBodyOf(req: VercelRequest): DbRow {
+    const b: unknown = req.body;
+    if (b && typeof b === 'object' && !Array.isArray(b)) return b as DbRow;
+    if (typeof b === 'string' && b) {
+        const p: unknown = JSON.parse(b); // throws on malformed JSON
+        if (p && typeof p === 'object' && !Array.isArray(p)) return p as DbRow;
+        return {};
     }
     return {};
 }
@@ -270,9 +290,17 @@ export function verifySession(req: VercelRequest): boolean {
     return expect.length === got.length && timingSafeEqual(expect, got);
 }
 
-/** Gate every admin route except login. 401 on failure. */
+/**
+ * Gate every admin route except login. 401 on failure.
+ * ADDITIVE (ADMIN-PORT §3): the legacy HMAC cookie session keeps working
+ * unchanged AND the admin-suite Bearer JWT is additionally accepted for roles
+ * super|admin, so the console's extra pages can reuse these endpoints with one
+ * token. Nothing about the old ADMIN_PASSWORD token flow changes.
+ */
 export function requireAdmin(req: VercelRequest, res: VercelResponse): boolean {
     if (verifySession(req)) return true;
+    const session = getSession(req);
+    if (session && (session.role === 'super' || session.role === 'admin')) return true;
     json(res, 401, { error: 'unauthorized' });
     return false;
 }

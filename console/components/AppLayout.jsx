@@ -1,0 +1,133 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { getToken, clearToken, apiFetch } from '@/lib/apiFetch';
+import Icon from '@/components/Icons';
+
+const ALL_NAV = [
+    { href: '/dashboard',  icon: 'dashboard', label: 'Dashboard' },
+    { href: '/licenses',   icon: 'key',       label: 'Licenses'  },
+    { href: '/sales',      icon: 'trending',  label: 'Sales'     },
+    { href: '/expenses',   icon: 'wallet',    label: 'Expenses'  },
+    { href: '/admins',       icon: 'users',   label: 'Admins',         superOnly: true },
+    { href: '/whitelabel',   icon: 'layers',  label: 'Whitelabel',     superOnly: true },
+    { href: '/affiliates',   icon: 'share',   label: 'Affiliates'                   },
+    { href: '/payments',     icon: 'rupee',   label: 'Payments'                     },
+    { href: '/withdrawals',  icon: 'arrowUp', label: 'Withdrawals'                      },
+    { href: '/logs',         icon: 'list',    label: 'Logs',           superOnly: true },
+    { href: '/devices',      icon: 'phone',   label: 'Devices'                    },
+    { href: '/app-config',   icon: 'settings', label: 'App Config'                },
+];
+
+export default function AppLayout({ children }) {
+    const router   = useRouter();
+    const pathname = usePathname();
+    const [user, setUser]     = useState(null);
+    const [ready, setReady]   = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    useEffect(() => {
+        if (!getToken()) { router.replace('/login'); return; }
+        let cachedUser = null;
+        const cached = localStorage.getItem('acceptpro_admin_user');
+        if (cached) try { cachedUser = JSON.parse(cached); setUser(cachedUser); } catch {}
+
+        apiFetch('/api/auth/me').then(r => {
+            if (!r) return; // auto-redirected on 401
+            if (r.ok) {
+                // Cache the live record as the session user — but NEVER let
+                // it drop the role: whitelabel records don't store one, and
+                // every page gates on user.role (a refresh with a role-less
+                // cache makes resellers see the unrestricted admin UI).
+                const merged = { ...r.data, role: r.data.role || cachedUser?.role };
+                setUser(merged);
+                localStorage.setItem('acceptpro_admin_user', JSON.stringify(merged));
+            }
+            setReady(true);
+        });
+    }, []);
+
+    // Close the mobile sidebar whenever the route changes
+    useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
+    const logout = () => {
+        clearToken(); // also removes acceptpro_admin_user
+        router.replace('/login');
+    };
+
+    if (!ready && !user) {
+        return (
+            <div style={{ minHeight: '100vh', background: '#0a0d14', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3a4560', fontSize: 13 }}>
+                Loading…
+            </div>
+        );
+    }
+
+    // Whitelabel resellers only get the Licenses module; super sees
+    // everything; regular admins see everything except super-only items.
+    const nav = ALL_NAV.filter(n => {
+        if (user?.role === 'whitelabel') return n.href === '/licenses';
+        return !n.superOnly || user?.role === 'super';
+    });
+
+    return (
+        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#0a0d14' }}>
+            {/* Mobile topbar */}
+            <div className="mobile-topbar">
+                <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setSidebarOpen(true)}
+                    aria-label="Open menu"
+                    style={{ padding: '6px 9px' }}
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                </button>
+                <div className="mobile-topbar-name">AcceptPro</div>
+                <div style={{ marginLeft: 'auto', fontSize: 12, color: '#4a5980' }}>{user?.name || user?.username}</div>
+            </div>
+
+            {/* Mobile sidebar backdrop */}
+            {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
+
+            {/* Sidebar */}
+            <aside className={`sidebar${sidebarOpen ? ' open' : ''}`}>
+                <div className="sidebar-logo">
+                    <div className="sidebar-logo-name">AcceptPro</div>
+                    <div className="sidebar-logo-sub">License Management</div>
+                </div>
+
+                <nav className="sidebar-nav">
+                    {nav.map(n => (
+                        <Link
+                            key={n.href}
+                            href={n.href}
+                            className={`nav-item${pathname.startsWith(n.href) ? ' active' : ''}`}
+                        >
+                            <span className="nav-icon"><Icon name={n.icon} size={16} /></span>
+                            <span>{n.label}</span>
+                        </Link>
+                    ))}
+                </nav>
+
+                <div className="sidebar-footer">
+                    <div className="sidebar-user-name">{user?.name || user?.username}</div>
+                    <div
+                        className="sidebar-user-role"
+                        style={{ color: user?.role === 'super' ? '#a78bfa' : user?.role === 'whitelabel' ? '#2dd4bf' : '#4a9eff' }}
+                    >
+                        {user?.role === 'whitelabel' ? 'Whitelabel' : user?.role}
+                    </div>
+                    <button className="btn btn-danger btn-sm" onClick={logout} style={{ width: '100%' }}>
+                        Sign Out
+                    </button>
+                </div>
+            </aside>
+
+            {/* Main content */}
+            <main className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+                {children}
+            </main>
+        </div>
+    );
+}
