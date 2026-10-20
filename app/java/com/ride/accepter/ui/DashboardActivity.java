@@ -1376,6 +1376,73 @@ public class DashboardActivity extends Activity {
 
     // -------------------------------------------------------------- settings
 
+    /** Persisted on/off switch for one of the four design preference rows. */
+    private Ui.ToggleSwitch prefToggle(final String key, boolean def) {
+        Ui.ToggleSwitch sw = ui.toggle();
+        sw.show(prefs.getBoolean(key, def));
+        sw.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                boolean nv = !((Ui.ToggleSwitch) v).isOn();
+                ((Ui.ToggleSwitch) v).show(nv);
+                prefs.edit().putBoolean(key, nv).apply();
+            }
+        });
+        return sw;
+    }
+
+    /** Quick-setup row (design panel 6): icon tile + title/sub + Grant/Fix/Pair. */
+    private void setupRow(LinearLayout parent, String title, String sub,
+                          String icon, int tileFill, String action, View.OnClickListener click) {
+        LinearLayout r = row();
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPadding(0, dp(12), 0, dp(12));
+        r.addView(ui.iconTile(icon, tileFill, ui.onPrimary));
+        r.addView(hspacer(dp(12)));
+        LinearLayout t = column();
+        t.addView(text(title, 15f, INK, Typeface.BOLD, 0f));
+        t.addView(text(sub, 12f, INK_SOFT, Typeface.NORMAL, 0f));
+        r.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        if (action == null) {
+            r.addView(ui.icon("check", GREEN, 20));
+        } else {
+            r.addView(ui.button(action, Ui.OUTLINE, click));
+        }
+        parent.addView(r, matchWrap());
+        View hair = new View(this);
+        hair.setBackground(round(CARD_EDGE, dp(1)));
+        parent.addView(hair, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+    }
+
+    /** Preference row (design panel 6): glyph + title + value/chevron or a switch. */
+    private void prefRow(LinearLayout parent, String icon, String title,
+                         String value, View right, View.OnClickListener click) {
+        LinearLayout r = row();
+        r.setGravity(Gravity.CENTER_VERTICAL);
+        r.setPadding(0, dp(12), 0, dp(12));
+        r.addView(ui.icon(icon, INK_FAINT, 20));
+        r.addView(hspacer(dp(12)));
+        r.addView(text(title, 15f, INK, Typeface.NORMAL, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        if (right != null) {
+            r.addView(right);
+        } else if (value != null) {
+            r.addView(label(value, 13f, INK_SOFT));
+            r.addView(hspacer(dp(6)));
+            r.addView(ui.icon("chevron", INK_FAINT, 18));
+        }
+        if (click != null) {
+            r.setClickable(true);
+            r.setFocusable(true);
+            r.setOnClickListener(click);
+        }
+        parent.addView(r, matchWrap());
+        View hair = new View(this);
+        hair.setBackground(round(CARD_EDGE, dp(1)));
+        parent.addView(hair, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+    }
+
     private void buildSettings(LinearLayout p) {
         head(p, "Settings", "Set it up once, then it runs on its own.");
 
@@ -1389,32 +1456,79 @@ public class DashboardActivity extends Activity {
         p.addView(text(T("appearance_sub", "Neon dark or clean light"), 12f, INK_SOFT,
                 Typeface.NORMAL, 0f));
         p.addView(spacer(dp(12)));
-        LinearLayout ap = row();
-        ap.addView(themePill(T("theme_dark", "Neon Dark"), true),
-                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        ap.addView(hspacer(dp(10)));
-        ap.addView(themePill(T("theme_light", "Light"), false),
-                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        p.addView(ap, matchWrap());
+        LinearLayout prefsCard = gradientCard(CARD, CARD);
+        prefsCard.setPadding(dp(16), dp(4), dp(16), dp(4));
+        prefRow(prefsCard, "moon", T("theme", "Theme"), dark ? "Dark" : "Light", null,
+                new View.OnClickListener() {
+            @Override public void onClick(View v) { setTheme(!dark); show(current); }
+        });
+        prefRow(prefsCard, "bell", "Alert on accept", null, prefToggle("alert_on_accept", true), null);
+        prefRow(prefsCard, "power", "Ola accept timers remove", null,
+                prefToggle("ola_timers_remove", true), null);
+        prefRow(prefsCard, "lock", "Hide developer options", null,
+                prefToggle("hide_dev_options", false), null);
+        prefRow(prefsCard, "globe", "Keep driving app in English", null,
+                prefToggle("keep_driving_english", true), null);
+        p.addView(prefsCard, matchWrap());
         p.addView(spacer(dp(20)));
 
-        // Quick setup
-        LinearLayout quick = gradientCard(QUICK_A, QUICK_B);
-        quick.setPadding(dp(18), dp(18), dp(18), dp(18));
-        quick.addView(label("Quick setup", 13f, BLUE));
+        // Quick setup (design panel 6): progress bar + one action row per item
+        int setupDone = (hasA11y() ? 1 : 0) + (hasOverlay() ? 1 : 0)
+                + (hasBatteryOk() ? 1 : 0) + (hasShizuku() ? 1 : 0);
+        LinearLayout quick = gradientCard(CARD, CARD);
+        quick.setPadding(dp(16), dp(8), dp(16), dp(4));
+        LinearLayout qh = row();
+        qh.setGravity(Gravity.CENTER_VERTICAL);
+        qh.setPadding(0, dp(10), 0, 0);
+        qh.addView(text("Quick setup", 16f, INK, Typeface.BOLD, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        qh.addView(label(setupDone + "/4", 13f, BLUE));
+        quick.addView(qh, matchWrap());
         quick.addView(spacer(dp(10)));
-        String[] steps = {
-                "1.  Grant the permissions on the Home tab",
-                "2.  Install Shizuku and pair it (button below)",
-                "3.  Pick the ride apps you use on the Apps tab",
-                "4.  Set your fare and distance rules on Filters",
-                "5.  Leave Detect-only ON and watch one real ride",
-                "6.  Turn Detect-only OFF to go live",
-        };
-        for (int i = 0; i < steps.length; i++) {
-            quick.addView(text(steps[i], 13f, i == 4 ? BLUE : INK_SOFT, Typeface.NORMAL, 0f));
-            if (i < steps.length - 1) quick.addView(spacer(dp(8)));
-        }
+        LinearLayout bar = row();
+        View barFill = new View(this);
+        barFill.setBackground(round(NEON, dp(2)));
+        View barRest = new View(this);
+        barRest.setBackground(round(SW_OFF, dp(2)));
+        bar.addView(barFill, new LinearLayout.LayoutParams(0, dp(4),
+                setupDone == 0 ? 0.001f : setupDone));
+        bar.addView(barRest, new LinearLayout.LayoutParams(0, dp(4),
+                setupDone == 4 ? 0.001f : (4 - setupDone)));
+        quick.addView(bar, matchWrap());
+        quick.addView(spacer(dp(6)));
+
+        setupRow(quick, "Accessibility service",
+                hasA11y() ? "Connected" : "Not enabled", "shield", BLUE,
+                hasA11y() ? null : "Grant", new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                open(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            }
+        });
+        setupRow(quick, "Draw over other apps",
+                hasOverlay() ? "Granted" : "Not granted", "alert", RED,
+                hasOverlay() ? null : "Grant", new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                open(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName())));
+            }
+        });
+        setupRow(quick, "Battery optimization",
+                hasBatteryOk() ? "Ignored" : "Not ignored", "power", AMBER,
+                hasBatteryOk() ? null : "Fix", new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                open(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                        Uri.parse("package:" + getPackageName())));
+            }
+        });
+        setupRow(quick, "Shizuku (optional)",
+                hasShizuku() ? "Paired" : (isShizukuInstalled() ? "Not paired" : "Not installed"),
+                "key", BLUE, hasShizuku() ? null : "Pair", new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                callAny("settingsShizukuGrant", new Class<?>[] { Context.class },
+                        DashboardActivity.this);
+                show(current);
+            }
+        });
         p.addView(quick, matchWrap());
         p.addView(spacer(dp(20)));
 
