@@ -1,0 +1,79 @@
+package a5;
+
+import com.google.firebase.firestore.model.C0160;
+import com.google.firebase.installations.C0177;
+import com.google.firebase.remoteconfig.internal.Code;
+import e2.C0262;
+import h0.C0299;
+import h6.C0309;
+import v5.C0445;
+
+/* JADX INFO: loaded from: classes.dex */
+public final class b extends w8.c {
+
+    /* JADX INFO: renamed from: a, reason: collision with root package name */
+    public Object f1222a;
+
+    /* JADX INFO: renamed from: b, reason: collision with root package name */
+    public final a4.q f1223b;
+
+    /* JADX INFO: renamed from: c, reason: collision with root package name */
+    public int f1224c;
+
+    /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+    public b(a4.q qVar, u8.e eVar) {
+        super(eVar);
+        this.f1223b = qVar;
+        int iM5016 = C0262.m5016();
+        int i10 = 1616;
+        while (true) {
+            i10 ^= 1633;
+            switch (i10) {
+                case Code.UNAVAILABLE /* 14 */:
+                    break;
+                case 49:
+                    if (iM5016 >= 0) {
+                        i10 = 1709;
+                    }
+                    break;
+                case 204:
+                    System.out.println(Integer.parseInt(C0445.m8676("jeNjyeBRu5Gw9tPCw3wlAFMWB")));
+                    return;
+                case 239:
+                    return;
+                default:
+                    continue;
+            }
+            i10 = 1678;
+        }
+    }
+
+    @Override // w8.a
+    public final Object invokeSuspend(Object obj) {
+        this.f1222a = obj;
+        int iM3371 = C0177.m3371(this);
+        this.f1224c = (iM3371 & Integer.MIN_VALUE) | (iM3371 ^ Integer.MIN_VALUE);
+        Object objM5993 = C0309.m5993(C0160.m3066(this), null, null, null, false, this);
+        v8.a aVarM5766 = C0299.m5766();
+        int i10 = 1616;
+        while (true) {
+            i10 ^= 1633;
+            switch (i10) {
+                case Code.UNAVAILABLE /* 14 */:
+                    break;
+                case 49:
+                    if (objM5993 == aVarM5766) {
+                        i10 = 1709;
+                    }
+                    break;
+                case 204:
+                    return objM5993;
+                case 239:
+                    return new q8.h(objM5993);
+                default:
+                    continue;
+            }
+            i10 = 1678;
+        }
+    }
+}

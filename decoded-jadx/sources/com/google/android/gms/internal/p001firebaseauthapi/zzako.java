@@ -1,0 +1,4386 @@
+package com.google.android.gms.internal.p001firebaseauthapi;
+
+import com.google.firebase.firestore.index.FirestoreIndexValueWriter;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.internal.Code;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import o7.i2;
+import sun.misc.Unsafe;
+import u.k1;
+
+/* JADX INFO: loaded from: classes.dex */
+final class zzako<T> implements zzalc<T> {
+    private static final int[] zza = new int[0];
+    private static final Unsafe zzb = zzamh.zzb();
+    private final int[] zzc;
+    private final Object[] zzd;
+    private final int zze;
+    private final int zzf;
+    private final zzakk zzg;
+    private final boolean zzh;
+    private final boolean zzi;
+    private final zzakz zzj;
+    private final boolean zzk;
+    private final int[] zzl;
+    private final int zzm;
+    private final int zzn;
+    private final zzaks zzo;
+    private final zzajt zzp;
+    private final zzamb<?, ?> zzq;
+    private final zzair<?> zzr;
+    private final zzakh zzs;
+
+    private zzako(int[] iArr, Object[] objArr, int i10, int i11, zzakk zzakkVar, zzakz zzakzVar, boolean z10, int[] iArr2, int i12, int i13, zzaks zzaksVar, zzajt zzajtVar, zzamb<?, ?> zzambVar, zzair<?> zzairVar, zzakh zzakhVar) {
+        this.zzc = iArr;
+        this.zzd = objArr;
+        this.zze = i10;
+        this.zzf = i11;
+        this.zzi = zzakkVar instanceof zzaja;
+        this.zzj = zzakzVar;
+        this.zzh = zzairVar != null && zzairVar.zza(zzakkVar);
+        this.zzk = false;
+        this.zzl = iArr2;
+        this.zzm = i12;
+        this.zzn = i13;
+        this.zzo = zzaksVar;
+        this.zzp = zzajtVar;
+        this.zzq = zzambVar;
+        this.zzr = zzairVar;
+        this.zzg = zzakkVar;
+        this.zzs = zzakhVar;
+    }
+
+    private static <T> double zza(T t10, long j10) {
+        return ((Double) zzamh.zze(t10, j10)).doubleValue();
+    }
+
+    private static <T> float zzb(T t10, long j10) {
+        return ((Float) zzamh.zze(t10, j10)).floatValue();
+    }
+
+    private static <T> int zzc(T t10, long j10) {
+        return ((Integer) zzamh.zze(t10, j10)).intValue();
+    }
+
+    private static <T> long zzd(T t10, long j10) {
+        return ((Long) zzamh.zze(t10, j10)).longValue();
+    }
+
+    private final zzalc zze(int i10) {
+        int i11 = (i10 / 3) << 1;
+        zzalc zzalcVar = (zzalc) this.zzd[i11];
+        if (zzalcVar != null) {
+            return zzalcVar;
+        }
+        zzalc<T> zzalcVarZza = zzaky.zza().zza((Class) this.zzd[i11 + 1]);
+        this.zzd[i11] = zzalcVarZza;
+        return zzalcVarZza;
+    }
+
+    private final Object zzf(int i10) {
+        return this.zzd[(i10 / 3) << 1];
+    }
+
+    private static boolean zzg(int i10) {
+        return (i10 & 536870912) != 0;
+    }
+
+    private static int zza(byte[] bArr, int i10, int i11, zzamo zzamoVar, Class<?> cls, zzahl zzahlVar) {
+        switch (zzakr.zza[zzamoVar.ordinal()]) {
+            case 1:
+                int iZzd = zzahi.zzd(bArr, i10, zzahlVar);
+                zzahlVar.zzc = Boolean.valueOf(zzahlVar.zzb != 0);
+                return iZzd;
+            case 2:
+                return zzahi.zza(bArr, i10, zzahlVar);
+            case 3:
+                zzahlVar.zzc = Double.valueOf(zzahi.zza(bArr, i10));
+                return i10 + 8;
+            case 4:
+            case 5:
+                zzahlVar.zzc = Integer.valueOf(zzahi.zzc(bArr, i10));
+                return i10 + 4;
+            case 6:
+            case 7:
+                zzahlVar.zzc = Long.valueOf(zzahi.zzd(bArr, i10));
+                return i10 + 8;
+            case 8:
+                zzahlVar.zzc = Float.valueOf(zzahi.zzb(bArr, i10));
+                return i10 + 4;
+            case 9:
+            case 10:
+            case 11:
+                int iZzc = zzahi.zzc(bArr, i10, zzahlVar);
+                zzahlVar.zzc = Integer.valueOf(zzahlVar.zza);
+                return iZzc;
+            case 12:
+            case 13:
+                int iZzd2 = zzahi.zzd(bArr, i10, zzahlVar);
+                zzahlVar.zzc = Long.valueOf(zzahlVar.zzb);
+                return iZzd2;
+            case Code.UNAVAILABLE /* 14 */:
+                return zzahi.zza(zzaky.zza().zza((Class) cls), bArr, i10, i11, zzahlVar);
+            case 15:
+                int iZzc2 = zzahi.zzc(bArr, i10, zzahlVar);
+                zzahlVar.zzc = Integer.valueOf(zzaib.zze(zzahlVar.zza));
+                return iZzc2;
+            case Code.UNAUTHENTICATED /* 16 */:
+                int iZzd3 = zzahi.zzd(bArr, i10, zzahlVar);
+                zzahlVar.zzc = Long.valueOf(zzaib.zza(zzahlVar.zzb));
+                return iZzd3;
+            case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                return zzahi.zzb(bArr, i10, zzahlVar);
+            default:
+                throw new RuntimeException("unsupported field type.");
+        }
+    }
+
+    private final int zzc(int i10) {
+        return this.zzc[i10 + 1];
+    }
+
+    private final zzajh zzd(int i10) {
+        return (zzajh) this.zzd[((i10 / 3) << 1) + 1];
+    }
+
+    private static void zzf(Object obj) {
+        if (!zzg(obj)) {
+            throw new IllegalArgumentException("Mutating immutable message: ".concat(String.valueOf(obj)));
+        }
+    }
+
+    private static boolean zzg(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof zzaja) {
+            return ((zzaja) obj).zzv();
+        }
+        return true;
+    }
+
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final int zzb(T t10) {
+        int i10;
+        int iZza;
+        int i11;
+        int iZzc;
+        int length = this.zzc.length;
+        int i12 = 0;
+        for (int i13 = 0; i13 < length; i13 += 3) {
+            int iZzc2 = zzc(i13);
+            int i14 = this.zzc[i13];
+            long j10 = 1048575 & iZzc2;
+            int iHashCode = 37;
+            switch ((iZzc2 & 267386880) >>> 20) {
+                case 0:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(Double.doubleToLongBits(zzamh.zza(t10, j10)));
+                    i12 = iZza + i10;
+                    break;
+                case 1:
+                    i10 = i12 * 53;
+                    iZza = Float.floatToIntBits(zzamh.zzb(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 2:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzd(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 3:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzd(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 4:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case 5:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzd(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 6:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case 7:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzh(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 8:
+                    i10 = i12 * 53;
+                    iZza = ((String) zzamh.zze(t10, j10)).hashCode();
+                    i12 = iZza + i10;
+                    break;
+                case 9:
+                    Object objZze = zzamh.zze(t10, j10);
+                    if (objZze != null) {
+                        iHashCode = objZze.hashCode();
+                    }
+                    i12 = (i12 * 53) + iHashCode;
+                    break;
+                case 10:
+                    i10 = i12 * 53;
+                    iZza = zzamh.zze(t10, j10).hashCode();
+                    i12 = iZza + i10;
+                    break;
+                case 11:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case 12:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case 13:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case Code.UNAVAILABLE /* 14 */:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzd(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case 15:
+                    i11 = i12 * 53;
+                    iZzc = zzamh.zzc(t10, j10);
+                    i12 = i11 + iZzc;
+                    break;
+                case Code.UNAUTHENTICATED /* 16 */:
+                    i10 = i12 * 53;
+                    iZza = zzajc.zza(zzamh.zzd(t10, j10));
+                    i12 = iZza + i10;
+                    break;
+                case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                    Object objZze2 = zzamh.zze(t10, j10);
+                    if (objZze2 != null) {
+                        iHashCode = objZze2.hashCode();
+                    }
+                    i12 = (i12 * 53) + iHashCode;
+                    break;
+                case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                case 19:
+                case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                    i10 = i12 * 53;
+                    iZza = zzamh.zze(t10, j10).hashCode();
+                    i12 = iZza + i10;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                    i10 = i12 * 53;
+                    iZza = zzamh.zze(t10, j10).hashCode();
+                    i12 = iZza + i10;
+                    break;
+                case 51:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(Double.doubleToLongBits(zza(t10, j10)));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 52:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = Float.floatToIntBits(zzb(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 53:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zzd(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 54:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zzd(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 56:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zzd(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 57:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 58:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zze(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 59:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = ((String) zzamh.zze(t10, j10)).hashCode();
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzamh.zze(t10, j10).hashCode();
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 61:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzamh.zze(t10, j10).hashCode();
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 62:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 63:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 64:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 65:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zzd(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 66:
+                    if (zzc(t10, i14, i13)) {
+                        i11 = i12 * 53;
+                        iZzc = zzc(t10, j10);
+                        i12 = i11 + iZzc;
+                    }
+                    break;
+                case 67:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzajc.zza(zzd(t10, j10));
+                        i12 = iZza + i10;
+                    }
+                    break;
+                case 68:
+                    if (zzc(t10, i14, i13)) {
+                        i10 = i12 * 53;
+                        iZza = zzamh.zze(t10, j10).hashCode();
+                        i12 = iZza + i10;
+                    }
+                    break;
+            }
+        }
+        int iHashCode2 = this.zzq.zzd(t10).hashCode() + (i12 * 53);
+        return this.zzh ? (iHashCode2 * 53) + this.zzr.zza(t10).hashCode() : iHashCode2;
+    }
+
+    /* JADX WARN: Code duplicated, block: B:25:0x006d  */
+    /* JADX WARN: Code duplicated, block: B:27:0x0073  */
+    /* JADX WARN: Code duplicated, block: B:40:0x0080 A[SYNTHETIC] */
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final void zzc(T t10) {
+        if (zzg(t10)) {
+            if (t10 instanceof zzaja) {
+                zzaja zzajaVar = (zzaja) t10;
+                zzajaVar.zzb(Integer.MAX_VALUE);
+                zzajaVar.zza = 0;
+                zzajaVar.zzt();
+            }
+            int length = this.zzc.length;
+            for (int i10 = 0; i10 < length; i10 += 3) {
+                int iZzc = zzc(i10);
+                long j10 = 1048575 & iZzc;
+                int i11 = (iZzc & 267386880) >>> 20;
+                if (i11 != 9) {
+                    if (i11 == 60 || i11 == 68) {
+                        if (zzc(t10, this.zzc[i10], i10)) {
+                            zze(i10).zzc(zzb.getObject(t10, j10));
+                        }
+                    } else {
+                        switch (i11) {
+                            case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                                if (zzc((Object) t10, i10)) {
+                                    zze(i10).zzc(zzb.getObject(t10, j10));
+                                }
+                                break;
+                            case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                            case 19:
+                            case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                            case 21:
+                            case 22:
+                            case 23:
+                            case 24:
+                            case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                            case 26:
+                            case 27:
+                            case 28:
+                            case 29:
+                            case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                            case 31:
+                            case 32:
+                            case 33:
+                            case 34:
+                            case 35:
+                            case 36:
+                            case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                            case 38:
+                            case 39:
+                            case 40:
+                            case 41:
+                            case 42:
+                            case 43:
+                            case 44:
+                            case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                            case 46:
+                            case 47:
+                            case 48:
+                            case 49:
+                                this.zzp.zzb(t10, j10);
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                                Unsafe unsafe = zzb;
+                                Object object = unsafe.getObject(t10, j10);
+                                if (object != null) {
+                                    unsafe.putObject(t10, j10, this.zzs.zzc(object));
+                                }
+                                break;
+                        }
+                    }
+                } else if (zzc((Object) t10, i10)) {
+                    zze(i10).zzc(zzb.getObject(t10, j10));
+                }
+            }
+            this.zzq.zzf(t10);
+            if (this.zzh) {
+                this.zzr.zzc(t10);
+            }
+        }
+    }
+
+    /* JADX WARN: Code duplicated, block: B:49:0x00d2  */
+    /* JADX WARN: Code duplicated, block: B:51:0x00e1  */
+    /* JADX WARN: Code duplicated, block: B:54:0x00ec  */
+    /* JADX WARN: Code duplicated, block: B:57:0x00f7 A[LOOP:2: B:52:0x00e6->B:57:0x00f7, LOOP_END] */
+    /* JADX WARN: Code duplicated, block: B:74:0x00f6 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:81:0x0114 A[SYNTHETIC] */
+    /* JADX WARN: Multi-variable type inference failed */
+    /* JADX WARN: Type inference failed for: r1v21 */
+    /* JADX WARN: Type inference failed for: r1v22 */
+    /* JADX WARN: Type inference failed for: r1v23, types: [com.google.android.gms.internal.firebase-auth-api.zzalc] */
+    /* JADX WARN: Type inference failed for: r1v30 */
+    /* JADX WARN: Type inference failed for: r1v31 */
+    /* JADX WARN: Type inference failed for: r1v8, types: [com.google.android.gms.internal.firebase-auth-api.zzalc] */
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final boolean zzd(T t10) {
+        int i10;
+        int i11;
+        List list;
+        ?? Zze;
+        int i12;
+        int i13 = 1048575;
+        int i14 = 0;
+        int i15 = 0;
+        while (i15 < this.zzm) {
+            int i16 = this.zzl[i15];
+            int i17 = this.zzc[i16];
+            int iZzc = zzc(i16);
+            int i18 = this.zzc[i16 + 2];
+            int i19 = i18 & 1048575;
+            int i20 = 1 << (i18 >>> 20);
+            if (i19 != i13) {
+                if (i19 != 1048575) {
+                    i14 = zzb.getInt(t10, i19);
+                }
+                i11 = i14;
+                i10 = i19;
+            } else {
+                i10 = i13;
+                i11 = i14;
+            }
+            if ((268435456 & iZzc) != 0 && !zza(t10, i16, i10, i11, i20)) {
+                return false;
+            }
+            int i21 = (267386880 & iZzc) >>> 20;
+            if (i21 == 9 || i21 == 17) {
+                if (zza(t10, i16, i10, i11, i20) && !zza((Object) t10, iZzc, zze(i16))) {
+                    return false;
+                }
+            } else if (i21 == 27) {
+                list = (List) zzamh.zze(t10, iZzc & 1048575);
+                if (list.isEmpty()) {
+                    continue;
+                } else {
+                    Zze = zze(i16);
+                    for (i12 = 0; i12 < list.size(); i12++) {
+                        if (!Zze.zzd(list.get(i12))) {
+                            return false;
+                        }
+                    }
+                }
+            } else if (i21 == 60 || i21 == 68) {
+                if (zzc(t10, i17, i16) && !zza((Object) t10, iZzc, zze(i16))) {
+                    return false;
+                }
+            } else if (i21 == 49) {
+                list = (List) zzamh.zze(t10, iZzc & 1048575);
+                if (list.isEmpty()) {
+                    Zze = zze(i16);
+                    while (i12 < list.size()) {
+                        if (!Zze.zzd(list.get(i12))) {
+                            return false;
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            } else if (i21 != 50) {
+                continue;
+            } else {
+                Map<?, ?> mapZzd = this.zzs.zzd(zzamh.zze(t10, iZzc & 1048575));
+                if (mapZzd.isEmpty()) {
+                    continue;
+                } else if (this.zzs.zza(zzf(i16)).zzc.zzb() == zzamy.MESSAGE) {
+                    ?? Zza = 0;
+                    for (Object obj : mapZzd.values()) {
+                        if (Zza == 0) {
+                            Zza = Zza;
+                            Zza = zzaky.zza().zza((Class) obj.getClass());
+                        }
+                        Zza = Zza;
+                        if (!Zza.zzd(obj)) {
+                            return false;
+                        }
+                    }
+                } else {
+                    continue;
+                }
+            }
+            i15++;
+            i13 = i10;
+            i14 = i11;
+        }
+        return !this.zzh || this.zzr.zza(t10).zzg();
+    }
+
+    private static zzame zze(Object obj) {
+        zzaja zzajaVar = (zzaja) obj;
+        zzame zzameVar = zzajaVar.zzb;
+        if (zzameVar != zzame.zzc()) {
+            return zzameVar;
+        }
+        zzame zzameVarZzd = zzame.zzd();
+        zzajaVar.zzb = zzameVarZzd;
+        return zzameVarZzd;
+    }
+
+    private static <T> boolean zze(T t10, long j10) {
+        return ((Boolean) zzamh.zze(t10, j10)).booleanValue();
+    }
+
+    private final boolean zzc(T t10, T t11, int i10) {
+        return zzc((Object) t10, i10) == zzc((Object) t11, i10);
+    }
+
+    private final boolean zzc(T t10, int i10) {
+        int iZzb = zzb(i10);
+        long j10 = iZzb & 1048575;
+        if (j10 != 1048575) {
+            return (zzamh.zzc(t10, j10) & (1 << (iZzb >>> 20))) != 0;
+        }
+        int iZzc = zzc(i10);
+        long j11 = iZzc & 1048575;
+        switch ((iZzc & 267386880) >>> 20) {
+            case 0:
+                return Double.doubleToRawLongBits(zzamh.zza(t10, j11)) != 0;
+            case 1:
+                return Float.floatToRawIntBits(zzamh.zzb(t10, j11)) != 0;
+            case 2:
+                return zzamh.zzd(t10, j11) != 0;
+            case 3:
+                return zzamh.zzd(t10, j11) != 0;
+            case 4:
+                return zzamh.zzc(t10, j11) != 0;
+            case 5:
+                return zzamh.zzd(t10, j11) != 0;
+            case 6:
+                return zzamh.zzc(t10, j11) != 0;
+            case 7:
+                return zzamh.zzh(t10, j11);
+            case 8:
+                Object objZze = zzamh.zze(t10, j11);
+                if (objZze instanceof String) {
+                    return !((String) objZze).isEmpty();
+                }
+                if (objZze instanceof zzahm) {
+                    return !zzahm.zza.equals(objZze);
+                }
+                throw new IllegalArgumentException();
+            case 9:
+                return zzamh.zze(t10, j11) != null;
+            case 10:
+                return !zzahm.zza.equals(zzamh.zze(t10, j11));
+            case 11:
+                return zzamh.zzc(t10, j11) != 0;
+            case 12:
+                return zzamh.zzc(t10, j11) != 0;
+            case 13:
+                return zzamh.zzc(t10, j11) != 0;
+            case Code.UNAVAILABLE /* 14 */:
+                return zzamh.zzd(t10, j11) != 0;
+            case 15:
+                return zzamh.zzc(t10, j11) != 0;
+            case Code.UNAUTHENTICATED /* 16 */:
+                return zzamh.zzd(t10, j11) != 0;
+            case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                return zzamh.zze(t10, j11) != null;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:24:0x0071 A[PHI: r12
+  0x0071: PHI (r12v4 int) = 
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v8 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v9 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v10 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v1 int)
+  (r12v11 int)
+  (r12v1 int)
+ binds: [B:18:0x0058, B:181:0x04d1, B:178:0x04bd, B:172:0x0497, B:169:0x047a, B:166:0x045f, B:163:0x0446, B:160:0x042d, B:157:0x0417, B:154:0x0403, B:151:0x03eb, B:148:0x03d2, B:145:0x03b3, B:124:0x02bf, B:121:0x02a9, B:118:0x0293, B:115:0x027d, B:112:0x0267, B:109:0x0251, B:106:0x023b, B:103:0x0225, B:100:0x0210, B:97:0x01fb, B:94:0x01e6, B:91:0x01d1, B:88:0x01bc, B:86:0x01ad, B:84:0x01a3, B:79:0x016f, B:76:0x0163, B:73:0x0153, B:70:0x0143, B:67:0x0133, B:64:0x0127, B:61:0x011b, B:58:0x010f, B:52:0x00f1, B:50:0x00eb, B:48:0x00dd, B:45:0x00cc, B:42:0x00bd, B:39:0x00ae, B:37:0x00a8, B:35:0x00a1, B:32:0x0096, B:29:0x0087, B:26:0x0078, B:23:0x0070, B:21:0x0060] A[DONT_GENERATE, DONT_INLINE]] */
+    /* JADX WARN: Type inference fix 'apply assigned field type' failed
+    java.lang.UnsupportedOperationException: ArgType.getObject(), call class: class jadx.core.dex.instructions.args.ArgType$PrimitiveArg
+    	at jadx.core.dex.instructions.args.ArgType.getObject(ArgType.java:596)
+    	at jadx.core.dex.attributes.nodes.ClassTypeVarsAttr.getTypeVarsMapFor(ClassTypeVarsAttr.java:35)
+    	at jadx.core.dex.nodes.utils.TypeUtils.replaceClassGenerics(TypeUtils.java:177)
+    	at jadx.core.dex.visitors.typeinference.FixTypesVisitor.insertExplicitUseCast(FixTypesVisitor.java:397)
+    	at jadx.core.dex.visitors.typeinference.FixTypesVisitor.tryFieldTypeWithNewCasts(FixTypesVisitor.java:359)
+    	at jadx.core.dex.visitors.typeinference.FixTypesVisitor.applyFieldType(FixTypesVisitor.java:309)
+    	at jadx.core.dex.visitors.typeinference.FixTypesVisitor.visit(FixTypesVisitor.java:94)
+     */
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final int zza(T t10) {
+        int i10;
+        int i11;
+        int i12;
+        int iZza;
+        int iZza2;
+        int iZza3;
+        int iZzd;
+        boolean z10;
+        int iZzc;
+        int iZzd2;
+        int iZzg;
+        int iZzh;
+        Unsafe unsafe = zzb;
+        int i13 = 1048575;
+        int i14 = 1048575;
+        int i15 = 0;
+        int i16 = 0;
+        int i17 = 0;
+        while (i16 < this.zzc.length) {
+            int iZzc2 = zzc(i16);
+            int i18 = (267386880 & iZzc2) >>> 20;
+            int[] iArr = this.zzc;
+            int i19 = iArr[i16];
+            int i20 = iArr[i16 + 2];
+            int i21 = i20 & i13;
+            if (i18 <= 17) {
+                if (i21 != i14) {
+                    i15 = i21 == i13 ? 0 : unsafe.getInt(t10, i21);
+                    i14 = i21;
+                }
+                i10 = i14;
+                i11 = i15;
+                i12 = 1 << (i20 >>> 20);
+            } else {
+                i10 = i14;
+                i11 = i15;
+                i12 = 0;
+            }
+            long j10 = iZzc2 & i13;
+            if (i18 >= zzaix.zza.zza()) {
+                zzaix.zzb.zza();
+            }
+            switch (i18) {
+                case 0:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zza(i19, FirebaseRemoteConfig.DEFAULT_VALUE_FOR_DOUBLE);
+                        i17 += iZza;
+                    }
+                    break;
+                case 1:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zza(i19, 0.0f);
+                        i17 += iZza;
+                    }
+                    break;
+                case 2:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zzb(i19, unsafe.getLong(t10, j10));
+                        i17 += iZza;
+                    }
+                    break;
+                case 3:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zze(i19, unsafe.getLong(t10, j10));
+                        i17 += iZza;
+                    }
+                    break;
+                case 4:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zzc(i19, unsafe.getInt(t10, j10));
+                        i17 += iZza;
+                    }
+                    break;
+                case 5:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zza(i19, 0L);
+                        i17 += iZza;
+                    }
+                    break;
+                case 6:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza = zzaii.zzb(i19, 0);
+                        i17 += iZza;
+                    }
+                    break;
+                case 7:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zza(i19, true);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 8:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        Object object = unsafe.getObject(t10, j10);
+                        if (object instanceof zzahm) {
+                            iZza2 = zzaii.zza(i19, (zzahm) object);
+                        } else {
+                            iZza2 = zzaii.zza(i19, (String) object);
+                        }
+                        i17 += iZza2;
+                    }
+                    break;
+                case 9:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza3 = zzale.zza(i19, unsafe.getObject(t10, j10), zze(i16));
+                        i17 += iZza3;
+                    }
+                    break;
+                case 10:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zza(i19, (zzahm) unsafe.getObject(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 11:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zzf(i19, unsafe.getInt(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 12:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zza(i19, unsafe.getInt(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 13:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZzd = zzaii.zzd(i19, 0);
+                        i17 += iZzd;
+                    }
+                    break;
+                case Code.UNAVAILABLE /* 14 */:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zzc(i19, 0L);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 15:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zze(i19, unsafe.getInt(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case Code.UNAUTHENTICATED /* 16 */:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zzd(i19, unsafe.getLong(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                    if (zza(t10, i16, i10, i11, i12)) {
+                        iZza2 = zzaii.zza(i19, (zzakk) unsafe.getObject(t10, j10), zze(i16));
+                        i17 += iZza2;
+                    }
+                    break;
+                case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                    iZza3 = zzale.zzd(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZza3;
+                    break;
+                case 19:
+                    z10 = false;
+                    iZzc = zzale.zzc(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                    z10 = false;
+                    iZzc = zzale.zzf(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 21:
+                    z10 = false;
+                    iZzc = zzale.zzj(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 22:
+                    z10 = false;
+                    iZzc = zzale.zze(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 23:
+                    z10 = false;
+                    iZzc = zzale.zzd(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 24:
+                    z10 = false;
+                    iZzc = zzale.zzc(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                    z10 = false;
+                    iZzc = zzale.zza(i19, (List<?>) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 26:
+                    iZza3 = zzale.zzb(i19, (List) unsafe.getObject(t10, j10));
+                    i17 += iZza3;
+                    break;
+                case 27:
+                    iZza3 = zzale.zzb(i19, (List<?>) unsafe.getObject(t10, j10), zze(i16));
+                    i17 += iZza3;
+                    break;
+                case 28:
+                    iZza3 = zzale.zza(i19, (List<zzahm>) unsafe.getObject(t10, j10));
+                    i17 += iZza3;
+                    break;
+                case 29:
+                    iZza3 = zzale.zzi(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZza3;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                    z10 = false;
+                    iZzc = zzale.zzb(i19, (List<Integer>) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 31:
+                    z10 = false;
+                    iZzc = zzale.zzc(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 32:
+                    z10 = false;
+                    iZzc = zzale.zzd(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 33:
+                    z10 = false;
+                    iZzc = zzale.zzg(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 34:
+                    z10 = false;
+                    iZzc = zzale.zzh(i19, (List) unsafe.getObject(t10, j10), false);
+                    i17 += iZzc;
+                    break;
+                case 35:
+                    iZzd2 = zzale.zzd((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 36:
+                    iZzd2 = zzale.zzc((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                    iZzd2 = zzale.zzf((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 38:
+                    iZzd2 = zzale.zzj((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 39:
+                    iZzd2 = zzale.zze((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 40:
+                    iZzd2 = zzale.zzd((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 41:
+                    iZzd2 = zzale.zzc((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 42:
+                    iZzd2 = zzale.zza((List<?>) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 43:
+                    iZzd2 = zzale.zzi((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 44:
+                    iZzd2 = zzale.zzb((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                    iZzd2 = zzale.zzc((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 46:
+                    iZzd2 = zzale.zzd((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 47:
+                    iZzd2 = zzale.zzg((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 48:
+                    iZzd2 = zzale.zzh((List) unsafe.getObject(t10, j10));
+                    if (iZzd2 > 0) {
+                        iZzg = zzaii.zzg(i19);
+                        iZzh = zzaii.zzh(iZzd2);
+                        i17 += iZzh + iZzg + iZzd2;
+                    }
+                    break;
+                case 49:
+                    iZza3 = zzale.zza(i19, (List<zzakk>) unsafe.getObject(t10, j10), zze(i16));
+                    i17 += iZza3;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                    iZza3 = this.zzs.zza(i19, unsafe.getObject(t10, j10), zzf(i16));
+                    i17 += iZza3;
+                    break;
+                case 51:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, FirebaseRemoteConfig.DEFAULT_VALUE_FOR_DOUBLE);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 52:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, 0.0f);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 53:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zzb(i19, zzd(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 54:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zze(i19, zzd(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zzc(i19, zzc(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 56:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, 0L);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 57:
+                    if (zzc(t10, i19, i16)) {
+                        iZzd = zzaii.zzb(i19, 0);
+                        i17 += iZzd;
+                    }
+                    break;
+                case 58:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, true);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 59:
+                    if (zzc(t10, i19, i16)) {
+                        Object object2 = unsafe.getObject(t10, j10);
+                        if (object2 instanceof zzahm) {
+                            iZza2 = zzaii.zza(i19, (zzahm) object2);
+                        } else {
+                            iZza2 = zzaii.zza(i19, (String) object2);
+                        }
+                        i17 += iZza2;
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                    if (zzc(t10, i19, i16)) {
+                        iZza3 = zzale.zza(i19, unsafe.getObject(t10, j10), zze(i16));
+                        i17 += iZza3;
+                    }
+                    break;
+                case 61:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, (zzahm) unsafe.getObject(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 62:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zzf(i19, zzc(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 63:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, zzc(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 64:
+                    if (zzc(t10, i19, i16)) {
+                        iZzd = zzaii.zzd(i19, 0);
+                        i17 += iZzd;
+                    }
+                    break;
+                case 65:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zzc(i19, 0L);
+                        i17 += iZza2;
+                    }
+                    break;
+                case 66:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zze(i19, zzc(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 67:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zzd(i19, zzd(t10, j10));
+                        i17 += iZza2;
+                    }
+                    break;
+                case 68:
+                    if (zzc(t10, i19, i16)) {
+                        iZza2 = zzaii.zza(i19, (zzakk) unsafe.getObject(t10, j10), zze(i16));
+                        i17 += iZza2;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            i16 += 3;
+            i14 = i10;
+            i15 = i11;
+            i13 = 1048575;
+        }
+        int iZza4 = 0;
+        zzamb<?, ?> zzambVar = this.zzq;
+        int iZza5 = i17 + zzambVar.zza(zzambVar.zzd(t10));
+        if (!this.zzh) {
+            return iZza5;
+        }
+        zzais<T> zzaisVarZza = this.zzr.zza(t10);
+        for (int i22 = 0; i22 < zzaisVarZza.zza.zzb(); i22++) {
+            Map.Entry entryZzb = zzaisVarZza.zza.zzb(i22);
+            iZza4 += zzais.zza((zzaiu<?>) entryZzb.getKey(), entryZzb.getValue());
+        }
+        for (Map.Entry entry : zzaisVarZza.zza.zzc()) {
+            iZza4 += zzais.zza((zzaiu<?>) entry.getKey(), entry.getValue());
+        }
+        return iZza5 + iZza4;
+    }
+
+    private final boolean zzc(T t10, int i10, int i11) {
+        return zzamh.zzc(t10, (long) (zzb(i11) & 1048575)) == i10;
+    }
+
+    private final int zzb(int i10) {
+        return this.zzc[i10 + 2];
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private final void zzb(T t10, T t11, int i10) {
+        int i11 = this.zzc[i10];
+        if (zzc(t11, i11, i10)) {
+            long jZzc = zzc(i10) & 1048575;
+            Unsafe unsafe = zzb;
+            Object object = unsafe.getObject(t11, jZzc);
+            if (object != null) {
+                zzalc zzalcVarZze = zze(i10);
+                if (!zzc(t10, i11, i10)) {
+                    if (!zzg(object)) {
+                        unsafe.putObject(t10, jZzc, object);
+                    } else {
+                        Object objZza = zzalcVarZze.zza();
+                        zzalcVarZze.zza(objZza, object);
+                        unsafe.putObject(t10, jZzc, objZza);
+                    }
+                    zzb(t10, i11, i10);
+                    return;
+                }
+                Object object2 = unsafe.getObject(t10, jZzc);
+                if (!zzg(object2)) {
+                    Object objZza2 = zzalcVarZze.zza();
+                    zzalcVarZze.zza(objZza2, object2);
+                    unsafe.putObject(t10, jZzc, objZza2);
+                    object2 = objZza2;
+                }
+                zzalcVarZze.zza(object2, object);
+                return;
+            }
+            throw new IllegalStateException("Source subfield " + this.zzc[i10] + " is present but null: " + String.valueOf(t11));
+        }
+    }
+
+    private final void zzb(T t10, int i10) {
+        int iZzb = zzb(i10);
+        long j10 = 1048575 & iZzb;
+        if (j10 == 1048575) {
+            return;
+        }
+        zzamh.zza((Object) t10, j10, (1 << (iZzb >>> 20)) | zzamh.zzc(t10, j10));
+    }
+
+    private final void zzb(T t10, int i10, int i11) {
+        zzamh.zza((Object) t10, zzb(i11) & 1048575, i10);
+    }
+
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final boolean zzb(T t10, T t11) {
+        boolean zZza;
+        int length = this.zzc.length;
+        for (int i10 = 0; i10 < length; i10 += 3) {
+            int iZzc = zzc(i10);
+            long j10 = iZzc & 1048575;
+            switch ((iZzc & 267386880) >>> 20) {
+                case 0:
+                    if (!zzc(t10, t11, i10) || Double.doubleToLongBits(zzamh.zza(t10, j10)) != Double.doubleToLongBits(zzamh.zza(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 1:
+                    if (!zzc(t10, t11, i10) || Float.floatToIntBits(zzamh.zzb(t10, j10)) != Float.floatToIntBits(zzamh.zzb(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 2:
+                    if (!zzc(t10, t11, i10) || zzamh.zzd(t10, j10) != zzamh.zzd(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 3:
+                    if (!zzc(t10, t11, i10) || zzamh.zzd(t10, j10) != zzamh.zzd(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 4:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 5:
+                    if (!zzc(t10, t11, i10) || zzamh.zzd(t10, j10) != zzamh.zzd(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 6:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 7:
+                    if (!zzc(t10, t11, i10) || zzamh.zzh(t10, j10) != zzamh.zzh(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 8:
+                    if (!zzc(t10, t11, i10) || !zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 9:
+                    if (!zzc(t10, t11, i10) || !zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 10:
+                    if (!zzc(t10, t11, i10) || !zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 11:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 12:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 13:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case Code.UNAVAILABLE /* 14 */:
+                    if (!zzc(t10, t11, i10) || zzamh.zzd(t10, j10) != zzamh.zzd(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case 15:
+                    if (!zzc(t10, t11, i10) || zzamh.zzc(t10, j10) != zzamh.zzc(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case Code.UNAUTHENTICATED /* 16 */:
+                    if (!zzc(t10, t11, i10) || zzamh.zzd(t10, j10) != zzamh.zzd(t11, j10)) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                    if (!zzc(t10, t11, i10) || !zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                case 19:
+                case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                    zZza = zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10));
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                    zZza = zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10));
+                    break;
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                case 56:
+                case 57:
+                case 58:
+                case 59:
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                case 61:
+                case 62:
+                case 63:
+                case 64:
+                case 65:
+                case 66:
+                case 67:
+                case 68:
+                    long jZzb = zzb(i10) & 1048575;
+                    if (zzamh.zzc(t10, jZzb) != zzamh.zzc(t11, jZzb) || !zzale.zza(zzamh.zze(t10, j10), zzamh.zze(t11, j10))) {
+                        return false;
+                    }
+                    continue;
+                    break;
+                    break;
+                default:
+                    continue;
+                    break;
+            }
+            if (!zZza) {
+                return false;
+            }
+        }
+        if (!this.zzq.zzd(t10).equals(this.zzq.zzd(t11))) {
+            return false;
+        }
+        if (this.zzh) {
+            return this.zzr.zza(t10).equals(this.zzr.zza(t11));
+        }
+        return true;
+    }
+
+    /*  JADX ERROR: Type inference failed
+        jadx.core.utils.exceptions.JadxOverflowException: Type inference error: updates count limit reached with updateSeq = 35441. Try increasing type updates limit count.
+        	at jadx.core.utils.ErrorsCounter.addError(ErrorsCounter.java:59)
+        	at jadx.core.utils.ErrorsCounter.error(ErrorsCounter.java:31)
+        	at jadx.core.dex.attributes.nodes.NotificationAttrNode.addError(NotificationAttrNode.java:19)
+        	at jadx.core.dex.visitors.typeinference.TypeInferenceVisitor.visit(TypeInferenceVisitor.java:79)
+        */
+    public final int zza(T r31, byte[] r32, int r33, int r34, int r35, com.google.android.gms.internal.p001firebaseauthapi.zzahl r36) {
+        /*
+            Method dump skipped, instruction units count: 3544
+            To view this dump add '--comments-level debug' option
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.android.gms.internal.p001firebaseauthapi.zzako.zza(java.lang.Object, byte[], int, int, int, com.google.android.gms.internal.firebase-auth-api.zzahl):int");
+    }
+
+    private final int zza(int i10) {
+        if (i10 < this.zze || i10 > this.zzf) {
+            return -1;
+        }
+        return zza(i10, 0);
+    }
+
+    private final int zza(int i10, int i11) {
+        int length = (this.zzc.length / 3) - 1;
+        while (i11 <= length) {
+            int i12 = (length + i11) >>> 1;
+            int i13 = i12 * 3;
+            int i14 = this.zzc[i13];
+            if (i10 == i14) {
+                return i13;
+            }
+            if (i10 < i14) {
+                length = i12 - 1;
+            } else {
+                i11 = i12 + 1;
+            }
+        }
+        return -1;
+    }
+
+    /* JADX WARN: Code duplicated, block: B:125:0x025b  */
+    /* JADX WARN: Code duplicated, block: B:127:0x0260  */
+    /* JADX WARN: Code duplicated, block: B:130:0x0276  */
+    /* JADX WARN: Code duplicated, block: B:131:0x0279  */
+    public static <T> zzako<T> zza(Class<T> cls, zzaki zzakiVar, zzaks zzaksVar, zzajt zzajtVar, zzamb<?, ?> zzambVar, zzair<?> zzairVar, zzakh zzakhVar) {
+        int i10;
+        int iCharAt;
+        int iCharAt2;
+        int i11;
+        int i12;
+        int[] iArr;
+        int i13;
+        int i14;
+        int i15;
+        int i16;
+        char cCharAt;
+        int i17;
+        char cCharAt2;
+        int i18;
+        char cCharAt3;
+        int i19;
+        char cCharAt4;
+        int i20;
+        char cCharAt5;
+        int i21;
+        char cCharAt6;
+        int i22;
+        char cCharAt7;
+        int i23;
+        char cCharAt8;
+        int i24;
+        int i25;
+        int i26;
+        zzala zzalaVar;
+        boolean z10;
+        int iObjectFieldOffset;
+        int i27;
+        int i28;
+        int iObjectFieldOffset2;
+        int i29;
+        Field fieldZza;
+        int i30;
+        char cCharAt9;
+        int i31;
+        int i32;
+        int i33;
+        Object obj;
+        Field fieldZza2;
+        int i34;
+        Object obj2;
+        Field fieldZza3;
+        int i35;
+        char cCharAt10;
+        int i36;
+        char cCharAt11;
+        int i37;
+        char cCharAt12;
+        int i38;
+        char cCharAt13;
+        if (zzakiVar instanceof zzala) {
+            zzala zzalaVar2 = (zzala) zzakiVar;
+            String strZzd = zzalaVar2.zzd();
+            int length = strZzd.length();
+            char c10 = '\ud800';
+            if (strZzd.charAt(0) >= '\ud800') {
+                int i39 = 1;
+                while (true) {
+                    i10 = i39 + 1;
+                    if (strZzd.charAt(i39) < '\ud800') {
+                        break;
+                    }
+                    i39 = i10;
+                }
+            } else {
+                i10 = 1;
+            }
+            int i40 = i10 + 1;
+            int iCharAt3 = strZzd.charAt(i10);
+            if (iCharAt3 >= 55296) {
+                int i41 = iCharAt3 & 8191;
+                int i42 = 13;
+                while (true) {
+                    i38 = i40 + 1;
+                    cCharAt13 = strZzd.charAt(i40);
+                    if (cCharAt13 < '\ud800') {
+                        break;
+                    }
+                    i41 |= (cCharAt13 & '\u1fff') << i42;
+                    i42 += 13;
+                    i40 = i38;
+                }
+                iCharAt3 = i41 | (cCharAt13 << i42);
+                i40 = i38;
+            }
+            if (iCharAt3 == 0) {
+                iCharAt = 0;
+                iCharAt2 = 0;
+                i14 = 0;
+                i15 = 0;
+                i11 = 0;
+                i13 = 0;
+                iArr = zza;
+                i12 = 0;
+            } else {
+                int i43 = i40 + 1;
+                int iCharAt4 = strZzd.charAt(i40);
+                if (iCharAt4 >= 55296) {
+                    int i44 = iCharAt4 & 8191;
+                    int i45 = 13;
+                    while (true) {
+                        i23 = i43 + 1;
+                        cCharAt8 = strZzd.charAt(i43);
+                        if (cCharAt8 < '\ud800') {
+                            break;
+                        }
+                        i44 |= (cCharAt8 & '\u1fff') << i45;
+                        i45 += 13;
+                        i43 = i23;
+                    }
+                    iCharAt4 = i44 | (cCharAt8 << i45);
+                    i43 = i23;
+                }
+                int i46 = i43 + 1;
+                int iCharAt5 = strZzd.charAt(i43);
+                if (iCharAt5 >= 55296) {
+                    int i47 = iCharAt5 & 8191;
+                    int i48 = 13;
+                    while (true) {
+                        i22 = i46 + 1;
+                        cCharAt7 = strZzd.charAt(i46);
+                        if (cCharAt7 < '\ud800') {
+                            break;
+                        }
+                        i47 |= (cCharAt7 & '\u1fff') << i48;
+                        i48 += 13;
+                        i46 = i22;
+                    }
+                    iCharAt5 = i47 | (cCharAt7 << i48);
+                    i46 = i22;
+                }
+                int i49 = i46 + 1;
+                int iCharAt6 = strZzd.charAt(i46);
+                if (iCharAt6 >= 55296) {
+                    int i50 = iCharAt6 & 8191;
+                    int i51 = 13;
+                    while (true) {
+                        i21 = i49 + 1;
+                        cCharAt6 = strZzd.charAt(i49);
+                        if (cCharAt6 < '\ud800') {
+                            break;
+                        }
+                        i50 |= (cCharAt6 & '\u1fff') << i51;
+                        i51 += 13;
+                        i49 = i21;
+                    }
+                    iCharAt6 = i50 | (cCharAt6 << i51);
+                    i49 = i21;
+                }
+                int i52 = i49 + 1;
+                int iCharAt7 = strZzd.charAt(i49);
+                if (iCharAt7 >= 55296) {
+                    int i53 = iCharAt7 & 8191;
+                    int i54 = 13;
+                    while (true) {
+                        i20 = i52 + 1;
+                        cCharAt5 = strZzd.charAt(i52);
+                        if (cCharAt5 < '\ud800') {
+                            break;
+                        }
+                        i53 |= (cCharAt5 & '\u1fff') << i54;
+                        i54 += 13;
+                        i52 = i20;
+                    }
+                    iCharAt7 = i53 | (cCharAt5 << i54);
+                    i52 = i20;
+                }
+                int i55 = i52 + 1;
+                iCharAt = strZzd.charAt(i52);
+                if (iCharAt >= 55296) {
+                    int i56 = iCharAt & 8191;
+                    int i57 = 13;
+                    while (true) {
+                        i19 = i55 + 1;
+                        cCharAt4 = strZzd.charAt(i55);
+                        if (cCharAt4 < '\ud800') {
+                            break;
+                        }
+                        i56 |= (cCharAt4 & '\u1fff') << i57;
+                        i57 += 13;
+                        i55 = i19;
+                    }
+                    iCharAt = i56 | (cCharAt4 << i57);
+                    i55 = i19;
+                }
+                int i58 = i55 + 1;
+                iCharAt2 = strZzd.charAt(i55);
+                if (iCharAt2 >= 55296) {
+                    int i59 = iCharAt2 & 8191;
+                    int i60 = 13;
+                    while (true) {
+                        i18 = i58 + 1;
+                        cCharAt3 = strZzd.charAt(i58);
+                        if (cCharAt3 < '\ud800') {
+                            break;
+                        }
+                        i59 |= (cCharAt3 & '\u1fff') << i60;
+                        i60 += 13;
+                        i58 = i18;
+                    }
+                    iCharAt2 = i59 | (cCharAt3 << i60);
+                    i58 = i18;
+                }
+                int i61 = i58 + 1;
+                int iCharAt8 = strZzd.charAt(i58);
+                if (iCharAt8 >= 55296) {
+                    int i62 = iCharAt8 & 8191;
+                    int i63 = 13;
+                    while (true) {
+                        i17 = i61 + 1;
+                        cCharAt2 = strZzd.charAt(i61);
+                        if (cCharAt2 < '\ud800') {
+                            break;
+                        }
+                        i62 |= (cCharAt2 & '\u1fff') << i63;
+                        i63 += 13;
+                        i61 = i17;
+                    }
+                    iCharAt8 = i62 | (cCharAt2 << i63);
+                    i61 = i17;
+                }
+                int i64 = i61 + 1;
+                int iCharAt9 = strZzd.charAt(i61);
+                if (iCharAt9 >= 55296) {
+                    int i65 = iCharAt9 & 8191;
+                    int i66 = 13;
+                    while (true) {
+                        i16 = i64 + 1;
+                        cCharAt = strZzd.charAt(i64);
+                        if (cCharAt < '\ud800') {
+                            break;
+                        }
+                        i65 |= (cCharAt & '\u1fff') << i66;
+                        i66 += 13;
+                        i64 = i16;
+                    }
+                    iCharAt9 = i65 | (cCharAt << i66);
+                    i64 = i16;
+                }
+                i11 = (iCharAt4 << 1) + iCharAt5;
+                i12 = iCharAt4;
+                iArr = new int[iCharAt9 + iCharAt2 + iCharAt8];
+                i13 = iCharAt9;
+                i40 = i64;
+                i14 = iCharAt6;
+                i15 = iCharAt7;
+            }
+            Unsafe unsafe = zzb;
+            Object[] objArrZze = zzalaVar2.zze();
+            Class<?> cls2 = zzalaVar2.zza().getClass();
+            int[] iArr2 = new int[iCharAt * 3];
+            Object[] objArr = new Object[iCharAt << 1];
+            int i67 = i13 + iCharAt2;
+            int i68 = i13;
+            int i69 = i67;
+            int i70 = 0;
+            int i71 = 0;
+            while (i40 < length) {
+                int i72 = i40 + 1;
+                int iCharAt10 = strZzd.charAt(i40);
+                if (iCharAt10 >= c10) {
+                    int i73 = iCharAt10 & 8191;
+                    int i74 = i72;
+                    int i75 = 13;
+                    while (true) {
+                        i37 = i74 + 1;
+                        cCharAt12 = strZzd.charAt(i74);
+                        if (cCharAt12 < c10) {
+                            break;
+                        }
+                        i73 |= (cCharAt12 & '\u1fff') << i75;
+                        i75 += 13;
+                        i74 = i37;
+                    }
+                    iCharAt10 = i73 | (cCharAt12 << i75);
+                    i24 = i37;
+                } else {
+                    i24 = i72;
+                }
+                int i76 = i24 + 1;
+                int iCharAt11 = strZzd.charAt(i24);
+                if (iCharAt11 >= c10) {
+                    int i77 = iCharAt11 & 8191;
+                    int i78 = i76;
+                    int i79 = 13;
+                    while (true) {
+                        i36 = i78 + 1;
+                        cCharAt11 = strZzd.charAt(i78);
+                        if (cCharAt11 < c10) {
+                            break;
+                        }
+                        i77 |= (cCharAt11 & '\u1fff') << i79;
+                        i79 += 13;
+                        i78 = i36;
+                    }
+                    iCharAt11 = i77 | (cCharAt11 << i79);
+                    i25 = i36;
+                } else {
+                    i25 = i76;
+                }
+                int i80 = iCharAt11 & 255;
+                int i81 = length;
+                if ((iCharAt11 & 1024) != 0) {
+                    iArr[i71] = i70;
+                    i71++;
+                }
+                int i82 = i15;
+                if (i80 >= 51) {
+                    int i83 = i25 + 1;
+                    int iCharAt12 = strZzd.charAt(i25);
+                    char c11 = '\ud800';
+                    if (iCharAt12 >= 55296) {
+                        int i84 = iCharAt12 & 8191;
+                        int i85 = 13;
+                        while (true) {
+                            i35 = i83 + 1;
+                            cCharAt10 = strZzd.charAt(i83);
+                            if (cCharAt10 < c11) {
+                                break;
+                            }
+                            i84 |= (cCharAt10 & '\u1fff') << i85;
+                            i85 += 13;
+                            i83 = i35;
+                            c11 = '\ud800';
+                        }
+                        iCharAt12 = i84 | (cCharAt10 << i85);
+                        i83 = i35;
+                    }
+                    int i86 = i80 - 51;
+                    int i87 = i83;
+                    if (i86 != 9 && i86 != 17) {
+                        if (i86 == 12 && (zzalaVar2.zzb().equals(zzakz.PROTO2) || (iCharAt11 & 2048) != 0)) {
+                            i32 = i11 + 1;
+                            objArr[((i70 / 3) << 1) + 1] = objArrZze[i11];
+                        }
+                        i33 = iCharAt12 << 1;
+                        obj = objArrZze[i33];
+                        if (obj instanceof Field) {
+                            fieldZza2 = (Field) obj;
+                        } else {
+                            fieldZza2 = zza(cls2, (String) obj);
+                            objArrZze[i33] = fieldZza2;
+                        }
+                        iObjectFieldOffset2 = (int) unsafe.objectFieldOffset(fieldZza2);
+                        i34 = i33 + 1;
+                        obj2 = objArrZze[i34];
+                        if (obj2 instanceof Field) {
+                            fieldZza3 = (Field) obj2;
+                        } else {
+                            fieldZza3 = zza(cls2, (String) obj2);
+                            objArrZze[i34] = fieldZza3;
+                        }
+                        iObjectFieldOffset = (int) unsafe.objectFieldOffset(fieldZza3);
+                        zzalaVar = zzalaVar2;
+                        strZzd = strZzd;
+                        i26 = i11;
+                        i27 = i87;
+                        i29 = 0;
+                        z10 = true;
+                    } else {
+                        i32 = i11 + 1;
+                        objArr[((i70 / 3) << 1) + 1] = objArrZze[i11];
+                    }
+                    i11 = i32;
+                    i33 = iCharAt12 << 1;
+                    obj = objArrZze[i33];
+                    if (obj instanceof Field) {
+                        fieldZza2 = (Field) obj;
+                    } else {
+                        fieldZza2 = zza(cls2, (String) obj);
+                        objArrZze[i33] = fieldZza2;
+                    }
+                    iObjectFieldOffset2 = (int) unsafe.objectFieldOffset(fieldZza2);
+                    i34 = i33 + 1;
+                    obj2 = objArrZze[i34];
+                    if (obj2 instanceof Field) {
+                        fieldZza3 = (Field) obj2;
+                    } else {
+                        fieldZza3 = zza(cls2, (String) obj2);
+                        objArrZze[i34] = fieldZza3;
+                    }
+                    iObjectFieldOffset = (int) unsafe.objectFieldOffset(fieldZza3);
+                    zzalaVar = zzalaVar2;
+                    strZzd = strZzd;
+                    i26 = i11;
+                    i27 = i87;
+                    i29 = 0;
+                    z10 = true;
+                } else {
+                    i26 = i11 + 1;
+                    Field fieldZza4 = zza(cls2, (String) objArrZze[i11]);
+                    if (i80 == 9 || i80 == 17) {
+                        zzalaVar = zzalaVar2;
+                        objArr[((i70 / 3) << 1) + 1] = fieldZza4.getType();
+                    } else {
+                        if (i80 == 27 || i80 == 49) {
+                            zzalaVar = zzalaVar2;
+                            i31 = i11 + 2;
+                            objArr[((i70 / 3) << 1) + 1] = objArrZze[i26];
+                        } else if (i80 == 12 || i80 == 30 || i80 == 44) {
+                            zzalaVar = zzalaVar2;
+                            if (zzalaVar2.zzb() == zzakz.PROTO2 || (iCharAt11 & 2048) != 0) {
+                                i31 = i11 + 2;
+                                objArr[((i70 / 3) << 1) + 1] = objArrZze[i26];
+                            }
+                        } else if (i80 == 50) {
+                            int i88 = i68 + 1;
+                            iArr[i68] = i70;
+                            int i89 = (i70 / 3) << 1;
+                            int i90 = i11 + 2;
+                            objArr[i89] = objArrZze[i26];
+                            if ((iCharAt11 & 2048) != 0) {
+                                i26 = i11 + 3;
+                                objArr[i89 + 1] = objArrZze[i90];
+                                zzalaVar = zzalaVar2;
+                                i68 = i88;
+                            } else {
+                                i68 = i88;
+                                i26 = i90;
+                                zzalaVar = zzalaVar2;
+                            }
+                        } else {
+                            zzalaVar = zzalaVar2;
+                        }
+                        i26 = i31;
+                    }
+                    int iObjectFieldOffset3 = (int) unsafe.objectFieldOffset(fieldZza4);
+                    if ((iCharAt11 & 4096) == 0 || i80 > 17) {
+                        z10 = true;
+                        iObjectFieldOffset = 1048575;
+                        i27 = i25;
+                        i28 = 0;
+                    } else {
+                        i27 = i25 + 1;
+                        int iCharAt13 = strZzd.charAt(i25);
+                        if (iCharAt13 >= 55296) {
+                            int i91 = iCharAt13 & 8191;
+                            int i92 = 13;
+                            while (true) {
+                                i30 = i27 + 1;
+                                cCharAt9 = strZzd.charAt(i27);
+                                if (cCharAt9 < '\ud800') {
+                                    break;
+                                }
+                                i91 |= (cCharAt9 & '\u1fff') << i92;
+                                i92 += 13;
+                                i27 = i30;
+                            }
+                            iCharAt13 = i91 | (cCharAt9 << i92);
+                            i27 = i30;
+                        }
+                        z10 = true;
+                        int i93 = (iCharAt13 / 32) + (i12 << 1);
+                        Object obj3 = objArrZze[i93];
+                        if (obj3 instanceof Field) {
+                            fieldZza = (Field) obj3;
+                        } else {
+                            fieldZza = zza(cls2, (String) obj3);
+                            objArrZze[i93] = fieldZza;
+                        }
+                        i28 = iCharAt13 % 32;
+                        iObjectFieldOffset = (int) unsafe.objectFieldOffset(fieldZza);
+                    }
+                    if (i80 >= 18 && i80 <= 49) {
+                        iArr[i69] = iObjectFieldOffset3;
+                        i69++;
+                    }
+                    int i94 = i28;
+                    iObjectFieldOffset2 = iObjectFieldOffset3;
+                    i29 = i94;
+                }
+                int i95 = i70 + 1;
+                iArr2[i70] = iCharAt10;
+                int i96 = i70 + 2;
+                int i97 = i12;
+                iArr2[i95] = (i80 << 20) | ((iCharAt11 & 256) != 0 ? 268435456 : 0) | ((iCharAt11 & 512) != 0 ? 536870912 : 0) | ((iCharAt11 & 2048) != 0 ? Integer.MIN_VALUE : 0) | iObjectFieldOffset2;
+                i70 += 3;
+                iArr2[i96] = (i29 << 20) | iObjectFieldOffset;
+                i40 = i27;
+                i11 = i26;
+                length = i81;
+                zzalaVar2 = zzalaVar;
+                strZzd = strZzd;
+                i15 = i82;
+                i12 = i97;
+                i14 = i14;
+                c10 = '\ud800';
+            }
+            zzala zzalaVar3 = zzalaVar2;
+            return new zzako<>(iArr2, objArr, i14, i15, zzalaVar3.zza(), zzalaVar3.zzb(), false, iArr, i13, i67, zzaksVar, zzajtVar, zzambVar, zzairVar, zzakhVar);
+        }
+        throw new NoSuchMethodError();
+    }
+
+    private final <UT, UB> UB zza(Object obj, int i10, UB ub, zzamb<UT, UB> zzambVar, Object obj2) {
+        zzajh zzajhVarZzd;
+        int i11 = this.zzc[i10];
+        Object objZze = zzamh.zze(obj, zzc(i10) & 1048575);
+        return (objZze == null || (zzajhVarZzd = zzd(i10)) == null) ? ub : (UB) zza(i10, i11, this.zzs.zze(objZze), zzajhVarZzd, ub, zzambVar, obj2);
+    }
+
+    private final <K, V, UT, UB> UB zza(int i10, int i11, Map<K, V> map, zzajh zzajhVar, UB ub, zzamb<UT, UB> zzambVar, Object obj) {
+        zzakf<?, ?> zzakfVarZza = this.zzs.zza(zzf(i10));
+        Iterator<Map.Entry<K, V>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<K, V> next = it.next();
+            if (!zzajhVar.zza(((Integer) next.getValue()).intValue())) {
+                if (ub == null) {
+                    ub = zzambVar.zzc(obj);
+                }
+                zzahv zzahvVarZzc = zzahm.zzc(zzakc.zza(zzakfVarZza, next.getKey(), next.getValue()));
+                try {
+                    zzakc.zza(zzahvVarZzc.zzb(), zzakfVarZza, next.getKey(), next.getValue());
+                    zzambVar.zza(ub, i11, zzahvVarZzc.zza());
+                    it.remove();
+                } catch (IOException e4) {
+                    throw new RuntimeException(e4);
+                }
+            }
+        }
+        return ub;
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private final Object zza(T t10, int i10) {
+        zzalc zzalcVarZze = zze(i10);
+        long jZzc = zzc(i10) & 1048575;
+        if (!zzc((Object) t10, i10)) {
+            return zzalcVarZze.zza();
+        }
+        Object object = zzb.getObject(t10, jZzc);
+        if (zzg(object)) {
+            return object;
+        }
+        Object objZza = zzalcVarZze.zza();
+        if (object != null) {
+            zzalcVarZze.zza(objZza, object);
+        }
+        return objZza;
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private final Object zza(T t10, int i10, int i11) {
+        zzalc zzalcVarZze = zze(i11);
+        if (!zzc(t10, i10, i11)) {
+            return zzalcVarZze.zza();
+        }
+        Object object = zzb.getObject(t10, zzc(i11) & 1048575);
+        if (zzg(object)) {
+            return object;
+        }
+        Object objZza = zzalcVarZze.zza();
+        if (object != null) {
+            zzalcVarZze.zza(objZza, object);
+        }
+        return objZza;
+    }
+
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final T zza() {
+        return (T) this.zzo.zza(this.zzg);
+    }
+
+    private static Field zza(Class<?> cls, String str) {
+        try {
+            return cls.getDeclaredField(str);
+        } catch (NoSuchFieldException unused) {
+            Field[] declaredFields = cls.getDeclaredFields();
+            for (Field field : declaredFields) {
+                if (str.equals(field.getName())) {
+                    return field;
+                }
+            }
+            String name = cls.getName();
+            String string = Arrays.toString(declaredFields);
+            StringBuilder sbC = k1.c("Field ", str, " for ", name, " not found. Known fields are ");
+            sbC.append(string);
+            throw new RuntimeException(sbC.toString());
+        }
+    }
+
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final void zza(T t10, T t11) {
+        zzf(t10);
+        t11.getClass();
+        for (int i10 = 0; i10 < this.zzc.length; i10 += 3) {
+            int iZzc = zzc(i10);
+            long j10 = 1048575 & iZzc;
+            int i11 = this.zzc[i10];
+            switch ((iZzc & 267386880) >>> 20) {
+                case 0:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza(t10, j10, zzamh.zza(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 1:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzb(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 2:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzd(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 3:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzd(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 4:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 5:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzd(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 6:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 7:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zzc(t10, j10, zzamh.zzh(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 8:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza(t10, j10, zzamh.zze(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 9:
+                    zza(t10, t11, i10);
+                    break;
+                case 10:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza(t10, j10, zzamh.zze(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 11:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 12:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 13:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case Code.UNAVAILABLE /* 14 */:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzd(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case 15:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzc(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case Code.UNAUTHENTICATED /* 16 */:
+                    if (zzc((Object) t11, i10)) {
+                        zzamh.zza((Object) t10, j10, zzamh.zzd(t11, j10));
+                        zzb((Object) t10, i10);
+                    }
+                    break;
+                case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                    zza(t10, t11, i10);
+                    break;
+                case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                case 19:
+                case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                    this.zzp.zza(t10, t11, j10);
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                    zzale.zza(this.zzs, t10, t11, j10);
+                    break;
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                case 56:
+                case 57:
+                case 58:
+                case 59:
+                    if (zzc(t11, i11, i10)) {
+                        zzamh.zza(t10, j10, zzamh.zze(t11, j10));
+                        zzb(t10, i11, i10);
+                    }
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                    zzb(t10, t11, i10);
+                    break;
+                case 61:
+                case 62:
+                case 63:
+                case 64:
+                case 65:
+                case 66:
+                case 67:
+                    if (zzc(t11, i11, i10)) {
+                        zzamh.zza(t10, j10, zzamh.zze(t11, j10));
+                        zzb(t10, i11, i10);
+                    }
+                    break;
+                case 68:
+                    zzb(t10, t11, i10);
+                    break;
+            }
+        }
+        zzale.zza(this.zzq, t10, t11);
+        if (this.zzh) {
+            zzale.zza(this.zzr, t10, t11);
+        }
+    }
+
+    /* JADX WARN: Code duplicated, block: B:169:0x062e A[Catch: all -> 0x00ca, TryCatch #4 {all -> 0x00ca, blocks: (B:48:0x00c4, B:53:0x00d2, B:167:0x0629, B:169:0x062e, B:170:0x0633, B:65:0x00fe, B:67:0x0113, B:68:0x0124, B:69:0x0135, B:70:0x0146, B:71:0x0157, B:73:0x0161, B:76:0x0168, B:77:0x016d, B:78:0x017a, B:79:0x018b, B:80:0x0199, B:81:0x01ab, B:82:0x01b3, B:83:0x01c5, B:84:0x01d7, B:85:0x01e9, B:86:0x01fb, B:87:0x020d, B:88:0x021f, B:89:0x0231, B:90:0x0243, B:92:0x0253, B:96:0x0274, B:93:0x025d, B:95:0x0265, B:97:0x0285, B:98:0x0297, B:99:0x02a5, B:100:0x02b3, B:101:0x02c1), top: B:195:0x00c4 }] */
+    /* JADX WARN: Code duplicated, block: B:175:0x063f A[LOOP:2: B:173:0x063b->B:175:0x063f, LOOP_END] */
+    /* JADX WARN: Code duplicated, block: B:177:0x0653  */
+    /* JADX WARN: Code duplicated, block: B:184:0x0662 A[LOOP:1: B:182:0x065e->B:184:0x0662, LOOP_END] */
+    /* JADX WARN: Code duplicated, block: B:186:0x0676  */
+    /* JADX WARN: Code duplicated, block: B:208:0x0639 A[SYNTHETIC] */
+    /* JADX WARN: Code duplicated, block: B:220:? A[RETURN, SYNTHETIC] */
+    /* JADX WARN: Multi-variable type inference failed */
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final void zza(T t10, zzald zzaldVar, zzaip zzaipVar) throws Throwable {
+        zzamb zzambVar;
+        int i10;
+        zzamb zzambVar2;
+        T t11;
+        Object obj;
+        zzair<?> zzairVar;
+        zzaip zzaipVar2;
+        Object obj2;
+        int i11;
+        T t12 = t10;
+        zzaip zzaipVar3 = zzaipVar;
+        zzaipVar.getClass();
+        zzf(t10);
+        zzamb zzambVar3 = this.zzq;
+        zzair<?> zzairVar2 = this.zzr;
+        Object objZza = null;
+        Object obj3 = null;
+        while (true) {
+            try {
+                int iZzc = zzaldVar.zzc();
+                int iZza = zza(iZzc);
+                if (iZza < 0) {
+                    if (iZzc == Integer.MAX_VALUE) {
+                        for (int i12 = this.zzm; i12 < this.zzn; i12++) {
+                            objZza = zza(t10, this.zzl[i12], objZza, (zzamb<UT, Object>) zzambVar3, t10);
+                        }
+                        if (objZza != null) {
+                            zzambVar3.zzb(t12, objZza);
+                            return;
+                        }
+                        return;
+                    }
+                    try {
+                        Object objZza2 = !this.zzh ? null : zzairVar2.zza(zzaipVar3, this.zzg, iZzc);
+                        if (objZza2 != null) {
+                            Object objZzb = obj3 == null ? zzairVar2.zzb(t12) : obj3;
+                            zzambVar2 = zzambVar3;
+                            t11 = t12;
+                            try {
+                                objZza = zzairVar2.zza(t10, zzaldVar, objZza2, zzaipVar, objZzb, objZza, zzambVar2);
+                                obj3 = objZzb;
+                            } catch (Throwable th) {
+                                th = th;
+                                t12 = t11;
+                                zzambVar = zzambVar2;
+                                while (i10 < this.zzn) {
+                                    objZza = zza(t10, this.zzl[i10], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                }
+                                if (objZza != null) {
+                                    zzambVar.zzb(t12, objZza);
+                                }
+                                throw th;
+                            }
+                        } else {
+                            zzambVar2 = zzambVar3;
+                            t11 = t12;
+                            zzambVar2.zza(zzaldVar);
+                            if (objZza == null) {
+                                objZza = zzambVar2.zzc(t11);
+                            }
+                            if (!zzambVar2.zza(objZza, zzaldVar)) {
+                                int i13 = this.zzm;
+                                while (i13 < this.zzn) {
+                                    zzamb zzambVar4 = zzambVar2;
+                                    objZza = zza(t10, this.zzl[i13], objZza, (zzamb<UT, Object>) zzambVar4, t10);
+                                    i13++;
+                                    t11 = t11;
+                                    zzambVar2 = zzambVar4;
+                                }
+                                T t13 = t11;
+                                zzamb zzambVar5 = zzambVar2;
+                                if (objZza != null) {
+                                    zzambVar5.zzb(t13, objZza);
+                                    return;
+                                }
+                                return;
+                            }
+                        }
+                        t12 = t11;
+                        zzambVar3 = zzambVar2;
+                    } catch (Throwable th2) {
+                        th = th2;
+                        zzambVar = zzambVar3;
+                        t12 = t12;
+                        while (i10 < this.zzn) {
+                            objZza = zza(t10, this.zzl[i10], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                        }
+                        if (objZza != null) {
+                            zzambVar.zzb(t12, objZza);
+                        }
+                        throw th;
+                    }
+                } else {
+                    zzambVar = zzambVar3;
+                    t12 = t12;
+                    try {
+                        int iZzc2 = zzc(iZza);
+                        switch ((267386880 & iZzc2) >>> 20) {
+                            case 0:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza(t12, iZzc2 & 1048575, zzaldVar.zza());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 1:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzb());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 2:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzl());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 3:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzo());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 4:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzg());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 5:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzk());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 6:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzf());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 7:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zzc(t12, iZzc2 & 1048575, zzaldVar.zzs());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 8:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zza((Object) t12, iZzc2, zzaldVar);
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 9:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzakk zzakkVar = (zzakk) zza((Object) t12, iZza);
+                                zzaldVar.zzb(zzakkVar, (zzalc<zzakk>) zze(iZza), zzaipVar2);
+                                zza(t12, iZza, zzakkVar);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 10:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza(t12, iZzc2 & 1048575, zzaldVar.zzp());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 11:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzj());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 12:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                int iZze = zzaldVar.zze();
+                                zzajh zzajhVarZzd = zzd(iZza);
+                                if (zzajhVarZzd != null && !zzajhVarZzd.zza(iZze)) {
+                                    objZza = zzale.zza(t12, iZzc, iZze, obj, zzambVar);
+                                    zzairVar2 = zzairVar;
+                                    zzaipVar3 = zzaipVar2;
+                                    zzambVar3 = zzambVar;
+                                }
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, iZze);
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 13:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzh());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case Code.UNAVAILABLE /* 14 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzm());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 15:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzi());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case Code.UNAUTHENTICATED /* 16 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzamh.zza((Object) t12, iZzc2 & 1048575, zzaldVar.zzn());
+                                zzb((Object) t12, iZza);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzakk zzakkVar2 = (zzakk) zza((Object) t12, iZza);
+                                zzaldVar.zza(zzakkVar2, (zzalc<zzakk>) zze(iZza), zzaipVar2);
+                                zza(t12, iZza, zzakkVar2);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzc(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 19:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzg(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzi(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 21:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzq(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 22:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzh(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 23:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzf(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 24:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zze(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zza(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 26:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                if (zzg(iZzc2)) {
+                                    zzaldVar.zzo(this.zzp.zza(t12, iZzc2 & 1048575));
+                                } else {
+                                    zzaldVar.zzn(this.zzp.zza(t12, iZzc2 & 1048575));
+                                }
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 27:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzb((List) this.zzp.zza(t12, iZzc2 & 1048575), (zzalc) zze(iZza), zzaipVar2);
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 28:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzb(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 29:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzp(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                List<Integer> listZza = this.zzp.zza(t12, iZzc2 & 1048575);
+                                zzaldVar.zzd(listZza);
+                                objZza = zzale.zza(t10, iZzc, listZza, zzd(iZza), objZza, zzambVar);
+                                zzairVar2 = zzairVar;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 31:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzj(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 32:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzk(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 33:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzl(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 34:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzm(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 35:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzc(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 36:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzg(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzi(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 38:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzq(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 39:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzh(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 40:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzf(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 41:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zze(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 42:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zza(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 43:
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzaldVar.zzp(this.zzp.zza(t12, iZzc2 & 1048575));
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 44:
+                                List<Integer> listZza2 = this.zzp.zza(t12, iZzc2 & 1048575);
+                                zzaldVar.zzd(listZza2);
+                                obj2 = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                try {
+                                    objZza = zzale.zza(t10, iZzc, listZza2, zzd(iZza), obj2, zzambVar);
+                                } catch (zzaji unused) {
+                                    objZza = obj2;
+                                    zzambVar.zza(zzaldVar);
+                                    if (objZza == null) {
+                                        objZza = zzambVar.zzc(t12);
+                                    }
+                                    if (!zzambVar.zza(objZza, zzaldVar)) {
+                                        for (i11 = this.zzm; i11 < this.zzn; i11++) {
+                                            objZza = zza(t10, this.zzl[i11], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                        }
+                                        if (objZza != null) {
+                                            zzambVar.zzb(t12, objZza);
+                                            return;
+                                        }
+                                        return;
+                                    }
+                                } catch (Throwable th3) {
+                                    th = th3;
+                                    objZza = obj2;
+                                    for (i10 = this.zzm; i10 < this.zzn; i10++) {
+                                        objZza = zza(t10, this.zzl[i10], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                    }
+                                    if (objZza != null) {
+                                        zzambVar.zzb(t12, objZza);
+                                    }
+                                    throw th;
+                                }
+                                zzairVar2 = zzairVar;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                                zzaldVar.zzj(this.zzp.zza(t12, iZzc2 & 1048575));
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 46:
+                                zzaldVar.zzk(this.zzp.zza(t12, iZzc2 & 1048575));
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 47:
+                                zzaldVar.zzl(this.zzp.zza(t12, iZzc2 & 1048575));
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 48:
+                                zzaldVar.zzm(this.zzp.zza(t12, iZzc2 & 1048575));
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 49:
+                                zzaldVar.zza((List) this.zzp.zza(t12, iZzc2 & 1048575), (zzalc) zze(iZza), zzaipVar3);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                                Object objZzf = zzf(iZza);
+                                long jZzc = zzc(iZza) & 1048575;
+                                Object objZze = zzamh.zze(t12, jZzc);
+                                if (objZze == null) {
+                                    objZze = this.zzs.zzb(objZzf);
+                                    zzamh.zza(t12, jZzc, objZze);
+                                } else if (this.zzs.zzf(objZze)) {
+                                    Object objZzb2 = this.zzs.zzb(objZzf);
+                                    this.zzs.zza(objZzb2, objZze);
+                                    zzamh.zza(t12, jZzc, objZzb2);
+                                    objZze = objZzb2;
+                                }
+                                zzaldVar.zza(this.zzs.zze(objZze), this.zzs.zza(objZzf), zzaipVar3);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 51:
+                                zzamh.zza(t12, iZzc2 & 1048575, Double.valueOf(zzaldVar.zza()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 52:
+                                zzamh.zza(t12, iZzc2 & 1048575, Float.valueOf(zzaldVar.zzb()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 53:
+                                zzamh.zza(t12, iZzc2 & 1048575, Long.valueOf(zzaldVar.zzl()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 54:
+                                zzamh.zza(t12, iZzc2 & 1048575, Long.valueOf(zzaldVar.zzo()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(zzaldVar.zzg()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 56:
+                                zzamh.zza(t12, iZzc2 & 1048575, Long.valueOf(zzaldVar.zzk()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 57:
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(zzaldVar.zzf()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 58:
+                                zzamh.zza(t12, iZzc2 & 1048575, Boolean.valueOf(zzaldVar.zzs()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 59:
+                                zza((Object) t12, iZzc2, zzaldVar);
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                                zzakk zzakkVar3 = (zzakk) zza(t12, iZzc, iZza);
+                                zzaldVar.zzb(zzakkVar3, (zzalc<zzakk>) zze(iZza), zzaipVar3);
+                                zza(t12, iZzc, iZza, zzakkVar3);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 61:
+                                zzamh.zza(t12, iZzc2 & 1048575, zzaldVar.zzp());
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 62:
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(zzaldVar.zzj()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 63:
+                                int iZze2 = zzaldVar.zze();
+                                zzajh zzajhVarZzd2 = zzd(iZza);
+                                if (zzajhVarZzd2 != null && !zzajhVarZzd2.zza(iZze2)) {
+                                    objZza = zzale.zza(t12, iZzc, iZze2, objZza, zzambVar);
+                                    t12 = t12;
+                                    zzambVar3 = zzambVar;
+                                }
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(iZze2));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 64:
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(zzaldVar.zzh()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 65:
+                                zzamh.zza(t12, iZzc2 & 1048575, Long.valueOf(zzaldVar.zzm()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 66:
+                                zzamh.zza(t12, iZzc2 & 1048575, Integer.valueOf(zzaldVar.zzi()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 67:
+                                zzamh.zza(t12, iZzc2 & 1048575, Long.valueOf(zzaldVar.zzn()));
+                                zzb(t12, iZzc, iZza);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            case 68:
+                                zzakk zzakkVar4 = (zzakk) zza(t12, iZzc, iZza);
+                                zzaldVar.zza(zzakkVar4, (zzalc<zzakk>) zze(iZza), zzaipVar3);
+                                zza(t12, iZzc, iZza, zzakkVar4);
+                                obj = objZza;
+                                zzairVar = zzairVar2;
+                                zzaipVar2 = zzaipVar3;
+                                zzairVar2 = zzairVar;
+                                objZza = obj;
+                                zzaipVar3 = zzaipVar2;
+                                zzambVar3 = zzambVar;
+                                break;
+                            default:
+                                if (objZza == null) {
+                                    try {
+                                        try {
+                                            objZza = zzambVar.zzc(t12);
+                                        } catch (Throwable th4) {
+                                            th = th4;
+                                            while (i10 < this.zzn) {
+                                                objZza = zza(t10, this.zzl[i10], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                            }
+                                            if (objZza != null) {
+                                                zzambVar.zzb(t12, objZza);
+                                            }
+                                            throw th;
+                                        }
+                                    } catch (zzaji unused2) {
+                                        obj2 = objZza;
+                                        zzairVar = zzairVar2;
+                                        zzaipVar2 = zzaipVar3;
+                                        objZza = obj2;
+                                        zzambVar.zza(zzaldVar);
+                                        if (objZza == null) {
+                                            objZza = zzambVar.zzc(t12);
+                                        }
+                                        if (!zzambVar.zza(objZza, zzaldVar)) {
+                                            while (i11 < this.zzn) {
+                                                objZza = zza(t10, this.zzl[i11], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                            }
+                                            if (objZza != null) {
+                                                zzambVar.zzb(t12, objZza);
+                                                return;
+                                            }
+                                            return;
+                                        }
+                                        zzairVar2 = zzairVar;
+                                        zzaipVar3 = zzaipVar2;
+                                        zzambVar3 = zzambVar;
+                                        break;
+                                    }
+                                }
+                                try {
+                                    if (!zzambVar.zza(objZza, zzaldVar)) {
+                                        for (int i14 = this.zzm; i14 < this.zzn; i14++) {
+                                            objZza = zza(t10, this.zzl[i14], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                        }
+                                        if (objZza != null) {
+                                            zzambVar.zzb(t12, objZza);
+                                            return;
+                                        }
+                                        return;
+                                    }
+                                    t12 = t12;
+                                } catch (zzaji unused3) {
+                                    zzairVar = zzairVar2;
+                                    zzaipVar2 = zzaipVar3;
+                                    zzambVar.zza(zzaldVar);
+                                    if (objZza == null) {
+                                        objZza = zzambVar.zzc(t12);
+                                    }
+                                    if (!zzambVar.zza(objZza, zzaldVar)) {
+                                        while (i11 < this.zzn) {
+                                            objZza = zza(t10, this.zzl[i11], objZza, (zzamb<UT, Object>) zzambVar, t10);
+                                        }
+                                        if (objZza != null) {
+                                            zzambVar.zzb(t12, objZza);
+                                            return;
+                                        }
+                                        return;
+                                    }
+                                    zzairVar2 = zzairVar;
+                                    zzaipVar3 = zzaipVar2;
+                                }
+                                zzambVar3 = zzambVar;
+                                break;
+                        }
+                    } catch (Throwable th5) {
+                        th = th5;
+                    }
+                }
+            } catch (Throwable th6) {
+                th = th6;
+            }
+        }
+    }
+
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final void zza(T t10, byte[] bArr, int i10, int i11, zzahl zzahlVar) {
+        zza(t10, bArr, i10, i11, 0, zzahlVar);
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private final void zza(T t10, T t11, int i10) {
+        if (zzc((Object) t11, i10)) {
+            long jZzc = zzc(i10) & 1048575;
+            Unsafe unsafe = zzb;
+            Object object = unsafe.getObject(t11, jZzc);
+            if (object != null) {
+                zzalc zzalcVarZze = zze(i10);
+                if (!zzc((Object) t10, i10)) {
+                    if (!zzg(object)) {
+                        unsafe.putObject(t10, jZzc, object);
+                    } else {
+                        Object objZza = zzalcVarZze.zza();
+                        zzalcVarZze.zza(objZza, object);
+                        unsafe.putObject(t10, jZzc, objZza);
+                    }
+                    zzb((Object) t10, i10);
+                    return;
+                }
+                Object object2 = unsafe.getObject(t10, jZzc);
+                if (!zzg(object2)) {
+                    Object objZza2 = zzalcVarZze.zza();
+                    zzalcVarZze.zza(objZza2, object2);
+                    unsafe.putObject(t10, jZzc, objZza2);
+                    object2 = objZza2;
+                }
+                zzalcVarZze.zza(object2, object);
+                return;
+            }
+            throw new IllegalStateException("Source subfield " + this.zzc[i10] + " is present but null: " + String.valueOf(t11));
+        }
+    }
+
+    private final void zza(Object obj, int i10, zzald zzaldVar) {
+        if (zzg(i10)) {
+            zzamh.zza(obj, i10 & 1048575, zzaldVar.zzr());
+        } else if (this.zzi) {
+            zzamh.zza(obj, i10 & 1048575, zzaldVar.zzq());
+        } else {
+            zzamh.zza(obj, i10 & 1048575, zzaldVar.zzp());
+        }
+    }
+
+    private final void zza(T t10, int i10, Object obj) {
+        zzb.putObject(t10, zzc(i10) & 1048575, obj);
+        zzb((Object) t10, i10);
+    }
+
+    private final void zza(T t10, int i10, int i11, Object obj) {
+        zzb.putObject(t10, zzc(i11) & 1048575, obj);
+        zzb(t10, i10, i11);
+    }
+
+    private final <K, V> void zza(zzanb zzanbVar, int i10, Object obj, int i11) {
+        if (obj != null) {
+            zzanbVar.zza(i10, this.zzs.zza(zzf(i11)), this.zzs.zzd(obj));
+        }
+    }
+
+    private static void zza(int i10, Object obj, zzanb zzanbVar) {
+        if (obj instanceof String) {
+            zzanbVar.zza(i10, (String) obj);
+        } else {
+            zzanbVar.zza(i10, (zzahm) obj);
+        }
+    }
+
+    /* JADX WARN: Can't fix incorrect switch cases order, some code will duplicate */
+    /* JADX WARN: Code duplicated, block: B:176:0x054b  */
+    /* JADX WARN: Code duplicated, block: B:9:0x0037  */
+    @Override // com.google.android.gms.internal.p001firebaseauthapi.zzalc
+    public final void zza(T t10, zzanb zzanbVar) {
+        Map.Entry<?, ?> entry;
+        Iterator it;
+        int i10;
+        int i11;
+        int i12;
+        boolean z10;
+        int i13;
+        Unsafe unsafe;
+        boolean z11;
+        Iterator itZzc;
+        Map.Entry<?, ?> entry2;
+        zzanb zzanbVar2 = zzanbVar;
+        int i14 = 267386880;
+        int i15 = 1048575;
+        if (zzanbVar.zza() == zzana.zzb) {
+            zza(this.zzq, t10, zzanbVar2);
+            if (this.zzh) {
+                zzais<T> zzaisVarZza = this.zzr.zza(t10);
+                if (zzaisVarZza.zza.isEmpty()) {
+                    itZzc = null;
+                    entry2 = null;
+                } else {
+                    itZzc = zzaisVarZza.zzc();
+                    entry2 = (Map.Entry) itZzc.next();
+                }
+            } else {
+                itZzc = null;
+                entry2 = null;
+            }
+            for (int length = this.zzc.length - 3; length >= 0; length -= 3) {
+                int iZzc = zzc(length);
+                int i16 = this.zzc[length];
+                while (entry2 != null && this.zzr.zza(entry2) > i16) {
+                    this.zzr.zza(zzanbVar2, entry2);
+                    entry2 = itZzc.hasNext() ? (Map.Entry) itZzc.next() : null;
+                }
+                switch ((iZzc & 267386880) >>> 20) {
+                    case 0:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zza(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 1:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zzb(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 2:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzb(i16, zzamh.zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 3:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zze(i16, zzamh.zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 4:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzc(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 5:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 6:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzb(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 7:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zzh(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 8:
+                        if (zzc((Object) t10, length)) {
+                            zza(i16, zzamh.zze(t10, iZzc & 1048575), zzanbVar2);
+                        }
+                        break;
+                    case 9:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzb(i16, zzamh.zze(t10, iZzc & 1048575), zze(length));
+                        }
+                        break;
+                    case 10:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, (zzahm) zzamh.zze(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 11:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzf(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 12:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 13:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzd(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case Code.UNAVAILABLE /* 14 */:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzc(i16, zzamh.zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 15:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zze(i16, zzamh.zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case Code.UNAUTHENTICATED /* 16 */:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zzd(i16, zzamh.zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                        if (zzc((Object) t10, length)) {
+                            zzanbVar2.zza(i16, zzamh.zze(t10, iZzc & 1048575), zze(length));
+                        }
+                        break;
+                    case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                        zzale.zzb(this.zzc[length], (List<Double>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 19:
+                        zzale.zzf(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                        zzale.zzh(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 21:
+                        zzale.zzn(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 22:
+                        zzale.zzg(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 23:
+                        zzale.zze(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 24:
+                        zzale.zzd(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                        zzale.zza(this.zzc[length], (List<Boolean>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 26:
+                        zzale.zzb(this.zzc[length], (List<String>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2);
+                        break;
+                    case 27:
+                        zzale.zzb(this.zzc[length], (List<?>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, zze(length));
+                        break;
+                    case 28:
+                        zzale.zza(this.zzc[length], (List<zzahm>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2);
+                        break;
+                    case 29:
+                        zzale.zzm(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                        zzale.zzc(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 31:
+                        zzale.zzi(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 32:
+                        zzale.zzj(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 33:
+                        zzale.zzk(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 34:
+                        zzale.zzl(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, false);
+                        break;
+                    case 35:
+                        zzale.zzb(this.zzc[length], (List<Double>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 36:
+                        zzale.zzf(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                        zzale.zzh(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 38:
+                        zzale.zzn(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 39:
+                        zzale.zzg(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 40:
+                        zzale.zze(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 41:
+                        zzale.zzd(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 42:
+                        zzale.zza(this.zzc[length], (List<Boolean>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 43:
+                        zzale.zzm(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 44:
+                        zzale.zzc(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                        zzale.zzi(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 46:
+                        zzale.zzj(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 47:
+                        zzale.zzk(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 48:
+                        zzale.zzl(this.zzc[length], (List) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, true);
+                        break;
+                    case 49:
+                        zzale.zza(this.zzc[length], (List<?>) zzamh.zze(t10, iZzc & 1048575), zzanbVar2, zze(length));
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                        zza(zzanbVar2, i16, zzamh.zze(t10, iZzc & 1048575), length);
+                        break;
+                    case 51:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zza(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 52:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zzb(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 53:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzb(i16, zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 54:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zze(i16, zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzc(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 56:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 57:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzb(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 58:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zze(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 59:
+                        if (zzc(t10, i16, length)) {
+                            zza(i16, zzamh.zze(t10, iZzc & 1048575), zzanbVar2);
+                        }
+                        break;
+                    case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzb(i16, zzamh.zze(t10, iZzc & 1048575), zze(length));
+                        }
+                        break;
+                    case 61:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, (zzahm) zzamh.zze(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 62:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzf(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 63:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 64:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzd(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 65:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzc(i16, zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 66:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zze(i16, zzc(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 67:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zzd(i16, zzd(t10, iZzc & 1048575));
+                        }
+                        break;
+                    case 68:
+                        if (zzc(t10, i16, length)) {
+                            zzanbVar2.zza(i16, zzamh.zze(t10, iZzc & 1048575), zze(length));
+                        }
+                        break;
+                }
+            }
+            while (entry2 != null) {
+                this.zzr.zza(zzanbVar2, entry2);
+                entry2 = itZzc.hasNext() ? (Map.Entry) itZzc.next() : null;
+            }
+            return;
+        }
+        if (this.zzh) {
+            zzais<T> zzaisVarZza2 = this.zzr.zza(t10);
+            if (zzaisVarZza2.zza.isEmpty()) {
+                entry = null;
+                it = null;
+            } else {
+                Iterator itZzd = zzaisVarZza2.zzd();
+                entry = (Map.Entry) itZzd.next();
+                it = itZzd;
+            }
+        } else {
+            entry = null;
+            it = null;
+        }
+        int length2 = this.zzc.length;
+        Unsafe unsafe2 = zzb;
+        int i17 = 0;
+        int i18 = 0;
+        int i19 = 1048575;
+        while (i18 < length2) {
+            int iZzc2 = zzc(i18);
+            int[] iArr = this.zzc;
+            int i20 = iArr[i18];
+            int i21 = (iZzc2 & i14) >>> 20;
+            if (i21 <= 17) {
+                int i22 = iArr[i18 + 2];
+                int i23 = i22 & i15;
+                if (i23 != i19) {
+                    i17 = i23 == i15 ? 0 : unsafe2.getInt(t10, i23);
+                    i19 = i23;
+                } else {
+                    it = it;
+                }
+                i11 = i17;
+                i12 = 1 << (i22 >>> 20);
+                i10 = i19;
+            } else {
+                it = it;
+                i10 = i19;
+                i11 = i17;
+                i12 = 0;
+            }
+            while (entry != null && this.zzr.zza(entry) <= i20) {
+                this.zzr.zza(zzanbVar2, entry);
+                entry = it.hasNext() ? (Map.Entry) it.next() : null;
+            }
+            long j10 = iZzc2 & 1048575;
+            switch (i21) {
+                case 0:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, zzamh.zza(t10, j10));
+                    }
+                    break;
+                case 1:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, zzamh.zzb(t10, j10));
+                    }
+                    break;
+                case 2:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzb(i20, unsafe.getLong(t10, j10));
+                    }
+                    break;
+                case 3:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zze(i20, unsafe.getLong(t10, j10));
+                    }
+                    break;
+                case 4:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzc(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case 5:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, unsafe.getLong(t10, j10));
+                    }
+                    break;
+                case 6:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzb(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case 7:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, zzamh.zzh(t10, j10));
+                    }
+                    break;
+                case 8:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zza(i20, unsafe.getObject(t10, j10), zzanbVar2);
+                    }
+                    break;
+                case 9:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzb(i20, unsafe.getObject(t10, j10), zze(i13));
+                    }
+                    break;
+                case 10:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, (zzahm) unsafe.getObject(t10, j10));
+                    }
+                    break;
+                case 11:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzf(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case 12:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zza(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case 13:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzd(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case Code.UNAVAILABLE /* 14 */:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzc(i20, unsafe.getLong(t10, j10));
+                    }
+                    break;
+                case 15:
+                    i10 = i10;
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zze(i20, unsafe.getInt(t10, j10));
+                    }
+                    break;
+                case Code.UNAUTHENTICATED /* 16 */:
+                    entry = entry;
+                    length2 = length2;
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    i10 = i10;
+                    if (zza(t10, i13, i10, i11, i12)) {
+                        zzanbVar2.zzd(i20, unsafe.getLong(t10, j10));
+                    }
+                    break;
+                case i2.STRING_VALUE_FIELD_NUMBER /* 17 */:
+                    z10 = false;
+                    entry = entry;
+                    i13 = i18;
+                    length2 = length2;
+                    unsafe = unsafe2;
+                    if (zza(t10, i18, i10, i11, i12)) {
+                        zzanbVar2 = zzanbVar;
+                        zzanbVar2.zza(i20, unsafe.getObject(t10, j10), zze(i13));
+                    } else {
+                        zzanbVar2 = zzanbVar;
+                    }
+                    i10 = i10;
+                    break;
+                case i2.BYTES_VALUE_FIELD_NUMBER /* 18 */:
+                    z11 = false;
+                    zzale.zzb(this.zzc[i18], (List<Double>) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 19:
+                    z11 = false;
+                    zzale.zzf(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_TIMESTAMP /* 20 */:
+                    z11 = false;
+                    zzale.zzh(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 21:
+                    z11 = false;
+                    zzale.zzn(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 22:
+                    z11 = false;
+                    zzale.zzg(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 23:
+                    z11 = false;
+                    zzale.zze(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 24:
+                    z11 = false;
+                    zzale.zzd(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_STRING /* 25 */:
+                    z11 = false;
+                    zzale.zza(this.zzc[i18], (List<Boolean>) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 26:
+                    zzale.zzb(this.zzc[i18], (List<String>) unsafe2.getObject(t10, j10), zzanbVar2);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 27:
+                    zzale.zzb(this.zzc[i18], (List<?>) unsafe2.getObject(t10, j10), zzanbVar2, zze(i18));
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 28:
+                    zzale.zza(this.zzc[i18], (List<zzahm>) unsafe2.getObject(t10, j10), zzanbVar2);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 29:
+                    z11 = false;
+                    zzale.zzm(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_BLOB /* 30 */:
+                    z11 = false;
+                    zzale.zzc(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 31:
+                    z11 = false;
+                    zzale.zzi(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 32:
+                    z11 = false;
+                    zzale.zzj(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 33:
+                    z11 = false;
+                    zzale.zzk(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 34:
+                    z11 = false;
+                    zzale.zzl(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, false);
+                    z10 = z11;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 35:
+                    zzale.zzb(this.zzc[i18], (List<Double>) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 36:
+                    zzale.zzf(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE /* 37 */:
+                    zzale.zzh(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 38:
+                    zzale.zzn(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 39:
+                    zzale.zzg(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 40:
+                    zzale.zze(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 41:
+                    zzale.zzd(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 42:
+                    zzale.zza(this.zzc[i18], (List<Boolean>) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 43:
+                    zzale.zzm(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 44:
+                    zzale.zzc(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_GEOPOINT /* 45 */:
+                    zzale.zzi(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 46:
+                    zzale.zzj(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 47:
+                    zzale.zzk(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 48:
+                    zzale.zzl(this.zzc[i18], (List) unsafe2.getObject(t10, j10), zzanbVar2, true);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 49:
+                    zzale.zza(this.zzc[i18], (List<?>) unsafe2.getObject(t10, j10), zzanbVar2, zze(i18));
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_ARRAY /* 50 */:
+                    zza(zzanbVar2, i20, unsafe2.getObject(t10, j10), i18);
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 51:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, zza(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 52:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, zzb(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 53:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzb(i20, zzd(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 54:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zze(i20, zzd(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_MAP /* 55 */:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzc(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 56:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, zzd(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 57:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzb(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 58:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, zze(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 59:
+                    if (zzc(t10, i20, i18)) {
+                        zza(i20, unsafe2.getObject(t10, j10), zzanbVar2);
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case FirestoreIndexValueWriter.INDEX_TYPE_REFERENCE_SEGMENT /* 60 */:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzb(i20, unsafe2.getObject(t10, j10), zze(i18));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 61:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, (zzahm) unsafe2.getObject(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 62:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzf(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 63:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 64:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzd(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 65:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzc(i20, zzd(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 66:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zze(i20, zzc(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 67:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zzd(i20, zzd(t10, j10));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                case 68:
+                    if (zzc(t10, i20, i18)) {
+                        zzanbVar2.zza(i20, unsafe2.getObject(t10, j10), zze(i18));
+                    }
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+                default:
+                    z10 = false;
+                    i13 = i18;
+                    unsafe = unsafe2;
+                    break;
+            }
+            i18 = i13 + 3;
+            i17 = i11;
+            unsafe2 = unsafe;
+            i15 = 1048575;
+            it = it;
+            entry = entry;
+            length2 = length2;
+            i19 = i10;
+            i14 = 267386880;
+        }
+        Iterator it2 = it;
+        while (entry != null) {
+            this.zzr.zza(zzanbVar2, entry);
+            entry = it2.hasNext() ? (Map.Entry) it2.next() : null;
+        }
+        zza(this.zzq, t10, zzanbVar2);
+    }
+
+    private static <UT, UB> void zza(zzamb<UT, UB> zzambVar, T t10, zzanb zzanbVar) {
+        zzambVar.zzb(zzambVar.zzd(t10), zzanbVar);
+    }
+
+    private final boolean zza(T t10, int i10, int i11, int i12, int i13) {
+        if (i11 == 1048575) {
+            return zzc((Object) t10, i10);
+        }
+        return (i12 & i13) != 0;
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private static boolean zza(Object obj, int i10, zzalc zzalcVar) {
+        return zzalcVar.zzd(zzamh.zze(obj, i10 & 1048575));
+    }
+}

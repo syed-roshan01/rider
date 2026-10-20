@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+      HTTPS only.
+
+      The previous cleartext exceptions are gone:
+        * 103.194.228.95  - the original vendor's backend
+        * 192.168.0.185   - the LAN licence server used during development / QA
+
+      The licence endpoint is now
+        https://ckyfcwbnakbaitzurnze.supabase.co/functions/v1
+      so nothing needs cleartext any more.
+
+      base-config with cleartextTrafficPermitted="false" blocks plaintext on
+      every API level that understands this file, not just 28+. Without it,
+      API 26/27 would still allow cleartext by platform default.
+    -->
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

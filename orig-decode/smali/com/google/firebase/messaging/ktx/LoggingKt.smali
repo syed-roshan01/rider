@@ -1,0 +1,6 @@
+.class public final Lcom/google/firebase/messaging/ktx/LoggingKt;
+.super Ljava/lang/Object;
+
+
+# static fields
+.field public static final LIBRARY_NAME:Ljava/lang/String; = "fire-fcm-ktx"

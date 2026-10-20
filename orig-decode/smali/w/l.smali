@@ -1,0 +1,424 @@
+.class public abstract Lw/l;
+.super Ljava/lang/Object;
+
+
+# static fields
+.field public static final a:F
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .locals 1
+
+    const/16 v0, 0x190
+
+    int-to-float v0, v0
+
+    sput v0, Lw/l;->a:F
+
+    return-void
+.end method
+
+.method public static final a(Lv/r1;FLt/o;Lt/y;Lw/c;Lu8/e;)Ljava/lang/Object;
+    .locals 13
+
+    move-object v0, p2
+
+    move-object/from16 v1, p5
+
+    instance-of v2, v1, Lw/i;
+
+    if-eqz v2, :cond_0
+
+    move-object v2, v1
+
+    check-cast v2, Lw/i;
+
+    iget v3, v2, Lw/i;->e:I
+
+    const/high16 v4, -0x80000000
+
+    and-int v5, v3, v4
+
+    if-eqz v5, :cond_0
+
+    sub-int/2addr v3, v4
+
+    iput v3, v2, Lw/i;->e:I
+
+    goto :goto_0
+
+    :cond_0
+    new-instance v2, Lw/i;
+
+    invoke-direct {v2, v1}, Lw8/c;-><init>(Lu8/e;)V
+
+    :goto_0
+    iget-object v1, v2, Lw/i;->d:Ljava/lang/Object;
+
+    sget-object v3, Lv8/a;->a:Lv8/a;
+
+    iget v4, v2, Lw/i;->e:I
+
+    const/4 v5, 0x1
+
+    if-eqz v4, :cond_2
+
+    if-ne v4, v5, :cond_1
+
+    iget v0, v2, Lw/i;->a:F
+
+    iget-object v3, v2, Lw/i;->c:Ld9/r;
+
+    iget-object v2, v2, Lw/i;->b:Lt/o;
+
+    invoke-static {v1}, Ld7/t;->v0(Ljava/lang/Object;)V
+
+    goto :goto_2
+
+    :cond_1
+    new-instance v0, Ljava/lang/IllegalStateException;
+
+    const-string v1, "call to \'resume\' before \'invoke\' with coroutine"
+
+    invoke-direct {v0, v1}, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+
+    throw v0
+
+    :cond_2
+    invoke-static {v1}, Ld7/t;->v0(Ljava/lang/Object;)V
+
+    new-instance v1, Ld9/r;
+
+    invoke-direct {v1}, Ljava/lang/Object;-><init>()V
+
+    invoke-virtual {p2}, Lt/o;->b()Ljava/lang/Object;
+
+    move-result-object v4
+
+    check-cast v4, Ljava/lang/Number;
+
+    invoke-virtual {v4}, Ljava/lang/Number;->floatValue()F
+
+    move-result v4
+
+    const/4 v6, 0x0
+
+    cmpg-float v4, v4, v6
+
+    if-nez v4, :cond_3
+
+    move v4, v5
+
+    goto :goto_1
+
+    :cond_3
+    const/4 v4, 0x0
+
+    :goto_1
+    xor-int/2addr v4, v5
+
+    new-instance v12, Lw/j;
+
+    const/4 v11, 0x0
+
+    move-object v6, v12
+
+    move v7, p1
+
+    move-object v8, v1
+
+    move-object v9, p0
+
+    move-object/from16 v10, p4
+
+    invoke-direct/range {v6 .. v11}, Lw/j;-><init>(FLd9/r;Lv/r1;Lw/c;I)V
+
+    iput-object v0, v2, Lw/i;->b:Lt/o;
+
+    iput-object v1, v2, Lw/i;->c:Ld9/r;
+
+    move v6, p1
+
+    iput v6, v2, Lw/i;->a:F
+
+    iput v5, v2, Lw/i;->e:I
+
+    move-object/from16 v5, p3
+
+    invoke-static {p2, v5, v4, v12, v2}, Lt/e;->e(Lt/o;Lt/y;ZLc9/c;Lu8/e;)Ljava/lang/Object;
+
+    move-result-object v2
+
+    if-ne v2, v3, :cond_4
+
+    goto :goto_3
+
+    :cond_4
+    move-object v2, v0
+
+    move-object v3, v1
+
+    move v0, v6
+
+    :goto_2
+    new-instance v1, Lw/a;
+
+    iget v3, v3, Ld9/r;->a:F
+
+    sub-float/2addr v0, v3
+
+    new-instance v3, Ljava/lang/Float;
+
+    invoke-direct {v3, v0}, Ljava/lang/Float;-><init>(F)V
+
+    invoke-direct {v1, v3, v2}, Lw/a;-><init>(Ljava/lang/Float;Lt/o;)V
+
+    move-object v3, v1
+
+    :goto_3
+    return-object v3
+.end method
+
+.method public static final b(Lv/r1;FFLt/o;Lt/n;Lw/c;Lu8/e;)Ljava/lang/Object;
+    .locals 17
+
+    move/from16 v0, p1
+
+    move-object/from16 v1, p6
+
+    instance-of v2, v1, Lw/k;
+
+    if-eqz v2, :cond_0
+
+    move-object v2, v1
+
+    check-cast v2, Lw/k;
+
+    iget v3, v2, Lw/k;->f:I
+
+    const/high16 v4, -0x80000000
+
+    and-int v5, v3, v4
+
+    if-eqz v5, :cond_0
+
+    sub-int/2addr v3, v4
+
+    iput v3, v2, Lw/k;->f:I
+
+    :goto_0
+    move-object v8, v2
+
+    goto :goto_1
+
+    :cond_0
+    new-instance v2, Lw/k;
+
+    invoke-direct {v2, v1}, Lw8/c;-><init>(Lu8/e;)V
+
+    goto :goto_0
+
+    :goto_1
+    iget-object v1, v8, Lw/k;->e:Ljava/lang/Object;
+
+    sget-object v2, Lv8/a;->a:Lv8/a;
+
+    iget v3, v8, Lw/k;->f:I
+
+    const/4 v9, 0x0
+
+    const/4 v4, 0x1
+
+    if-eqz v3, :cond_2
+
+    if-ne v3, v4, :cond_1
+
+    iget v0, v8, Lw/k;->b:F
+
+    iget v2, v8, Lw/k;->a:F
+
+    iget-object v3, v8, Lw/k;->d:Ld9/r;
+
+    iget-object v4, v8, Lw/k;->c:Lt/o;
+
+    invoke-static {v1}, Ld7/t;->v0(Ljava/lang/Object;)V
+
+    move v11, v0
+
+    move v0, v2
+
+    move-object v10, v4
+
+    goto :goto_3
+
+    :cond_1
+    new-instance v0, Ljava/lang/IllegalStateException;
+
+    const-string v1, "call to \'resume\' before \'invoke\' with coroutine"
+
+    invoke-direct {v0, v1}, Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V
+
+    throw v0
+
+    :cond_2
+    invoke-static {v1}, Ld7/t;->v0(Ljava/lang/Object;)V
+
+    new-instance v1, Ld9/r;
+
+    invoke-direct {v1}, Ljava/lang/Object;-><init>()V
+
+    invoke-virtual/range {p3 .. p3}, Lt/o;->b()Ljava/lang/Object;
+
+    move-result-object v3
+
+    check-cast v3, Ljava/lang/Number;
+
+    invoke-virtual {v3}, Ljava/lang/Number;->floatValue()F
+
+    move-result v7
+
+    new-instance v5, Ljava/lang/Float;
+
+    invoke-direct {v5, v0}, Ljava/lang/Float;-><init>(F)V
+
+    invoke-virtual/range {p3 .. p3}, Lt/o;->b()Ljava/lang/Object;
+
+    move-result-object v3
+
+    check-cast v3, Ljava/lang/Number;
+
+    invoke-virtual {v3}, Ljava/lang/Number;->floatValue()F
+
+    move-result v3
+
+    cmpg-float v3, v3, v9
+
+    if-nez v3, :cond_3
+
+    move v3, v4
+
+    goto :goto_2
+
+    :cond_3
+    const/4 v3, 0x0
+
+    :goto_2
+    xor-int/lit8 v6, v3, 0x1
+
+    new-instance v16, Lw/j;
+
+    const/4 v15, 0x1
+
+    move-object/from16 v10, v16
+
+    move/from16 v11, p2
+
+    move-object v12, v1
+
+    move-object/from16 v13, p0
+
+    move-object/from16 v14, p5
+
+    invoke-direct/range {v10 .. v15}, Lw/j;-><init>(FLd9/r;Lv/r1;Lw/c;I)V
+
+    move-object/from16 v10, p3
+
+    iput-object v10, v8, Lw/k;->c:Lt/o;
+
+    iput-object v1, v8, Lw/k;->d:Ld9/r;
+
+    iput v0, v8, Lw/k;->a:F
+
+    iput v7, v8, Lw/k;->b:F
+
+    iput v4, v8, Lw/k;->f:I
+
+    move-object/from16 v3, p3
+
+    move-object v4, v5
+
+    move-object/from16 v5, p4
+
+    move v11, v7
+
+    move-object/from16 v7, v16
+
+    invoke-static/range {v3 .. v8}, Lt/e;->g(Lt/o;Ljava/lang/Float;Lt/n;ZLc9/c;Lu8/e;)Ljava/lang/Object;
+
+    move-result-object v3
+
+    if-ne v3, v2, :cond_4
+
+    goto :goto_4
+
+    :cond_4
+    move-object v3, v1
+
+    :goto_3
+    invoke-virtual {v10}, Lt/o;->b()Ljava/lang/Object;
+
+    move-result-object v1
+
+    check-cast v1, Ljava/lang/Number;
+
+    invoke-virtual {v1}, Ljava/lang/Number;->floatValue()F
+
+    move-result v1
+
+    invoke-static {v1, v11}, Lw/l;->c(FF)F
+
+    move-result v1
+
+    new-instance v2, Lw/a;
+
+    iget v3, v3, Ld9/r;->a:F
+
+    sub-float/2addr v0, v3
+
+    new-instance v3, Ljava/lang/Float;
+
+    invoke-direct {v3, v0}, Ljava/lang/Float;-><init>(F)V
+
+    const/16 v0, 0x1d
+
+    invoke-static {v10, v9, v1, v0}, Lt/e;->k(Lt/o;FFI)Lt/o;
+
+    move-result-object v0
+
+    invoke-direct {v2, v3, v0}, Lw/a;-><init>(Ljava/lang/Float;Lt/o;)V
+
+    :goto_4
+    return-object v2
+.end method
+
+.method public static final c(FF)F
+    .locals 2
+
+    const/4 v0, 0x0
+
+    cmpg-float v1, p1, v0
+
+    if-nez v1, :cond_0
+
+    return v0
+
+    :cond_0
+    cmpl-float v0, p1, v0
+
+    if-lez v0, :cond_1
+
+    invoke-static {p0, p1}, Lz6/a;->o(FF)F
+
+    move-result p0
+
+    goto :goto_0
+
+    :cond_1
+    invoke-static {p0, p1}, Lz6/a;->m(FF)F
+
+    move-result p0
+
+    :goto_0
+    return p0
+.end method

@@ -1,0 +1,11 @@
+package dagger.hilt.internal;
+
+import dagger.hilt.GeneratesRootInput;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+
+/* JADX INFO: loaded from: classes.dex */
+@Target({ElementType.TYPE})
+@GeneratesRootInput
+public @interface GeneratedEntryPoint {
+}

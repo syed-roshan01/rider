@@ -1,0 +1,399 @@
+{
+  "licenses": {
+    "06b0acf442850fce99e8f9de6f0a094f045789e64660f006afa61cf193621a8b": {
+      "keyHash": "06b0acf442850fce99e8f9de6f0a094f045789e64660f006afa61cf193621a8b",
+      "keySealed": "v1.yTd0WD6csvU-bQ7I.yVVHW0UtXeMkmTp4e5VUZkUgDmuKbQrXIg.kXjr0Ju-jBryNA35ilU9Dg",
+      "keyPrefix": "RA-SZ3V3",
+      "planType": "DAY",
+      "durationDays": 1,
+      "status": "active",
+      "createdAt": 1792175071776,
+      "activatedAt": 1792175071792,
+      "expiresAt": 1794767071907,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [],
+      "note": "e2e",
+      "createdBy": "admin"
+    },
+    "d65898ff1a1117c9abe5629c8a96f99cc22e0d4281b4d5f843d8426f0b7c1c52": {
+      "keyHash": "d65898ff1a1117c9abe5629c8a96f99cc22e0d4281b4d5f843d8426f0b7c1c52",
+      "keySealed": "v1.8TEzfeKTCV8eK_GQ.927KlKQcJ54_6zz_rVWgJZK5IB_t3Y4pNw.gtdcTjOBbcnBogjibL92FA",
+      "keyPrefix": "RA-Z9426",
+      "planType": "DAY",
+      "durationDays": 1,
+      "status": "unused",
+      "createdAt": 1792175071776,
+      "activatedAt": null,
+      "expiresAt": null,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [],
+      "note": "e2e",
+      "createdBy": "admin"
+    },
+    "3085c2313eba67c5ee781d3fff06a61a3f1e8fb15de2f01270f8867201706060": {
+      "keyHash": "3085c2313eba67c5ee781d3fff06a61a3f1e8fb15de2f01270f8867201706060",
+      "keySealed": "v1.Vej6qhgmIujpawB6.pE2Ejd8gWAc1kNsaV4IdgiLlYLEFsbViKg.bsuG9SQEfonhDl0gGhADJA",
+      "keyPrefix": "RA-C7YRX",
+      "planType": "DAY",
+      "durationDays": 1,
+      "status": "unused",
+      "createdAt": 1792175071776,
+      "activatedAt": null,
+      "expiresAt": null,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [],
+      "note": "e2e",
+      "createdBy": "admin"
+    },
+    "a54732acec37c21136c5c79a96271952652564fabff1f4ac7e5d154bdaf9ff5c": {
+      "keyHash": "a54732acec37c21136c5c79a96271952652564fabff1f4ac7e5d154bdaf9ff5c",
+      "keySealed": "v1.4hVkNZ1P8IMhuZk9.VcMCTMrgyyVTi8GPilu9znte6cSWX50uEw.QbZceD-XNRJlh-thXmaVWw",
+      "keyPrefix": "RA-MH1VP",
+      "planType": "MONTH",
+      "durationDays": 30,
+      "status": "active",
+      "createdAt": 1792175071980,
+      "activatedAt": 1792175071988,
+      "expiresAt": 1794767071988,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [
+        "002fcd42e510c80572b9eecf08119603c49943b5d27194c1deaaa049c8f83107"
+      ],
+      "note": "device-bound e2e",
+      "createdBy": "admin"
+    },
+    "ec0f9103d0216973ee6fc2efbee6ed69854534287c9b893fec7169990f454e10": {
+      "keyHash": "ec0f9103d0216973ee6fc2efbee6ed69854534287c9b893fec7169990f454e10",
+      "keySealed": "v1.uEYoDdWCVWOZkxG0.4yetjZ3Y8JUJld-p_ezQ1nn-_CwuQ2EqOQ.TJVvfG43Mqow1YUNa2f5CA",
+      "keyPrefix": "RA-VY0ZE",
+      "planType": "MONTH",
+      "durationDays": 30,
+      "status": "active",
+      "createdAt": 1792175072019,
+      "activatedAt": 1792175072027,
+      "expiresAt": 1794767072027,
+      "maxDevices": 2,
+      "boundDeviceCodeHashes": [
+        "cc7e0cbaa3ca656a8dcd12f16362c0d879135928be28ff389d038abd14a2e5be",
+        "be2f3cac7b38a565a912b45af350fbc94afa23e761efedaff7031006c09f2d84"
+      ],
+      "note": "two phones",
+      "createdBy": "admin"
+    },
+    "df0219c421b268e1f1aff62b5fb1f038d6431362ff6f9a61d3e545ed2b89e349": {
+      "keyHash": "df0219c421b268e1f1aff62b5fb1f038d6431362ff6f9a61d3e545ed2b89e349",
+      "keySealed": "v1.1zN1Sr2-rpRJxzBu.f64lM1_lxu2gJRYpJJfCta83-W6CHwAh-A.JdTjt0vTj8T1CJ_jYX8wmA",
+      "keyPrefix": "RA-G1220",
+      "planType": "MONTH",
+      "durationDays": 30,
+      "status": "unused",
+      "createdAt": 1792177533728,
+      "activatedAt": null,
+      "expiresAt": null,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [],
+      "note": "",
+      "createdBy": "admin"
+    },
+    "25669766255ff78c548ec3cc013f6730f50bbbf09e67a8ec3c59b6fc119004cd": {
+      "keyHash": "25669766255ff78c548ec3cc013f6730f50bbbf09e67a8ec3c59b6fc119004cd",
+      "keySealed": "v1.oYAz5bRNLzKh3Rdg.nJYquayPOABMGwlAdqLp7FuU2-RsMX2w3g.rzYfSGZclUNDpj6bFFXG4g",
+      "keyPrefix": "RA-73JRS",
+      "planType": "MONTH",
+      "durationDays": 30,
+      "status": "active",
+      "createdAt": 1792177563872,
+      "activatedAt": 1792177721093,
+      "expiresAt": 1794769721093,
+      "maxDevices": 1,
+      "boundDeviceCodeHashes": [
+        "bbf6320d9dfc500ae7ec0ecaae6331a777e36ef508b846bed521b30bfe3ef55b"
+      ],
+      "note": "#124",
+      "createdBy": "admin"
+    }
+  },
+  "devices": {
+    "b31ef20e1bec127a9aec46c6d148e883e7bbbce9a4f6635bbbc460a600b9b550": {
+      "hwidHash": "b31ef20e1bec127a9aec46c6d148e883e7bbbce9a4f6635bbbc460a600b9b550",
+      "appVersion": "",
+      "model": "",
+      "brand": "",
+      "integrity": "UNKNOWN",
+      "keyHash": "06b0acf442850fce99e8f9de6f0a094f045789e64660f006afa61cf193621a8b",
+      "activatedAt": 1792175071964,
+      "lastSeenAt": 1792175071964
+    },
+    "002fcd42e510c80572b9eecf08119603c49943b5d27194c1deaaa049c8f83107": {
+      "hwidHash": "002fcd42e510c80572b9eecf08119603c49943b5d27194c1deaaa049c8f83107",
+      "appVersion": "",
+      "model": "",
+      "brand": "",
+      "integrity": "UNKNOWN",
+      "keyHash": "a54732acec37c21136c5c79a96271952652564fabff1f4ac7e5d154bdaf9ff5c",
+      "activatedAt": 1792175071988,
+      "lastSeenAt": 1792175072064
+    },
+    "cc7e0cbaa3ca656a8dcd12f16362c0d879135928be28ff389d038abd14a2e5be": {
+      "hwidHash": "cc7e0cbaa3ca656a8dcd12f16362c0d879135928be28ff389d038abd14a2e5be",
+      "appVersion": "",
+      "model": "",
+      "brand": "",
+      "integrity": "UNKNOWN",
+      "keyHash": "ec0f9103d0216973ee6fc2efbee6ed69854534287c9b893fec7169990f454e10",
+      "activatedAt": 1792175072027,
+      "lastSeenAt": 1792175072027
+    },
+    "be2f3cac7b38a565a912b45af350fbc94afa23e761efedaff7031006c09f2d84": {
+      "hwidHash": "be2f3cac7b38a565a912b45af350fbc94afa23e761efedaff7031006c09f2d84",
+      "appVersion": "",
+      "model": "",
+      "brand": "",
+      "integrity": "UNKNOWN",
+      "keyHash": "ec0f9103d0216973ee6fc2efbee6ed69854534287c9b893fec7169990f454e10",
+      "activatedAt": 1792175072041,
+      "lastSeenAt": 1792175072041
+    },
+    "bbf6320d9dfc500ae7ec0ecaae6331a777e36ef508b846bed521b30bfe3ef55b": {
+      "hwidHash": "bbf6320d9dfc500ae7ec0ecaae6331a777e36ef508b846bed521b30bfe3ef55b",
+      "appVersion": "6",
+      "model": "SM-N770F",
+      "brand": "samsung",
+      "integrity": "UNKNOWN",
+      "keyHash": "25669766255ff78c548ec3cc013f6730f50bbbf09e67a8ec3c59b6fc119004cd",
+      "activatedAt": 1792177721094,
+      "lastSeenAt": 1792177721094
+    }
+  },
+  "audit": [
+    {
+      "id": "ca0bf438-f64a-43e4-aebc-22d9638c3a32",
+      "at": 1792177721102,
+      "actor": "device:bbf6320d9dfc",
+      "action": "activate.ok",
+      "detail": "RA-73JRS"
+    },
+    {
+      "id": "c03d95e5-562a-4831-9f38-890093385a96",
+      "at": 1792177606923,
+      "actor": "admin",
+      "action": "admin.login",
+      "detail": "ok"
+    },
+    {
+      "id": "1ed7eba8-89e5-4aa5-bcef-9f6a742669b5",
+      "at": 1792177563872,
+      "actor": "admin",
+      "action": "license.create",
+      "detail": "1x MONTH bound to 1 device(s)"
+    },
+    {
+      "id": "bb84c455-8d67-4667-8e41-6cdf81bfdfe8",
+      "at": 1792177533728,
+      "actor": "admin",
+      "action": "license.create",
+      "detail": "1x MONTH"
+    },
+    {
+      "id": "ea03647a-bb10-482b-8da6-a7b93dd92c10",
+      "at": 1792177531039,
+      "actor": "admin",
+      "action": "admin.login",
+      "detail": "ok"
+    },
+    {
+      "id": "d32743b6-0cfd-4e18-91b9-a1a167234ba1",
+      "at": 1792175072056,
+      "actor": "device:b0589c7379a8",
+      "action": "activate.denied",
+      "detail": "RA-VY0ZE DEVICE_MISMATCH"
+    },
+    {
+      "id": "76e4dced-0c2a-42b0-b2fd-653056091a4f",
+      "at": 1792175072047,
+      "actor": "device:be2f3cac7b38",
+      "action": "activate.ok",
+      "detail": "RA-VY0ZE"
+    },
+    {
+      "id": "a8118039-1434-4d1b-8bc3-2aae3f0abc78",
+      "at": 1792175072031,
+      "actor": "device:cc7e0cbaa3ca",
+      "action": "activate.ok",
+      "detail": "RA-VY0ZE"
+    },
+    {
+      "id": "d6e0ad6d-ab8d-4e6d-b7b1-d275e9ceb5b7",
+      "at": 1792175072019,
+      "actor": "admin",
+      "action": "license.create",
+      "detail": "1x MONTH bound to 2 device(s)"
+    },
+    {
+      "id": "fa02e3ac-a5c8-42e3-9653-c7d0fa1fc1af",
+      "at": 1792175072009,
+      "actor": "device:566598a097c3",
+      "action": "activate.denied",
+      "detail": "RA-MH1VP DEVICE_MISMATCH"
+    },
+    {
+      "id": "4e7d7e04-ed9a-4cb5-bc2e-fea452907900",
+      "at": 1792175072000,
+      "actor": "device:6d30a8e194a8",
+      "action": "activate.denied",
+      "detail": "RA-MH1VP DEVICE_MISMATCH"
+    },
+    {
+      "id": "aa708d22-a48e-4303-9561-a93fb9c75b10",
+      "at": 1792175071993,
+      "actor": "device:002fcd42e510",
+      "action": "activate.ok",
+      "detail": "RA-MH1VP"
+    },
+    {
+      "id": "f9b0b4db-922f-49ea-84c5-4c7bf9dd4157",
+      "at": 1792175071980,
+      "actor": "admin",
+      "action": "license.create",
+      "detail": "1x MONTH bound to 1 device(s)"
+    },
+    {
+      "id": "f2c9eda2-137b-44a2-a5da-ab32d9f8c95f",
+      "at": 1792175071969,
+      "actor": "device:b31ef20e1bec",
+      "action": "activate.ok",
+      "detail": "RA-SZ3V3"
+    },
+    {
+      "id": "d4d056ca-d6b7-4b59-a922-6437b318113a",
+      "at": 1792175071957,
+      "actor": "admin",
+      "action": "device.unbind",
+      "detail": "RA-SZ3V3 e2b75522c1c0"
+    },
+    {
+      "id": "6444ed9a-1d48-42dd-a799-6db539233ff7",
+      "at": 1792175071940,
+      "actor": "admin",
+      "action": "license.unrevoke",
+      "detail": "RA-SZ3V3"
+    },
+    {
+      "id": "7bfb9d3e-ca22-418d-9441-216cf2e2604f",
+      "at": 1792175071934,
+      "actor": "device:e2b75522c1c0",
+      "action": "validate.denied",
+      "detail": "RA-SZ3V3 REVOKED"
+    },
+    {
+      "id": "4dd1538a-fdbd-4658-bc5e-07da59d729b5",
+      "at": 1792175071926,
+      "actor": "admin",
+      "action": "license.revoke",
+      "detail": "RA-SZ3V3"
+    },
+    {
+      "id": "723d9109-61f2-4aef-9ca9-bbb3fd15e4ce",
+      "at": 1792175071907,
+      "actor": "admin",
+      "action": "license.extend",
+      "detail": "RA-SZ3V3 +30d"
+    },
+    {
+      "id": "a4011ccb-5e99-4c55-9d27-88e9f707c15d",
+      "at": 1792175071905,
+      "actor": "device:e2b75522c1c0",
+      "action": "validate.denied",
+      "detail": "RA-SZ3V3 EXPIRED"
+    },
+    {
+      "id": "026a09f7-8ea6-4e0f-bf7d-a1238fa7a3c8",
+      "at": 1792175071888,
+      "actor": "admin",
+      "action": "license.extend",
+      "detail": "RA-SZ3V3 +-120d"
+    },
+    {
+      "id": "5bd992c5-1c86-4246-be77-e6113b50965d",
+      "at": 1792175071878,
+      "actor": "admin",
+      "action": "license.extend",
+      "detail": "RA-SZ3V3 +30d"
+    },
+    {
+      "id": "e4b15773-c31d-4de4-9877-45e03468cd30",
+      "at": 1792175071866,
+      "actor": "admin",
+      "action": "config.update",
+      "detail": "{\"forceUpdateVersion\":0}"
+    },
+    {
+      "id": "4c317f0e-b24d-4dd4-9240-23d38fe51fcb",
+      "at": 1792175071857,
+      "actor": "admin",
+      "action": "config.update",
+      "detail": "{\"forceUpdateVersion\":99}"
+    },
+    {
+      "id": "5305a03f-5040-4787-a0e8-79940560e08a",
+      "at": 1792175071849,
+      "actor": "admin",
+      "action": "config.update",
+      "detail": "{\"maintenanceMode\":false}"
+    },
+    {
+      "id": "9b412a76-7cff-470a-a7e9-f09b2823153d",
+      "at": 1792175071840,
+      "actor": "admin",
+      "action": "config.update",
+      "detail": "{\"maintenanceMode\":true}"
+    },
+    {
+      "id": "4f596d05-0e56-4883-8cf1-3068299f3b22",
+      "at": 1792175071823,
+      "actor": "device:b31ef20e1bec",
+      "action": "activate.denied",
+      "detail": "RA-SZ3V3 DEVICE_LIMIT"
+    },
+    {
+      "id": "9cf73881-cf88-44a0-b096-45c2e23aa979",
+      "at": 1792175071797,
+      "actor": "device:e2b75522c1c0",
+      "action": "activate.ok",
+      "detail": "RA-SZ3V3"
+    },
+    {
+      "id": "99c097e3-2e35-456a-a1d7-f964abfbac08",
+      "at": 1792175071776,
+      "actor": "admin",
+      "action": "license.create",
+      "detail": "3x DAY"
+    },
+    {
+      "id": "b18f1a64-aa92-4683-aca7-75bea843dc52",
+      "at": 1792175071766,
+      "actor": "admin",
+      "action": "admin.login",
+      "detail": "ok"
+    },
+    {
+      "id": "45639d59-c6af-43aa-bbcf-d14a008fc6a2",
+      "at": 1792175071709,
+      "actor": "anonymous",
+      "action": "admin.login.fail",
+      "detail": "::1"
+    }
+  ],
+  "config": {
+    "maintenanceMode": false,
+    "maintenanceMessage": "App is under maintenance. Please try again later.",
+    "forceUpdateVersion": 0,
+    "updateDownloadUrl": "",
+    "updatePageUrl": "",
+    "minAllowedFare": 10,
+    "maxAllowedFare": 5000,
+    "versionBlocked": [],
+    "dialogMessage": "",
+    "dialogButtonText": "OK"
+  }
+}

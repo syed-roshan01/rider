@@ -85,9 +85,14 @@ function Task-Dex {
         throw "javac failed (exit $LASTEXITCODE)"
     }
 
-    $cls = Get-ChildItem $clsOut -Recurse -Filter *.class | ForEach-Object { $_.FullName }
-    $clsQ = ($cls | ForEach-Object { '"' + $_ + '"' }) -join ' '
-    cmd /c "`"$d8`" --min-api 26 --output `"$dexOut`" $clsQ > build\d8.log 2>&1"
+    # cmd caps a command line at 8191 chars and ~75 deep class paths overflow it
+    # (d8's @argfile also can't quote paths with spaces). Zip the classes and hand
+    # d8 one archive argument instead - d8 accepts zip/jar inputs.
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $jar = Join-Path (Get-Location) 'build\classes.jar'
+    if (Test-Path $jar) { Remove-Item $jar -Force }
+    [System.IO.Compression.ZipFile]::CreateFromDirectory((Resolve-Path $clsOut).Path, $jar)
+    cmd /c "`"$d8`" --min-api 26 --output `"$dexOut`" build\classes.jar > build\d8.log 2>&1"
     if ($LASTEXITCODE -ne 0) {
         Get-Content 'build\d8.log' | Select-Object -Last 20 | Out-String | Write-Host
         throw "d8 failed (exit $LASTEXITCODE)"

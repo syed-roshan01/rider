@@ -1,0 +1,27 @@
+.class public interface abstract Ldagger/hilt/android/internal/lifecycle/DefaultViewModelFactories$FragmentEntryPoint;
+.super Ljava/lang/Object;
+
+
+# annotations
+.annotation build Ldagger/hilt/EntryPoint;
+.end annotation
+
+.annotation build Ldagger/hilt/InstallIn;
+    value = {
+        Ldagger/hilt/android/components/FragmentComponent;
+    }
+.end annotation
+
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Ldagger/hilt/android/internal/lifecycle/DefaultViewModelFactories;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "FragmentEntryPoint"
+.end annotation
+
+
+# virtual methods
+.method public abstract getHiltInternalFactoryFactory()Ldagger/hilt/android/internal/lifecycle/DefaultViewModelFactories$InternalFactoryFactory;
+.end method

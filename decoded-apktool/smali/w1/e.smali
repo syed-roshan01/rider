@@ -1,0 +1,14 @@
+.class public abstract Lw1/e;
+.super Ljava/lang/Object;
+
+
+# direct methods
+.method public static a(Landroid/view/View;)Landroid/view/contentcapture/ContentCaptureSession;
+    .locals 0
+
+    invoke-virtual {p0}, Landroid/view/View;->getContentCaptureSession()Landroid/view/contentcapture/ContentCaptureSession;
+
+    move-result-object p0
+
+    return-object p0
+.end method

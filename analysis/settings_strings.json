@@ -1,0 +1,1018 @@
+{
+  "_meta": {
+    "source": "decoded-apktool/smali/g5/b.smali - class Lg5/b; (lines 1-11357); string table built in <clinit> (lines 14-10938)",
+    "class_layout": {
+      "a": "public static final List<g5.a> - 9 language descriptors. g5.a (toString \"LanguageItem(code=.., name=.., nativeName=..)\") has fields a=ISO lang code, b=English language name, c=language name in its own script. Creation order in <clinit> (lines 25-167): en, hi, ta, kn, te, ml, mr, bn, pa. Runtime list order is scrambled by opaque array-index writes (sget int-field xor constant) and was not recovered.",
+      "b": "public static final Map<String, Map<String, String>> - langCode -> (stringKey -> text). Built with kotlin mapOf(...) from Pair arrays in 9 chunks, each closed by const-string lang code + mapOf (e.g. line 2179 \"en\"); chunk creation order: en, hi, bn, ta, kn, te, ml, mr, pa. Entry counts: en=111 (complete), hi=104, bn=103, ta/kn/te/ml/mr/pa=61. Runtime map iteration order is scrambled the same way and was not recovered (irrelevant for lookup).",
+      "short": "private static final short[17] - NOT table data. Stores only 3 small XOR-encoded strings used at runtime: offset 0, length 7, xor key 0x8a3 -> \"context\" (checkNotNullParameter name in a()); offset 7, length 8, xor key 0xa51 -> \"langCode\" (checkNotNullParameter name in b()); offset 15, length 2, xor key 0x9f5 -> \"en\" (fallback lang code used by b()). Decode helpers e.g. Ld7/...->([SIII)Ljava/lang/String; implement chars[i] = (shorts[offset + i] ^ xorKey) as char over args (shorts, offset, length, xorKey). The accessor method on g5/b returns this array, or null when the integrity int it checks is negative."
+    },
+    "lookup_semantics_b": {
+      "signature": "public static String b(String key, String langCode) - smali Lg5/b;->b(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String; (lines 11032-11289)",
+      "steps": [
+        "checkNotNullParameter(langCode, \"langCode\") - p1 (2nd arg) is the language code, p0 (1st arg) is the string key",
+        "langMap = b.get(langCode)  (java.util.Map.get via wrapper)",
+        "if (langMap == null) langMap = b.get(\"en\")  - unknown lang code falls back entirely to the English map; \"en\" is decrypted from short[] (offset 15, xor 0x9f5)",
+        "text = langMap.get(key)",
+        "if (text == null) text = b.get(\"en\").get(key)  - key missing in the requested language falls back to the English text",
+        "if (text != null) return text; else return key  - unknown key is echoed back as-is; b() never returns null"
+      ],
+      "short_table_role": "Only provides the literal \"en\" (fallback code) and two checkNotNullParameter name strings (\"context\", \"langCode\"). All 111 keys and all 995 texts are plain data in <clinit>: const-string literals plus trivial string-accessor constants; nothing table-related is encrypted in the short[] array."
+    },
+    "locale_switch_a": {
+      "signature": "public static void a(Context context, String langCode) - smali lines 10939-11030",
+      "steps": [
+        "checkNotNullParameter(context, \"context\")",
+        "try { locale = new Locale(langCode); Locale.setDefault(locale);",
+        "cfg = new Configuration(context.getResources().getConfiguration()); cfg.setLocale(locale);",
+        "context.getResources().updateConfiguration(cfg, context.getResources().getDisplayMetrics());",
+        "context.createConfigurationContext(cfg);  (result only null-checked, not stored)",
+        "} catch (Exception) { /* silently ignored */ }"
+      ],
+      "note": "Legacy in-place locale switch: mutates the default Locale and the Resources Configuration of the process. Exceptions are swallowed by an opaque sparse-switch catch block. Verified wrapper calls: Locale.setDefault, Configuration.setLocale, Resources.updateConfiguration, Context.createConfigurationContext, Map.get, Intrinsics.checkNotNullParameter."
+    },
+    "extraction": {
+      "method": "Static reconstruction of <clinit> register data-flow (no execution): const-string literals decoded from smali \\uXXXX escapes; strings delivered through the obfuscator per-string accessor methods (static ...()Ljava/lang/String; returning a const-string behind junk control flow) resolved via analysis/accessor_strings.json; kotlin `to(a,b)` pair calls (Lz6/a;->n0 and one other helper) treated as (key -> text); kotlin mapOf([Lq8/f;) groups delimited by new-array / aput-object / D0 calls.",
+      "validation": "All 693 pair constructions land in exactly one map each (684 inner + 9 outer = 693); all 111 keys are distinct snake_case identifiers; every key present in any language also exists in en; several pairs verified against raw smali lines.",
+      "per_language_coverage": {
+        "en": 111,
+        "hi": 104,
+        "bn": 103,
+        "ta": 61,
+        "kn": 61,
+        "te": 61,
+        "ml": 61,
+        "mr": 61,
+        "pa": 61
+      },
+      "missing_translation_behavior": "A key absent from a language map is omitted from that key row in this JSON; at runtime b() serves the English text."
+    },
+    "language_names": "The 9 language display names (English/Hindi/Bengali/Tamil/Kannada/Telugu/Malayalam/Marathi/Punjabi and their native spellings) are NOT string-table keys. They come from the List<g5.a> field a (see class_layout.a and languages[]).",
+    "languages": [
+      {
+        "code": "en",
+        "name": "English",
+        "native_name": "English",
+        "table_entries": 111
+      },
+      {
+        "code": "hi",
+        "name": "Hindi",
+        "native_name": "हिंदी",
+        "table_entries": 104
+      },
+      {
+        "code": "bn",
+        "name": "Bengali",
+        "native_name": "বাংলা",
+        "table_entries": 103
+      },
+      {
+        "code": "ta",
+        "name": "Tamil",
+        "native_name": "தமிழ்",
+        "table_entries": 61
+      },
+      {
+        "code": "kn",
+        "name": "Kannada",
+        "native_name": "ಕನ್ನಡ",
+        "table_entries": 61
+      },
+      {
+        "code": "te",
+        "name": "Telugu",
+        "native_name": "తెలుగు",
+        "table_entries": 61
+      },
+      {
+        "code": "ml",
+        "name": "Malayalam",
+        "native_name": "മലയാളം",
+        "table_entries": 61
+      },
+      {
+        "code": "mr",
+        "name": "Marathi",
+        "native_name": "मराठी",
+        "table_entries": 61
+      },
+      {
+        "code": "pa",
+        "name": "Punjabi",
+        "native_name": "ਪੰਜਾਬੀ",
+        "table_entries": 61
+      }
+    ],
+    "requested_keys_absent_from_table": [
+      "accessibility_enabled",
+      "service_enabled",
+      "ride_alert_enabled"
+    ]
+  },
+  "accept_label": {
+    "en": "Accept",
+    "hi": "स्वीकार",
+    "bn": "গ্রহণ"
+  },
+  "accept_timer_desc": {
+    "en": "The accept timer countdown animation will be removed and popups will appear instantly. Requires Shizuku.",
+    "hi": "टाइमर एनीमेशन हटा दिया जाएगा और राइड तुरंत स्वीकार होगी। शिज़ुकु आवश्यक है।",
+    "bn": "অ্যাকসেপ্ট টাইমার কাউন্টডাউন অ্যানিমেশন সরানো হবে এবং পপআপ সাথে সাথে ভাসবে। শিযুকু প্রয়োজন।",
+    "ta": "டைமர் அனிமேஷன் அகற்றப்பட்டு பாப்அப்கள் உடனடியாக தோன்றும். ஷிசுகு தேவை.",
+    "kn": "ಆಕ್ಸೆಪ್ಟ್ ಟೈಮರ್ ಕೌಂಟ್‌ಡೌನ್ ಅನಿಮೇಷನ್ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ ಮತ್ತು ಪಾಪ್‌ಅಪ್‌ಗಳು ತಕ್ಷಣ ಗೋಚರಿಸುತ್ತವೆ. ಶಿಜುಕು ಅಗತ್ಯವಿದೆ.",
+    "te": "అంగీకార టైమర్ యానిమేషన్ తొలగించబడుతుంది మరియు పాపప్‌లు తక్షణమే కనిపిస్తాయి. షిజుకు అవసరం.",
+    "ml": "ആക്‌സെപ്റ്റ് ടൈമർ കൗണ്ട്ഡൗൺ ആനിമേഷൻ നീക്കം ചെയ്യപ്പെടും, പോപ്പ്അപ്പുകൾ ഉടനടി വരും. ഷിസുകു വേണം.",
+    "mr": "एक्सेप्ट टाइमर काउंटडाऊन ॲनिमेशन काढले जाईल आणि पॉपअप लगेच दिसतील. शिझुकु आवश्यक.",
+    "pa": "ਐਕਸੈਪਟ ਟਾਈਮਰ ਕਾਊਂਟਡਾਊਨ ਐਨੀਮੇਸ਼ਨ ਹਟਾਇਆ ਜਾਵੇਗਾ ਅਤੇ ਪੌਪਅੱਪ ਤੁਰੰਤ ਦਿਖਾਈ ਦੇਣਗੇ। ਸ਼ਿਜ਼ੂਕੂ ਲੋੜੀਂਦਾ ਹੈ।"
+  },
+  "accept_timer_title": {
+    "en": "Ola accept timers remove",
+    "hi": "ओला एक्सेप्ट टाइमर हटाएं",
+    "bn": "ওলা অ্যাকসেপ্ট টাইমার সরান",
+    "ta": "ஓலா அக்செப்ட் டைமரை அகற்று",
+    "kn": "ಓಲಾ ಆಕ್ಸೆಪ್ಟ್ ಟೈಮರ್ ತೆಗೆದುಹಾಕಿ",
+    "te": "ఓలా అంగీకార టైమర్‌ను తొలగించండి",
+    "ml": "ഓല ആക്‌സെപ്റ്റ് ടൈമർ നീക്കം ചെയ്യുക",
+    "mr": "ओला एक्सेप्ट टाइमर हटवा",
+    "pa": "ਓਲਾ ਐਕਸੈਪਟ ਟਾਈਮਰ ਹਟਾਓ"
+  },
+  "accepted": {
+    "en": "Accepted",
+    "hi": "स्वीकृत",
+    "bn": "গৃহীত"
+  },
+  "active_filters": {
+    "en": "Active Filters",
+    "hi": "सक्रिय फ़िल्टर",
+    "bn": "সক্রিয় ফিল্টার"
+  },
+  "add_filter": {
+    "en": "Add Filter",
+    "hi": "फ़िल्टर जोड़ें",
+    "bn": "ফিল্টার যোগ করুন"
+  },
+  "alert_on_accept": {
+    "en": "Alert on Accept",
+    "hi": "स्वीकार करने पर अलर्ट",
+    "bn": "অ্যাকসেপ্ট হলে সতর্কবার্তা",
+    "ta": "ஏற்கும்போது எச்சரிக்கை",
+    "kn": "ಆಕ್ಸೆಪ್ಟ್ ಆದಾಗ ಎಚ್ಚರಿಕೆ",
+    "te": "అంగీకరించినప్పుడు అలర్ట్ చేయి",
+    "ml": "ആക്‌സെപ്റ്റ് ചെയ്യുമ്പോൾ അലേർട്ട്",
+    "mr": "एक्सेप्ट झाल्यावर अलर्ट",
+    "pa": "ਐਕਸੈਪਟ ਹੋਣ 'ਤੇ ਅਲਰਟ"
+  },
+  "anti_detection_desc": {
+    "en": "Prevents ride apps from detecting Developer Options or blocking auto-accept.",
+    "hi": "राइड ऐप्स को डेवलपर विकल्प का पता लगाने से रोकता है।",
+    "bn": "রাইড অ্যাপগুলোকে ডেভেলপার অপশন সনাক্ত করতে বাধা দেয়।",
+    "ta": "ரைடு ஆப்ஸ்கள் டெவலப்பர் விருப்பங்களைக் கண்டறிவததைத் தடுக்கிறது.",
+    "kn": "ರೈಡ್ ಆಪ್‌ಗಳು ಡೆವಲಪರ್ ಆಯ್ಕೆಗಳನ್ನು ಪತ್ತೆಹಚ್ಚುವುದನ್ನು ತಡೆಯುತ್ತದೆ.",
+    "te": "రైడ్ యాప్‌లు డెవలపర్ ఎంపికలను గుర్తించకుండా నిరోధిస్తుంది.",
+    "ml": "റൈഡ് ആപ്പുകൾ ഡെവലപ്പർ ഓപ്ഷനുകൾ കണ്ടെത്തുന്നതിൽ നിന്ന് തടയുന്നു.",
+    "mr": "राइड ॲप्सना डेव्हलपर पर्याय ओळखण्यापासून रोखते.",
+    "pa": "ਰਾਈਡ ਐਪਾਂ ਨੂੰ ਡਿਵੈਲਪਰ ਵਿਕਲਪਾਂ ਦਾ ਪਤਾ ਲਗਾਉਣ ਤੋਂ ਰੋਕਦਾ ਹੈ।"
+  },
+  "anti_detection_title": {
+    "en": "Hide Developer Options",
+    "hi": "डेवलपर विकल्प छुपाएं",
+    "bn": "ডেভেলপার অপশন লুকান",
+    "ta": "டெவலப்பர் விருப்பங்களை மறை",
+    "kn": "ಡೆವಲಪರ್ ಆಯ್ಕೆಗಳನ್ನು ಮರೆಮಾಡಿ",
+    "te": "డెవలపర్ ఎంపికలను దాచండి",
+    "ml": "ഡെവലപ്പർ ഓപ്ഷനുകൾ മറയ്ക്കുക",
+    "mr": "डेव्हलपर पर्याय लपवा",
+    "pa": "ਡਿਵੈਲਪਰ ਵਿਕਲਪ ਲੁਕਾਓ"
+  },
+  "app_name": {
+    "en": "Ride Accepter Pro",
+    "hi": "राइड एक्सेप्टर प्रो",
+    "bn": "রাইড অ্যাকসেপ্টর প্রো",
+    "ta": "ரைட் அக்செப்டர் புரோ",
+    "kn": "ರೈಡ್ ಆಕ್ಸೆಪ್ಟರ್ ಪ್ರೊ",
+    "te": "రైడ్ ఆక్సెప్టర్ ప్రో",
+    "ml": "റൈഡ് ആക്‌സെപ്റ്റർ പ്രോ",
+    "mr": "राइड एक्सेप्टर प्रो",
+    "pa": "ਰਾਈਡ ਐਕਸੈਪਟਰ ਪ੍ਰੋ"
+  },
+  "apps": {
+    "en": "Apps",
+    "hi": "ऐप्स",
+    "bn": "অ্যাপস",
+    "ta": "ஆப்ஸ்",
+    "kn": "ಆಪ್ಸ್‌ಗಳು",
+    "te": "యాప్‌లు",
+    "ml": "ആപ്പുകൾ",
+    "mr": "ॲप्स",
+    "pa": "ਐਪਸ"
+  },
+  "auto_accept_active": {
+    "en": "Auto-Accept Active",
+    "hi": "ऑटो-एक्सेप्ट चालू",
+    "bn": "অটো-অ্যাকসেপ্ট সক্রিয়"
+  },
+  "auto_accept_paused": {
+    "en": "Auto-Accept Paused",
+    "hi": "ऑटो-एक्सेप्ट रुका हुआ",
+    "bn": "অটো-অ্যাকসেপ্ট বিরতি"
+  },
+  "clear_all": {
+    "en": "Clear All",
+    "hi": "सब हटाएं",
+    "bn": "সব মুছুন"
+  },
+  "dashboard": {
+    "en": "Dashboard",
+    "hi": "डैशबोर्ड",
+    "bn": "ড্যাশবোর্ড",
+    "ta": "டாஷ்போர்டு",
+    "kn": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+    "te": "డాష్‌బోర్డ్",
+    "ml": "ഡാഷ്‌ബോർഡ്",
+    "mr": "डॅशबोर्ड",
+    "pa": "ਡੈਸ਼ਬੋਰਡ"
+  },
+  "dev_hidden_status": {
+    "en": "Developer options are currently hidden from ride apps.",
+    "hi": "डेवलपर विकल्प फ़िलहाल राइड ऐप्स से छुपा हुआ है।",
+    "bn": "ডেভেলপার অপশন বর্তমানে রাইড অ্যাপ থেকে লুকানো আছে।"
+  },
+  "dev_options_disabled_toast": {
+    "en": "Developer options disabled! Tap 'Build Number' 7 times in About Phone.",
+    "hi": "डेवलपर विकल्प बंद हैं! 'अबाउट फोन' में 'बिल्ड नंबर' पर 7 बार टैप करें।",
+    "bn": "ডেভেলপার অপশন বন্ধ! 'এবাউট ফোন' এ 'বিল্ড নাম্বার' এ ৭ বার ট্যাপ করুন।"
+  },
+  "dev_options_guide": {
+    "en": "Enable Developer Options",
+    "hi": "डेवलपर विकल्प चालू करें",
+    "bn": "ডেভেলপার অপশন চালু করুন",
+    "ta": "டெவலப்பர் விருப்பங்களை இயக்கும்",
+    "kn": "ಡೆವಲಪರ್ ಆಯ್ಕೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "te": "డెవలపర్ ఎంపికలను ప్రారంభించండి",
+    "ml": "ഡെവലപ്പർ ഓപ്ഷനുകൾ ഓണാക്കുക",
+    "mr": "डेव्हलपर पर्याय सुरू करा",
+    "pa": "ਡਿਵੈਲਪਰ ਵਿਕਲਪ ਚਾਲੂ ਕਰੋ"
+  },
+  "dev_options_hidden": {
+    "en": "Developer Options Hidden ✓",
+    "hi": "डेवलपर विकल्प छुपाया गया ✓",
+    "bn": "ডেভেলপার অপশন লুকানো হয়েছে ✓"
+  },
+  "dev_options_restored": {
+    "en": "Developer Options Restored ✓",
+    "hi": "डेवलपर विकल्प वापस लाया गया ✓",
+    "bn": "ডেভেলপার অপশন ফিরিয়ে আনা হয়েছে ✓"
+  },
+  "distance_filter": {
+    "en": "Distance Filter",
+    "hi": "दूरी फ़िल्टर",
+    "bn": "দূরত্ব ফিল্টার"
+  },
+  "driver_apps_status": {
+    "en": "Driver Apps Status",
+    "hi": "ड्राइवर ऐप स्थिति",
+    "bn": "ড্রাইভার অ্যাপ স্ট্যাটাস",
+    "ta": "டிரைவர் ஆப்ஸ் நிலை",
+    "kn": "ಚಾಲಕ ಆಪ್ಸ್‌ಗಳ ಸ್ಥಿತಿ",
+    "te": "డ్రైవర్ యాప్‌ల స్థితి",
+    "ml": "ഡ്രൈവർ ആപ്പ് സ്റ്റാറ്റസ്",
+    "mr": "ड्रायव्हर ॲप्स स्थिती",
+    "pa": "ਡਰਾਈਵਰ ਐਪਾਂ ਦੀ ਸਥਿਤੀ"
+  },
+  "driving_language_notice": {
+    "en": "Please keep your driving app's language set to English for reliable auto-accept detection.",
+    "hi": "विश्वसनीय ऑटो-एक्सेप्ट डिटेक्शन के लिए कृपया अपने ड्राइविंग ऐप की भाषा अंग्रेज़ी में रखें।",
+    "bn": "নির্ভরযোগ্য অটো-অ্যাকসেপ্ট শনাক্তকরণের জন্য অনুগ্রহ করে আপনার ড্রাইভিং অ্যাপের ভাষা ইংরেজিতে রাখুন।",
+    "ta": "நம்பகமான ஆட்டோ-ஏற்றல் கண்டறிதலுக்கு உங்கள் ஓட்டுநர் பயன்பாட்டின் மொழியை ஆங்கிலத்தில் வைத்திருக்கவும்.",
+    "kn": "ವಿಶ್ವಾಸಾರ್ಹ ಆಟೋ-ಆಕ್ಸೆಪ್ಟ್ ಪತ್ತೆಗಾಗಿ ದಯವಿಟ್ಟು ನಿಮ್ಮ ಡ್ರೈವಿಂಗ್ ಆ್ಯಪ್‌ನ ಭಾಷೆಯನ್ನು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಇರಿಸಿ.",
+    "te": "నమ్మదగిన ఆటో-యాక్సెప్ట్ గుర్తింపు కోసం దయచేసి మీ డ్రైవింగ్ యాప్ భాషను ఇంగ్లీష్‌లో ఉంచండి.",
+    "ml": "വിശ്വസനീയമായ ഓട്ടോ-ആക്സെപ്റ്റ് കണ്ടെത്തലിന് ദയവായി നിങ്ങളുടെ ഡ്രൈവിംഗ് ആപ്പിന്റെ ഭാഷ ഇംഗ്ലീഷിൽ സൂക്ഷിക്കുക.",
+    "mr": "विश्वासार्ह ऑटो-अ‍ॅक्सेप्ट डिटेक्शनसाठी कृपया तुमच्या ड्रायव्हिंग अ‍ॅपची भाषा इंग्रजीत ठेवा.",
+    "pa": "ਭਰੋਸੇਯੋਗ ਆਟੋ-ਐਕਸੈਪਟ ਖੋਜ ਲਈ ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਡਰਾਈਵਿੰਗ ਐਪ ਦੀ ਭਾਸ਼ਾ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਰੱਖੋ।"
+  },
+  "drop_distance_km": {
+    "en": "Drop Distance (km)",
+    "hi": "ड्रॉप दूरी (किमी)",
+    "bn": "ড্রপ দূরত্ব (কিমি)"
+  },
+  "email": {
+    "en": "Email"
+  },
+  "enable_accessibility": {
+    "en": "Enable Accessibility Service",
+    "hi": "एक्सेसिबिलिटी सेवा चालू करें",
+    "bn": "অ্যাক্সেসিবিলিটি সার্ভিস চালু করুন",
+    "ta": "அணுகல்தன்மை சேவையை இயக்கும்",
+    "kn": "ಅಕ್ಸೆಸಿಬಿಲಿಟಿ ಸೇವೆಯನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "te": "యాక్సెసిబిలిటీ సర్వీస్‌ను ప్రారంభించండి",
+    "ml": "ആക്‌സസിബിലിറ്റി സർവീസ് ഓണാക്കുക",
+    "mr": "ॲक्सेसिबिलिटी सर्व्हिस सुरू करा",
+    "pa": "ਐਕਸੈਸਿਬਿਲਟੀ ਸਰਵਿਸ ਚਾਲੂ ਕਰੋ"
+  },
+  "enable_dev_options": {
+    "en": "Enable Developer Options",
+    "hi": "डेवलपर विकल्प चालू करें",
+    "bn": "ডেভেলপার অপশন চালু করুন",
+    "ta": "டெவலப்பர் விருப்பங்களை இயக்கும்",
+    "kn": "ಡೆವಲಪರ್ ಆಯ್ಕೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "te": "డెవలపర్ ఎంపికలను ప్రారంభించండి",
+    "ml": "ഡെവലപ്പർ ഓപ്ഷനുകൾ ഓണാക്കുക",
+    "mr": "डेव्हलपर पर्याय सुरू करा",
+    "pa": "ਡਿਵੈਲਪਰ ਵਿਕਲਪ ਚਾਲੂ ਕਰੋ"
+  },
+  "enable_shizuku_first": {
+    "en": "Enable Shizuku first to use this feature",
+    "hi": "पहले शिज़ुकु चालू करें",
+    "bn": "আগে শিযুকু চালু করুন"
+  },
+  "expires": {
+    "en": "Expires"
+  },
+  "fare_filter": {
+    "en": "Fare Filter",
+    "hi": "किराया फ़िल्टर",
+    "bn": "ভাড়া ফিল্টার",
+    "ta": "கட்டண ஃபில்டர்",
+    "kn": "ದರ ಫಿಲ್ಟರ್",
+    "te": "ఛార్జీ ఫిల్టర్",
+    "ml": "നിരക്ക് ഫിൽട്ടർ",
+    "mr": "भाडे फिल्टर",
+    "pa": "ਕਿਰਾਇਆ ਫਿਲਟਰ"
+  },
+  "filter_by_distance": {
+    "en": "Filter by Distance",
+    "hi": "दूरी से फ़िल्टर",
+    "bn": "দূরত্ব দিয়ে ফিল্টার"
+  },
+  "filter_by_location": {
+    "en": "Filter by Drop Location",
+    "hi": "ड्रॉप स्थान से फ़िल्टर",
+    "bn": "ড্রপ লোকেশন দিয়ে ফিল্টার"
+  },
+  "filter_saved": {
+    "en": "Filter Saved ✓",
+    "hi": "फ़िल्टर सेव हुआ ✓",
+    "bn": "ফিল্টার সেভ হয়েছে ✓",
+    "ta": "ஃபில்டர் சேமிக்கப்பட்டது ✓",
+    "kn": "ಫಿಲ್ಟರ್ ಉಳಿಸಲಾಗಿದೆ ✓",
+    "te": "ఫిల్టర్ సేవ్ అయింది ✓",
+    "ml": "ഫിൽട്ടർ സേവ് ചെയ്തു ✓",
+    "mr": "फिल्टर सेव्ह झाले ✓",
+    "pa": "ਫਿਲਟਰ ਸੇਵ ਹੋ ਗਿਆ ✓"
+  },
+  "filters": {
+    "en": "Filters",
+    "hi": "फ़िल्टर",
+    "bn": "ফিল্টার",
+    "ta": "ஃபில்டர்கள்",
+    "kn": "ಫಿಲ್ಟರ್‌ಗಳು",
+    "te": "ఫిల్టర్లు",
+    "ml": "ഫിൽട്ടറുകൾ",
+    "mr": "फिल्टर",
+    "pa": "ਫਿਲਟਰ"
+  },
+  "grant_overlay": {
+    "en": "Grant Display Over Other Apps",
+    "hi": "अन्य ऐप्स के ऊपर प्रदर्शन की अनुमति दें",
+    "bn": "অন্যান্য অ্যাপের উপরে প্রদর্শনের অনুমতি দিন",
+    "ta": "பிற ஆப்ஸ்களின் மேல் காண்பிக்க அனுமதி வழங்கவும்",
+    "kn": "ಇತರ ಆಪ್‌ಗಳ ಮೇಲೆ ಪ್ರದರ್ಶಿಸಲು ಅನುಮತಿ ನೀಡಿ",
+    "te": "ఇతర యాప్‌లపై డిస్‌ప్లే అనుమతి ఇవ్వండి",
+    "ml": "മറ്റ് ആപ്പുകൾക്ക് മുകളിൽ കാണിക്കാൻ അനുമതി നൽകുക",
+    "mr": "इतर ॲप्सवर प्रदर्शित करण्याची परवानगी द्या",
+    "pa": "ਹੋਰ ਐਪਾਂ ਦੇ ਉੱਪਰ ਦਿਖਾਉਣ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ"
+  },
+  "grant_permissions_first": {
+    "en": "Grant permissions first",
+    "hi": "पहले अनुमतियां दें",
+    "bn": "আগে অনুমতি দিন"
+  },
+  "grant_shizuku_btn": {
+    "en": "Grant Shizuku Permission / Pair",
+    "hi": "शिज़ुकु अनुमति दें / पेयर करें",
+    "bn": "শিযুকু অনুমতি দিন / পেয়ার করুন",
+    "ta": "ஷிசுகு அனுமதி வழங்கவும் / இணைக்கவும்",
+    "kn": "ಶಿಜುಕು ಅನುಮತಿ ನೀಡಿ / ಜೋಡಿಸಿ",
+    "te": "షిజుకు అనుమతి ఇవ్వండి / జత చేయండి",
+    "ml": "ഷിസുകു അനുമതി നൽകുക / ജോടിയാക്കുക",
+    "mr": "शिझुकु परवानगी द्या / पेअर करा",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਇਜਾਜ਼ਤ ਦਿਓ / ਪੇਅਰ ਕਰੋ"
+  },
+  "hide_btn": {
+    "en": "Hide",
+    "hi": "छुपाएं",
+    "bn": "লুকান"
+  },
+  "history": {
+    "en": "Ride History",
+    "hi": "राइड इतिहास",
+    "bn": "রাইড ইতিহাস",
+    "ta": "ரைடு வரலாறு",
+    "kn": "ರೈಡ್ ಇತಿಹಾಸ",
+    "te": "రైడ్ చరిత్ర",
+    "ml": "റൈഡ് ഹിസ്റ്ററി",
+    "mr": "राइड इतिहास",
+    "pa": "ਰਾਈਡ ਇਤਿਹਾਸ"
+  },
+  "how_to_use": {
+    "en": "How to Use"
+  },
+  "install_shizuku_btn": {
+    "en": "Install Shizuku App (Play Store)",
+    "hi": "शिज़ुकु ऐप इंस्टॉल करें (प्ले स्टोर)",
+    "bn": "শিযুকু অ্যাপ ইনস্টল করুন (প্লে স্টোর)",
+    "ta": "ஷிசுகு ஆப் நிறுவவும் (பிளே ஸ்டோர்)",
+    "kn": "ಶಿಜುಕು ಆಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ (ಪ್ಲೇ ಸ್ಟೋರ್)",
+    "te": "షిజుకు యాప్ ఇన్‌స్టాల్ చేయండి (ప్లే స్టోర్)",
+    "ml": "ഷിസുകു ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക (പ്ലേ സ്റ്റോർ)",
+    "mr": "शिझुकु ॲप इन्स्टॉल करा (प्ले स्टोअर)",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਐਪ ਇੰਸਟਾਲ ਕਰੋ (ਪਲੇ ਸਟੋਰ)"
+  },
+  "installed_apps": {
+    "en": "Installed Target Apps",
+    "hi": "इंस्टॉल किए गए ऐप्स",
+    "bn": "ইনস্টল করা অ্যাপস",
+    "ta": "நிறுவப்பட்ட ஆப்ஸ்",
+    "kn": "ಇನ್‌ಸ್ಟಾಲ್ ಆಗಿರುವ ಆಪ್ಸ್‌ಗಳು",
+    "te": "ఇన్‌స్టాల్ చేసిన యాప్‌లు",
+    "ml": "ഇൻസ്റ്റാൾ ചെയ്ത ആപ്പുകൾ",
+    "mr": "इन्स्टॉल केलेले ॲप्स",
+    "pa": "ਇੰਸਟਾਲ ਕੀਤੀਆਂ ਐਪਾਂ"
+  },
+  "installed_apps_desc": {
+    "en": "Only apps installed on your device are shown. Toggle to enable/disable auto-accept per app.",
+    "hi": "केवल आपके डिवाइस पर इंस्टॉल किए गए ऐप्स दिखाए जाते हैं। प्रति ऐप ऑटो-एक्सेप्ट चालू/बंद करें।",
+    "bn": "শুধুমাত্র ইনস্টল করা অ্যাপস দেখানো হচ্ছে। প্রতি অ্যাপে অটো-অ্যাকসেপ্ট চালু/বন্ধ করুন।"
+  },
+  "location_filter": {
+    "en": "Location Filter",
+    "hi": "स्थान फ़िल्टर",
+    "bn": "লোকেশন ফিল্টার"
+  },
+  "master_filter_toggle": {
+    "en": "Master Filter Switch",
+    "hi": "मास्टर फ़िल्टर स्विच",
+    "bn": "মাস্টার ফিল্টার সুইচ",
+    "ta": "மாஸ்டர் ஃபில்டர் சுவிட்ச்",
+    "kn": "ಮಾಸ್ಟರ್ ಫಿಲ್ಟರ್ ಸ್ವಿಚ್",
+    "te": "మాస్టర్ ఫిల్టర్ స్విచ్",
+    "ml": "മാസ്റ്റർ ഫിൽട്ടർ സ്വിച്ച്",
+    "mr": "मास्टर फिल्टर स्विच",
+    "pa": "ਮਾਸਟਰ ਫਿਲਟਰ ਸਵਿੱਚ"
+  },
+  "max_km": {
+    "en": "Max km",
+    "hi": "अधिकतम किमी",
+    "bn": "সর্বোচ্চ কিমি"
+  },
+  "min_fare": {
+    "en": "Minimum Fare Filter (₹)",
+    "hi": "न्यूनतम किराया फ़िल्टर (₹)",
+    "bn": "সর্বনিম্ন ভাড়া ফিল্টার (₹)",
+    "ta": "குறைந்தபட்ச கட்டண ஃபில்டர் (₹)",
+    "kn": "ಕನಿಷ್ಠ ದರ ಫಿಲ್ಟರ್ (₹)",
+    "te": "కనిష్ట ఛార్జీ ఫిల్టర్ (₹)",
+    "ml": "കുറഞ്ഞ നിരക്ക് ഫിൽട്ടർ (₹)",
+    "mr": "किमान भाडे फिल्टर (₹)",
+    "pa": "ਘੱਟੋ-ਘੱਟ ਕਿਰਾਇਆ ਫਿਲਟਰ (₹)"
+  },
+  "min_km": {
+    "en": "Min km",
+    "hi": "न्यूनतम किमी",
+    "bn": "ন্যূনতম কিমি"
+  },
+  "monitoring_ride_apps": {
+    "en": "Monitoring ride apps",
+    "hi": "राइड ऐप्स की निगरानी कर रहा है",
+    "bn": "রাইড অ্যাপস মনিটরিং করা হচ্ছে"
+  },
+  "name": {
+    "en": "Name"
+  },
+  "no_apps_found_desc": {
+    "en": "Install Ola Driver, Uber Driver, Rapido Captain, or Porter to get started.",
+    "hi": "शुरू करने के लिए ओला ड्राइवर, उबर ड्राइवर, रैपिडो कैप्टन, या पोर्टर इंस्टॉल करें।",
+    "bn": "শুরু করতে ওলা ড্রাইভার, উবার ড্রাইভার, র‍্যাপিডো ক্যাপ্টেন, বা পোর্টার ইনস্টল করুন।"
+  },
+  "no_apps_found_title": {
+    "en": "No Supported Driver Apps Found",
+    "hi": "कोई समर्थित ड्राइवर ऐप नहीं मिला",
+    "bn": "কোনো সমর্থিত ড্রাইভার অ্যাপ পাওয়া যায়নি"
+  },
+  "no_rides_yet": {
+    "en": "No rides yet",
+    "hi": "अभी तक कोई राइड नहीं",
+    "bn": "এখনো কোনো রাইড নেই"
+  },
+  "onboarding_title": {
+    "en": "Quick App Setup & Permissions",
+    "hi": "त्वरित ऐप सेटअप और अनुमतियां",
+    "bn": "দ্রুত অ্যাপ সেটআপ ও অনুমতি",
+    "ta": "விரைவு ஆப் அமைப்பு & அனுமதிகள்",
+    "kn": "ತ್ವರಿತ ಆಪ್ ಸೆಟಪ್ ಮತ್ತು ಅನುಮತಿಗಳು",
+    "te": "శీఘ్ర యాప్ సెటప్ & అనుమతులు",
+    "ml": "ക്വിക്ക് ആപ്പ് സെറ്റപ്പും അനുമതികളും",
+    "mr": "जलद ॲप सेटअप आणि परवानग्या",
+    "pa": "ਤੁਰੰਤ ਐਪ ਸੈਟਅੱਪ ਅਤੇ ਇਜਾਜ਼ਤਾਂ"
+  },
+  "open_accessibility": {
+    "en": "Enable Accessibility Service",
+    "hi": "एक्सेसिबिलिटी सेवा चालू करें",
+    "bn": "অ্যাক্সেসিবিলিটি সার্ভিস চালু করুন",
+    "ta": "அணுகல்தன்மை சேவையை இயக்கும்",
+    "kn": "ಅಕ್ಸೆಸಿಬಿಲಿಟಿ ಸೇವೆಯನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    "te": "యాక్సెసిబిలిటీ సర్వీస్‌ను ప్రారంభించండి",
+    "ml": "ആക്‌സസിബിലിറ്റി സർവീസ് ഓണാക്കുക",
+    "mr": "ॲक्सेसिबिलिटी सर्व्हिस सुरू करा",
+    "pa": "ਐਕਸੈਸਿਬਿਲਟੀ ਸਰਵਿਸ ਚਾਲੂ ਕਰੋ"
+  },
+  "open_dev_options": {
+    "en": "Open Developer Settings",
+    "hi": "डेवलपर सेटिंग्स खोलें",
+    "bn": "ডেভেলপার সেটিংস খুলুন",
+    "ta": "டெவலப்பர் அமைப்புகளைத் திறக்கவும்",
+    "kn": "ಡೆವಲಪರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ",
+    "te": "డెవలపర్ సెట్టింగ్‌లను తెరవండి",
+    "ml": "ഡെവലപ്പർ ക്രമീകരണങ്ങൾ തുറക്കുക",
+    "mr": "डेव्हलपर सेटिंग्ज उघडा",
+    "pa": "ਡਿਵੈਲਪਰ ਸੈਟਿੰਗਾਂ ਖੋਲ੍ਹੋ"
+  },
+  "open_overlay": {
+    "en": "Grant Overlay Permission",
+    "hi": "ओवरले अनुमति दें",
+    "bn": "ওভারলে অনুমতি দিন",
+    "ta": "மேலடுக்கு அனுமதி வழங்கவும்",
+    "kn": "ಓವರ್‌ಲೇ ಅನುಮತಿ ನೀಡಿ",
+    "te": "ఓవర్‌లే అనుమతి ఇవ్వండి",
+    "ml": "ഓവർലേ അനുമതി നൽകുക",
+    "mr": "ओव्हरले परवानगी द्या",
+    "pa": "ਓਵਰਲੇ ਇਜਾਜ਼ਤ ਦਿਓ"
+  },
+  "open_shizuku_btn": {
+    "en": "Open Shizuku App (Start Service)",
+    "hi": "शिज़ुकु ऐप खोलें (सर्विस शुरू करें)",
+    "bn": "শিযুকু অ্যাপ খুলুন (সার্ভিস শুরু করুন)",
+    "ta": "ஷிசுகு ஆப் திறக்கவும் (சேவையைத் தொடங்கு)",
+    "kn": "ಶಿಜುಕು ಆಪ್ ತೆರೆಯಿರಿ (ಸೇವೆ ಪ್ರಾರಂಭಿಸಿ)",
+    "te": "షిజుకు యాప్ తెరవండి (సర్వీస్ ప్రారంభించండి)",
+    "ml": "ഷിസുകു ആപ്പ് തുറക്കുക (സർവീസ് തുടങ്ങുക)",
+    "mr": "शिझुकु ॲप उघडा (सर्व्हिस सुरू करा)",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਐਪ ਖੋਲ੍ਹੋ (ਸਰਵਿਸ ਸ਼ੁਰੂ ਕਰੋ)"
+  },
+  "pair_shizuku": {
+    "en": "Pair & Authorize Shizuku App",
+    "hi": "शिज़ुकु ऐप पेयर और अधिकृत करें",
+    "bn": "শিযুকু অ্যাপ পেয়ার ও অনুমোদন করুন",
+    "ta": "ஷிசுகு ஆப் இணைக்கவும் மற்றும் அங்கீகரிக்கவும்",
+    "kn": "ಶಿಜುಕು ಆಪ್ ಜೋಡಿಸಿ ಮತ್ತು ಅಧಿಕೃತಗೊಳಿಸಿ",
+    "te": "షిజుకు యాప్‌ను జత చేయండి & అనుమతించండి",
+    "ml": "ഷിസുകു ആപ്പ് ജോടിയാക്കുകയും അനുമതി നൽകുകയും ചെയ്യുക",
+    "mr": "शिझुकु ॲप पेअर आणि अधिकृत करा",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਐਪ ਪੇਅਰ ਅਤੇ ਅਧਿਕਾਰਤ ਕਰੋ"
+  },
+  "payment_pending": {
+    "en": "Payment Verification Under Process...",
+    "hi": "भुगतान सत्यापन प्रक्रिया में है...",
+    "bn": "পেমেন্ট যাচাই প্রক্রিয়াধীন...",
+    "ta": "கட்டண சரிபார்ப்பு நடைபெறுகிறது...",
+    "kn": "ಪಾವತಿ ಪರಿಶೀಲನೆ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ...",
+    "te": "చెల్లింపు పరిశీలన ప్రక్రియలో ఉంది...",
+    "ml": "പേയ്‌മെന്റ് സ്ഥിരീകരണം പുരോഗമിക്കുന്നു...",
+    "mr": "पेमेंट पडताळणी प्रक्रियेत आहे...",
+    "pa": "ਭੁਗਤਾਨ ਦੀ ਪੁਸ਼ਟੀ ਚੱਲ ਰਹੀ ਹੈ..."
+  },
+  "payment_success": {
+    "en": "Payment Verified Successfully!",
+    "hi": "भुगतान सफलतापूर्वक सत्यापित!",
+    "bn": "পেমেন্ট সফলভাবে যাচাই হয়েছে!",
+    "ta": "கட்டணம் வெற்றிகரமாக சரிபார்க்கப்பட்டது!",
+    "kn": "ಪಾವತಿಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ!",
+    "te": "చెల్లింపు విజయవంతంగా పరిశీలించబడింది!",
+    "ml": "പേയ്‌മെന്റ് വിജയകരമായി സ്ഥിരീകരിച്ചു!",
+    "mr": "पेमेंट यशस्वीरित्या पडताळले गेले!",
+    "pa": "ਭੁਗਤਾਨ ਸਫਲਤਾਪੂਰਵਕ ਤਸਦੀਕ ਹੋ ਗਿਆ!"
+  },
+  "pickup_distance_km": {
+    "en": "Pickup Distance (km)",
+    "hi": "पिकअप दूरी (किमी)",
+    "bn": "পিকআপ দূরত্ব (কিমি)"
+  },
+  "plan": {
+    "en": "Plan"
+  },
+  "play_sound_on_accept": {
+    "en": "Play sound when ride is accepted",
+    "hi": "राइड स्वीकार होने पर ध्वनि बजाएं",
+    "bn": "রাইড অ্যাকসেপ্ট হলে সাউন্ড বাজান",
+    "ta": "ரைடு ஏற்கப்படும்போது ஒலி எழுப்பவும்",
+    "kn": "ರೈಡ್ ಆಕ್ಸೆಪ್ಟ್ ಆದಾಗ ಶಬ್ದ ಮಾಡಿ",
+    "te": "రైడ్ అంగీకరించినప్పుడు శబ్దం చేయండి",
+    "ml": "റൈഡ് സ്വീകരിക്കുമ്പോൾ ശബ്ദം ഉണ്ടാക്കുക",
+    "mr": "राइड स्वीकारल्यावर आवाज करा",
+    "pa": "ਰਾਈਡ ਐਕਸੈਪਟ ਹੋਣ 'ਤੇ ਆਵਾਜ਼ ਚਲਾਓ"
+  },
+  "profile": {
+    "en": "Profile",
+    "hi": "प्रोफ़ाइल"
+  },
+  "quick_setup": {
+    "en": "Quick Setup",
+    "hi": "त्वरित सेटअप",
+    "bn": "দ্রুত সেটআপ",
+    "ta": "விரைவு அமைப்பு",
+    "kn": "ತ್ವರಿತ ಸೆಟಪ್",
+    "te": "శీఘ్ర సెటప్",
+    "ml": "ക്വിക്ക് സെറ്റപ്പ്",
+    "mr": "जलद सेटअप",
+    "pa": "ਤੁਰੰਤ ਸੈਟਅੱਪ"
+  },
+  "reject_label": {
+    "en": "Reject",
+    "hi": "अस्वीकार",
+    "bn": "প্রত্যাখ্যান"
+  },
+  "restart_warning": {
+    "en": "⚠ Turn OFF → ON the service to apply changes",
+    "hi": "⚠ बदलाव लागू करने के लिए सर्विस बंद → चालू करें",
+    "bn": "⚠ পরিবর্তন প্রয়োগ করতে সার্ভিস বন্ধ → চালু করুন"
+  },
+  "restore_btn": {
+    "en": "Restore",
+    "hi": "वापस लाएं",
+    "bn": "ফিরিয়ে আনুন"
+  },
+  "ride_history": {
+    "en": "Ride History",
+    "hi": "राइड इतिहास",
+    "bn": "রাইড ইতিহাস"
+  },
+  "rides_appear_here": {
+    "en": "Accepted and skipped rides will appear here",
+    "hi": "स्वीकृत और छोड़ी हुई राइड यहां दिखाई देगी",
+    "bn": "গৃহীত ও বাদ দেওয়া রাইড এখানে দেখা যাবে"
+  },
+  "save_filter_btn": {
+    "en": "Save Filter",
+    "hi": "फ़िल्टर सेव करें",
+    "bn": "ফিল্টার সেভ করুন",
+    "ta": "ஃபில்டர் சேமிக்கவும்",
+    "kn": "ಫಿಲ್ಟರ್ ಉಳಿಸಿ",
+    "te": "ఫిల్టర్ సేవ్ చేయండి",
+    "ml": "ഫിൽട്ടർ സേവ് ചെയ്യുക",
+    "mr": "फिल्टर सेव्ह करा",
+    "pa": "ਫਿਲਟਰ ਸੇਵ ਕਰੋ"
+  },
+  "save_language": {
+    "en": "SAVE LANGUAGE",
+    "hi": "भाषा सुरक्षित करें",
+    "bn": "ভাষা সংরক্ষণ করুন",
+    "ta": "மொழியைச் சேமிக்கவும்",
+    "kn": "ಭಾಷೆಯನ್ನು ಉಳಿಸಿ (SAVE)",
+    "te": "భాషను సేవ్ చేయండి",
+    "ml": "ഭാഷ സംരക്ഷിക്കുക",
+    "mr": "भाषा जतन करा",
+    "pa": "ਭਾਸ਼ਾ ਸੰਭਾਲੋ"
+  },
+  "select_language": {
+    "en": "Select App Language",
+    "hi": "ऐप भाषा चुनें",
+    "bn": "অ্যাপ ভাষা নির্বাচন করুন",
+    "ta": "பயன்பாட்டு மொழியைத் தேர்ந்தெடுக்கவும்",
+    "kn": "ಆಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "te": "యాప్ భాషను ఎంచుకోండి",
+    "ml": "ആപ്പ് ഭാഷ തിരഞ്ഞെടുക്കുക",
+    "mr": "ॲप भाषा निवडा",
+    "pa": "ਐਪ ਭਾਸ਼ਾ ਚੁਣੋ"
+  },
+  "select_language_sub": {
+    "en": "Choose language and tap Save below",
+    "hi": "भाषा चुनें और नीचे सेलेक्ट दबाएं",
+    "bn": "ভাষা নির্বাচন করুন এবং নিচে সেভ এ চাপুন",
+    "ta": "மொழியைத் தேர்ந்தெடுத்து கீழே சேமிக்கவும்",
+    "kn": "ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಕೆಳಗೆ ಸೇವ್ ಟ್ಯಾಪ್ ಮಾಡಿ",
+    "te": "భాషను ఎంచుకుని దిగువ సేవ్ నొక్కండి",
+    "ml": "ഭാഷ തിരഞ്ഞെടുത്ത് താഴെ സേവ് അമർത്തുക",
+    "mr": "भाषा निवडा आणि खाली सेव्ह दाबा",
+    "pa": "ਭਾਸ਼ਾ ਚੁਣੋ ਅਤੇ ਹੇਠਾਂ ਸੇਵ ਦਬਾਓ"
+  },
+  "select_plan": {
+    "en": "Select Your Plan",
+    "hi": "अपना प्लान चुनें",
+    "bn": "আপনার প্ল্যান নির্বাচন করুন",
+    "ta": "உங்கள் திட்டத்தை தேர்ந்தெடுக்கவும்",
+    "kn": "ನಿಮ್ಮ ಪ್ಲಾನ್ ಆಯ್ಕೆಮಾಡಿ",
+    "te": "మీ ప్లాన్‌ను ఎంచుకోండి",
+    "ml": "നിങ്ങളുടെ പ്ലാൻ തിരഞ്ഞെടുക്കുക",
+    "mr": "आपला प्लान निवडा",
+    "pa": "ਆਪਣਾ ਪਲਾਨ ਚੁਣੋ"
+  },
+  "service_active": {
+    "en": "Service Active",
+    "hi": "सर्विस चालू",
+    "bn": "সার্ভিস সক্রিয়",
+    "ta": "சேவை செயலில் உள்ளது",
+    "kn": "ಸೇವೆ ಸಕ್ರಿಯವಾಗಿದೆ",
+    "te": "సర్వీస్ యాక్టివ్‌గా ఉంది",
+    "ml": "സർവീസ് ആക്റ്റീവ് ആണ്",
+    "mr": "सर्व्हिस सुरू आहे",
+    "pa": "ਸਰਵਿਸ ਚਾਲੂ ਹੈ"
+  },
+  "service_control": {
+    "en": "Service Control",
+    "hi": "सर्विस कंट्रोल",
+    "bn": "সার্ভিস কন্ট্রোল",
+    "ta": "சேவை கட்டுப்பாடு",
+    "kn": "ಸೇವಾ ನಿಯಂತ್ರಣ",
+    "te": "సర్వీస్ కంట్రోల్",
+    "ml": "സർവീസ് കൺട്രോൾ",
+    "mr": "सर्व्हिस कंट्रोल",
+    "pa": "ਸਰਵਿਸ ਕੰਟਰੋਲ"
+  },
+  "service_running_setup_shizuku": {
+    "en": "Service running — setup Shizuku in Settings tab for Ola & Uber.",
+    "hi": "सर्विस चालू है — ओला और उबर के लिए सेटिंग्स में शिज़ुकु सेटअप करें।",
+    "bn": "সার্ভিস চলছে — ওলা ও উবারের জন্য সেটিংসে শিযুকু সেটআপ করুন।"
+  },
+  "service_stopped": {
+    "en": "Service Stopped",
+    "hi": "सर्विस बंद",
+    "bn": "সার্ভিস বন্ধ",
+    "ta": "சேவை நிறுத்தப்பட்டது",
+    "kn": "ಸೇವೆ ನಿಂತಿದೆ",
+    "te": "సర్వీస్ ఆగిపోయింది",
+    "ml": "സർവീസ് നിർത്തി",
+    "mr": "सर्व्हिस बंद आहे",
+    "pa": "ਸਰਵਿਸ ਬੰਦ ਹੈ"
+  },
+  "service_stopped_tap_to_start": {
+    "en": "Service is currently stopped. Turn on Service Switch above to start.",
+    "hi": "सर्विस फ़िलहाल बंद है। शुरू करने के लिए ऊपर सर्विस स्विच चालू करें।",
+    "bn": "সার্ভিস বন্ধ আছে। শুরু করতে উপরে সার্ভিস সুইচ চালু করুন।"
+  },
+  "settings": {
+    "en": "Settings",
+    "hi": "सेटिंग्स",
+    "bn": "সেটিংস",
+    "ta": "அமைப்புகள்",
+    "kn": "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "te": "సెట్టింగ్‌లు",
+    "ml": "ക്രമീകരണങ്ങൾ",
+    "mr": "सेटिंग्ज",
+    "pa": "ਸੈਟਿੰਗਾਂ"
+  },
+  "setup_guide": {
+    "en": "Setup Guide",
+    "hi": "सेटअप गाइड",
+    "bn": "সেটআপ গাইড"
+  },
+  "setup_guide_desc": {
+    "en": "Follow these steps for full functionality",
+    "hi": "पूर्ण कार्यक्षमता के लिए इन चरणों का पालन करें",
+    "bn": "সম্পূর্ণ কার্যকারিতার জন্য এই পদক্ষেপগুলো অনুসরণ করুন"
+  },
+  "shizuku_active_btn": {
+    "en": "Shizuku Service Active ✓",
+    "hi": "शिज़ुकु सर्विस चालू है ✓",
+    "bn": "শিযুকু সার্ভিস সক্রিয় আছে ✓",
+    "ta": "ஷிசுகு சேவை செயல்படுகிறது ✓",
+    "kn": "ಶಿಜುಕು ಸೇವೆ ಸಕ್ರಿಯವಾಗಿದೆ ✓",
+    "te": "షిజుకు సర్వీస్ యాక్టివ్‌గా ఉంది ✓",
+    "ml": "ഷിസുകു സർവീസ് ആക്റ്റീവ് ആണ് ✓",
+    "mr": "शिझुकु सर्व्हिस सक्रिय आहे ✓",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਸਰਵਿਸ ਐਕਟਿਵ ਹੈ ✓"
+  },
+  "shizuku_active_desc": {
+    "en": "Ola & Uber auto-accept engine ready at maximum speed.",
+    "hi": "ओला और उबर ऑटो-एक्सेप्ट इंजन अधिकतम गति पर तैयार है।",
+    "bn": "ওলা ও উবার অটো-অ্যাকসেপ্ট ইঞ্জিন সর্বোচ্চ গতিতে প্রস্তুত।",
+    "ta": "ஓலா & யூபர் ஆட்டோ-அக்செப்ட் என்ஜின் அதிகபட்ச வேகத்தில் தயார்.",
+    "kn": "ಓಲಾ ಮತ್ತು ಉಬರ್ ಆಟೋ-ಆಕ್ಸೆಪ್ಟ್ ಎಂಜಿನ್ ಗರಿಷ್ಠ ವೇಗದಲ್ಲಿ ಸಿದ್ಧವಾಗಿದೆ.",
+    "te": "ఓలా & ఉబెర్ ఆటో-అంగీకార ఇంజిన్ గరిష్ట వేగంతో సిద్ధంగా ఉంది.",
+    "ml": "ഓല & യൂബർ ഓട്ടോ-ആക്‌സെപ്റ്റ് എഞ്ചിൻ പരമാവധി സ്പീഡിൽ സജ്ജമാണ്.",
+    "mr": "ओला आणि उबर ऑटो-एक्सेप्ट इंजिन कमाल वेगात तयार आहे.",
+    "pa": "ਓਲਾ ਅਤੇ ਊਬਰ ਆਟੋ-ਐਕਸੈਪਟ ਇੰਜਣ ਵੱਧ ਤੋਂ ਵੱਧ ਸਪੀਡ 'ਤੇ ਤਿਆਰ ਹੈ।"
+  },
+  "shizuku_active_title": {
+    "en": "Shizuku Service Active ✓",
+    "hi": "शिज़ुकु सर्विस चालू है ✓",
+    "bn": "শিযুকু সার্ভিস সক্রিয় আছে ✓",
+    "ta": "ஷிசுகு சேவை செயல்படுகிறது ✓",
+    "kn": "ಶಿಜುಕು ಸೇವೆ ಸಕ್ರಿಯವಾಗಿದೆ ✓",
+    "te": "షిజుకు సర్వీస్ యాక్టివ్‌గా ఉంది ✓",
+    "ml": "ഷിസുകു സർവീസ് ആക്റ്റീവ് ആണ് ✓",
+    "mr": "शिझुकु सर्व्हिस सक्रिय आहे ✓",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਸਰਵਿਸ ਐਕਟਿਵ ਹੈ ✓"
+  },
+  "shizuku_apps_notice": {
+    "en": "{apps} requires Shizuku for auto-accepting. Setup Shizuku in Settings tab.",
+    "hi": "{apps} के लिए शिज़ुकु ऑटो-एक्सेप्ट के लिए आवश्यक है। सेटिंग्स टैब में शिज़ुकु सेटअप करें।",
+    "bn": "{apps} এর জন্য অটো-অ্যাকসেপ্ট করতে শিযুকু প্রয়োজন। সেটিংস ট্যাবে শিযুকু সেটআপ করুন।"
+  },
+  "shizuku_engine_status": {
+    "en": "Shizuku Engine Status",
+    "hi": "शिज़ुकु इंजन स्थिति",
+    "bn": "শিযুকু ইঞ্জিন স্ট্যাটাস",
+    "ta": "ஷிசுகு என்ஜின் நிலை",
+    "kn": "ಶಿಜುಕು ಎಂಜಿನ್ ಸ್ಥಿತಿ",
+    "te": "షిజుకు ఇంజిన్ స్థితి",
+    "ml": "ഷിസുകു എഞ്ചിൻ സ്റ്റാറ്റസ്",
+    "mr": "शिझुकु इंजिन स्थिती",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਇੰਜਣ ਸਥਿਤੀ"
+  },
+  "shizuku_not_installed_desc": {
+    "en": "Shizuku app is not installed. Required for Ola & Uber.",
+    "hi": "शिज़ुकु ऐप इंस्टॉल नहीं है। ओला और उबर के लिए आवश्यक है।",
+    "bn": "শিযুকু অ্যাপ ইনস্টল করা নেই। ওলা ও উবারের জন্য আবশ্যক।",
+    "ta": "ஷிசுகு ஆப் நிறுவப்படவில்லை. ஓலா & யூபருக்கு தேவை.",
+    "kn": "ಶಿಜುಕು ಆಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಆಗಿಲ್ಲ. ಓಲಾ ಮತ್ತು ಉಬರ್‌ಗೆ ಅಗತ್ಯವಿದೆ.",
+    "te": "షిజుకు యాప్ ఇన్‌స్టాల్ చేయబడలేదు. ఓలా & ఉబెర్‌కు అవసరం.",
+    "ml": "ഷിസുകു ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ല. ഓലയ്ക്കും യൂബറിനും വേണം.",
+    "mr": "शिझुकु ॲप इन्स्टॉल केलेले नाही. ओला आणि उबरसाठी आवश्यक.",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਐਪ ਇੰਸਟਾਲ ਨਹੀਂ ਹੈ। ਓਲਾ ਅਤੇ ਊਬਰ ਲਈ ਲੋੜੀਂਦਾ ਹੈ।"
+  },
+  "shizuku_not_installed_title": {
+    "en": "Shizuku Not Installed ✗",
+    "hi": "शिज़ुकु इंस्टॉल नहीं है ✗",
+    "bn": "শিযুকু ইনস্টল করা নেই ✗",
+    "ta": "ஷிசுகு நிறுவப்படவில்லை ✗",
+    "kn": "ಶಿಜುಕು ಇನ್‌ಸ್ಟಾಲ್ ಆಗಿಲ್ಲ ✗",
+    "te": "షిజుకు ఇన్‌స్టాల్ చేయబడలేదు ✗",
+    "ml": "ഷിസുകു ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ല ✗",
+    "mr": "शिझुकु इन्स्टॉल केलेले नाही ✗",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਇੰਸਟਾਲ ਨਹੀਂ ਹੈ ✗"
+  },
+  "shizuku_notice": {
+    "en": "⚠ Note: Ola & Uber require Shizuku mode for auto-accepting. Please setup Shizuku in Settings tab."
+  },
+  "shizuku_permission_desc": {
+    "en": "Shizuku service is running. Tap below to pair & authorize.",
+    "hi": "शिज़ुकु सर्विस चालू है। पेयर और अनुमति देने के लिए नीचे टैप करें।",
+    "bn": "শিযুকু সার্ভিস চলছে। পেয়ার এবং অনুমতি দিতে নিচে চাপুন।",
+    "ta": "ஷிசுகு சேவை இயங்குகிறது. இணைக்க கீழே தட்டவும்.",
+    "kn": "ಶಿಜುಕು ಸೇವೆ ಚಾಲನೆಯಲ್ಲಿದೆ. ಜೋಡಿಸಲು ಕೆಳಗೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    "te": "షిజుకు సర్వీస్ నడుస్తోంది. జత చేయడానికి దిగువ నొక్కండి.",
+    "ml": "ഷിസുകു സർവീസ് പ്രവർത്തിക്കുന്നു. ജോടിയാക്കാൻ താഴെ ടാപ്പ് ചെയ്യുക.",
+    "mr": "शिझुकु सर्व्हिस सुरू आहे. पेअर आणि अधिकृत करण्यासाठी खाली दाबा.",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਸਰਵਿਸ ਚੱਲ ਰਹੀ ਹੈ। ਪੇਅਰ ਅਤੇ ਅਧਿਕਾਰਤ ਕਰਨ ਲਈ ਹੇਠਾਂ ਟੈਪ ਕਰੋ।"
+  },
+  "shizuku_permission_title": {
+    "en": "Shizuku Permission Required ⚠",
+    "hi": "शिज़ुकु अनुमति आवश्यक ⚠",
+    "bn": "শিযুকু অনুমতি প্রয়োজন ⚠",
+    "ta": "ஷிசுகு அனுமதி தேவை ⚠",
+    "kn": "ಶಿಜುಕು ಅನುಮತಿ ಅಗತ್ಯವಿದೆ ⚠",
+    "te": "షిజుకు అనుమతి అవసరం ⚠",
+    "ml": "ഷിസുകു അനുമതി വേണം ⚠",
+    "mr": "शिझुकु परवानगी आवश्यक ⚠",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਇਜਾਜ਼ਤ ਲੋੜੀਂਦੀ ਹੈ ⚠"
+  },
+  "shizuku_stopped_desc": {
+    "en": "Shizuku app is installed but service is stopped. Open Shizuku to start it.",
+    "hi": "शिज़ुकु ऐप इंस्टॉल है लेकिन सर्विस बंद है। इसे चालू करने के लिए ऐप खोलें।",
+    "bn": "শিযুকু অ্যাপ ইনস্টল করা আছে কিন্তু সার্ভিস বন্ধ। চালু করতে খুলুন।",
+    "ta": "ஷிசுகு ஆப் நிறுவப்பட்டது ஆனால் சேவை நிறுத்தப்பட்டது. தொடங்க திறக்கவும்.",
+    "kn": "ಶಿಜುಕು ಆಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಆಗಿದೆ ಆದರೆ ಸೇವೆ ನಿಂತಿದೆ. ಪ್ರಾರಂಭಿಸಲು ತೆರೆಯಿರಿ.",
+    "te": "షిజుకు యాప్ ఇన్‌స్టాల్ చేయబడింది కానీ సర్వీస్ ఆగిపోయింది. ప్రారంభించడానికి తెరవండి.",
+    "ml": "ഷിസുകു ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്തിട്ടുണ്ട് എന്നാൽ സർവീസ് നിന്നു. തുറക്കുക.",
+    "mr": "शिझुकु ॲप इन्स्टॉल आहे पण सर्व्हिस बंद आहे. सुरू करण्यासाठी उघडा.",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਐਪ ਇੰਸਟਾਲ ਹੈ ਪਰ ਸਰਵਿਸ ਬੰਦ ਹੈ। ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਖੋਲ੍ਹੋ।"
+  },
+  "shizuku_stopped_title": {
+    "en": "Shizuku Service Stopped ✗",
+    "hi": "शिज़ुकु सर्विस बंद है ✗",
+    "bn": "শিযুকু সার্ভিস বন্ধ আছে ✗",
+    "ta": "ஷிசுகு சேவை நிறுத்தப்பட்டது ✗",
+    "kn": "ಶಿಜುಕು ಸೇವೆ ನಿಂತಿದೆ ✗",
+    "te": "షిజుకు సర్వీస్ ఆగిపోయింది ✗",
+    "ml": "ഷിസുകു സർവീസ് നിന്നു ✗",
+    "mr": "शिझुकु सर्व्हिस बंद आहे ✗",
+    "pa": "ਸ਼ਿਜ਼ੂਕੂ ਸਰਵਿਸ ਬੰਦ ਹੈ ✗"
+  },
+  "skip_rides_distance": {
+    "en": "Skip rides outside your km range",
+    "hi": "अपनी किमी रेंज से बाहर की राइड छोड़ें",
+    "bn": "আপনার কিমি রেঞ্জের বাইরের রাইড বাদ দিন"
+  },
+  "skip_rides_location": {
+    "en": "Accept or reject rides based on drop area keywords",
+    "hi": "ड्रॉप एरिया कीवर्ड के आधार पर राइड स्वीकार या अस्वीकार करें",
+    "bn": "ড্রপ এরিয়া কিওয়ার্ড অনুযায়ী রাইড গ্রহণ বা প্রত্যাখ্যান করুন"
+  },
+  "status": {
+    "en": "Status"
+  },
+  "stealth_mode": {
+    "en": "Anti-Detection (Stealth Mode)",
+    "hi": "एंटी-डिटेक्शन (स्टेल्थ मोड)",
+    "bn": "অ্যান্টি-ডিটেকশন (স্টেলথ মোড)",
+    "ta": "கண்டறிதல் எதிர்ப்பு (ஸ்டெல்த் முறை)",
+    "kn": "ಆಂಟಿ-ಡಿಟೆಕ್ಷನ್ (ಸ್ಟೆಲ್ತ್ ಮೋಡ್)",
+    "te": "యాంటీ-డిటెక్షన్ (స్టెల్త్ మోడ్)",
+    "ml": "ആന്റി-ഡിറ്റക്ഷൻ (സ്റ്റെൽത്ത് മോഡ്)",
+    "mr": "एंटी-डिटेक्शन (स्टेल्थ मोड)",
+    "pa": "ਐਂਟੀ-ਡਿਟੈਕਸ਼ਨ (ਸਟੈਲਥ ਮੋਡ)"
+  },
+  "subscription": {
+    "en": "Subscription",
+    "hi": "सब्सक्रिप्शन",
+    "bn": "সাবস্ক্রিপশন",
+    "ta": "சந்தா",
+    "kn": "ಚಂದಾದಾರಿಕೆ",
+    "te": "చందా",
+    "ml": "സബ്‌സ്‌ക്രിപ്‌ഷൻ",
+    "mr": "सबस्क्रिप्शन",
+    "pa": "ਸਬਸਕ੍ਰਿਪਸ਼ਨ"
+  },
+  "super_fast_mode": {
+    "en": "Super Fast Auto-Accept Engine",
+    "hi": "सुपर फास्ट ऑटो-एक्सेप्ट इंजन",
+    "bn": "সুপার ফাস্ট অটো-অ্যাকসেপ্ট ইঞ্জিন",
+    "ta": "சூப்பர் ஃபாஸ்ட் ஆட்டோ-அக்செப்ட் என்ஜின்",
+    "kn": "ಸೂಪರ್ ಫಾಸ್ಟ್ ಆಟೋ-ಆಕ್ಸೆಪ್ಟ್ ಎಂಜಿನ್",
+    "te": "సూపర్ ఫాస్ట్ ఆటో-అంగీకార ఇంజిన్",
+    "ml": "സൂപ്പർ ഫാസ്റ്റ് ഓട്ടോ-ആക്‌സെപ്റ്റ് എഞ്ചിൻ",
+    "mr": "सुपर फास्ट ऑटो-एक्सेप्ट इंजिन",
+    "pa": "ਸੁਪਰ ਫਾਸਟ ਆਟੋ-ਐਕਸੈਪਟ ਇੰਜਣ"
+  },
+  "tap_to_start": {
+    "en": "Tap to start",
+    "hi": "शुरू करने के लिए टैप करें",
+    "bn": "শুরু করতে ট্যাপ করুন"
+  },
+  "time_remaining": {
+    "en": "Subscription Time Remaining",
+    "hi": "शेष सब्सक्रिप्शन समय",
+    "bn": "অবশিষ্ট সাবস্ক্রিপশনের সময়",
+    "ta": "மீதமுள்ள சந்தா நேரம்",
+    "kn": "ಉಳಿದಿರುವ ಚಂದಾದಾರಿಕೆ ಸಮಯ",
+    "te": "మిగిలిన చందా సమయం",
+    "ml": "ബാക്കിയുള്ള സബ്‌സ്‌ക്രിപ്‌ഷൻ സമയം",
+    "mr": "उरलेली सबस्क्रिप्शन वेळ",
+    "pa": "ਬਾਕੀ ਸਬਸਕ੍ਰਿਪਸ਼ਨ ਸਮਾਂ"
+  },
+  "today_stats": {
+    "en": "Today's Stats",
+    "hi": "आज के आंकड़े",
+    "bn": "আজকের পরিসংখ্যান"
+  },
+  "unlimited_auto_accept": {
+    "en": "Unlimited Auto Accept",
+    "hi": "अनलिमिटेड ऑटो एक्सेप्ट",
+    "bn": "আনলিমিটেড অটো অ্যাকসেপ্ট",
+    "ta": "வரம்பற்ற ஆட்டோ அக்செப்ட்",
+    "kn": "ಅನ್‌ಲಿಮಿಟೆಡ್ ಆಟೋ ಆಕ್ಸೆಪ್ಟ್",
+    "te": "అపరిమిత ఆటో అంగీకారం",
+    "ml": "അൺലിമിറ്റഡ് ഓട്ടോ ആക്‌സെപ്റ്റ്",
+    "mr": "अमर्यादित ऑटो एक्सेप्ट",
+    "pa": "ਅਨਲਿਮਟਿਡ ਆਟੋ ਐਕਸੈਪਟ"
+  },
+  "unsaved_changes": {
+    "en": "⚠ Unsaved changes",
+    "hi": "⚠ अनसेव्ड बदलाव",
+    "bn": "⚠ অসংরক্ষিত পরিবর্তন",
+    "ta": "⚠ சேமிக்கப்படாத மாற்றங்கள்",
+    "kn": "⚠ ಉಳಿಸದ ಬದಲಾವಣೆಗಳು",
+    "te": "⚠ సేవ్ చేయని మార్పులు",
+    "ml": "⚠ മാറ്റങ്ങൾ സേവ് ചെയ്തിട്ടില്ല",
+    "mr": "⚠ जतन न केलेले बदल",
+    "pa": "⚠ ਅਣਸੇਵ ਕੀਤੇ ਬਦਲਾਅ"
+  },
+  "waiting_for_payment": {
+    "en": "Waiting for Payment",
+    "hi": "भुगतान की प्रतीक्षा",
+    "bn": "পেমেন্টের জন্য অপেক্ষা করা হচ্ছে"
+  },
+  "with_filter": {
+    "en": "(With Filter: Min ₹",
+    "hi": "(फ़िल्टर के साथ: न्यूनतम ₹",
+    "bn": "(ফিল্টার সহ: সর্বনিম্ন ₹",
+    "ta": "(ஃபில்டருடன்: குறைந்தபட்சம் ₹",
+    "kn": "(ಫಿಲ್ಟರ್‌ನೊಂದಿಗೆ: ಕನಿಷ್ಠ ₹",
+    "te": "(ఫిల్టర్‌తో: కనిష్ట ₹",
+    "ml": "(ഫിൽട്ടറോടെ: കുറഞ്ഞത് ₹",
+    "mr": "(फिल्टरसह: किमान ₹",
+    "pa": "(ਫਿਲਟਰ ਨਾਲ: ਘੱਟੋ-ਘੱਟ ₹"
+  },
+  "without_filter": {
+    "en": "(Without Filter)",
+    "hi": "(बिना फ़िल्टर)",
+    "bn": "(ফিল্টার ছাড়া)",
+    "ta": "(ஃபில்டர் இல்லாமல்)",
+    "kn": "(ಫಿಲ್ಟರ್ ಇಲ್ಲದೆ)",
+    "te": "(ఫిల్టర్ లేకుండా)",
+    "ml": "(ഫിൽട്ടർ ഇല്ലാതെ)",
+    "mr": "(फिल्टरशिवाय)",
+    "pa": "(ਫਿਲਟਰ ਤੋਂ ਬਿਨਾਂ)"
+  },
+  "working_perfectly_for": {
+    "en": "Working perfectly for",
+    "hi": "सफलतापूर्वक काम कर रहा है",
+    "bn": "সফলভাবে কাজ করছে",
+    "ta": "சிறப்பாக செயல்படுகிறது",
+    "kn": "ಯಶಸ್ವಿಯಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿದೆ",
+    "te": "అద్భుతంగా పనిచేస్తోంది",
+    "ml": "വിജയകരമായി പ്രവർത്തിക്കുന്നു",
+    "mr": "उत्कृष्ट कार्य करत आहे",
+    "pa": "ਸਫਲਤਾਪੂਰਵਕ ਕੰਮ ਕਰ ਰਿਹਾ ਹੈ"
+  }
+}

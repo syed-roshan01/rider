@@ -1,0 +1,13 @@
+# Static String constants recovered from the ([SIII) XOR blobs,
+# keyed by the field they are assigned to in <clinit>.
+
+com.auto.accept.service.MyFirebaseService.CHANNEL_ID                     = 'DefaultChannelId'
+com.auto.accept.service.MyFirebaseService.TAG                            = 'MyFirebaseService'
+com.auto.accept.service.OverlayService.CHANNEL_ID                        = 'overlay_channel'
+com.auto.accept.service.OverlayService.TAG                               = 'OverlayService'
+com.auto.accept.service.RideAcceptorService.ACTION_FARE_DETECTED         = 'com.auto.accept.FARE_DETECTED'
+com.auto.accept.service.RideAcceptorService.ACTION_SERVICE_STATUS        = 'com.auto.accept.SERVICE_STATUS'
+com.auto.accept.service.RideAcceptorService.EXTRA_ACCEPTED               = 'accepted'
+com.auto.accept.service.RideAcceptorService.EXTRA_FARE_AMOUNT            = 'fare_amount'
+com.auto.accept.service.RideAcceptorService.EXTRA_IS_ACTIVE              = 'is_active'
+com.auto.accept.service.RideAcceptorService.TAG                          = 'RideAcceptor'
