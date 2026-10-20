@@ -24,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ride.accepter.ui.Ui;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -64,14 +66,10 @@ public class ActivationActivity extends Activity {
     private volatile String lastError;
 
     private static final String PREFS = "ra_license";
-    private static final int BG = 0xFF0E1116;
-    private static final int PANEL = 0xFF1A2030;
-    private static final int ACCENT = 0xFF4F8CFF;
-    private static final int TEXT = 0xFFE6ECF7;
-    private static final int MUTED = 0xFF8B98B3;
+    private Ui ui;
 
     private EditText keyInput;
-    private Button activateBtn;
+    private TextView activateBtn;
     private TextView status;
     private ProgressBar spinner;
     private String code;
@@ -87,7 +85,9 @@ public class ActivationActivity extends Activity {
             return;
         }
         // paint the window before the view tree exists so there is no white flash
-        getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(BG));
+        ui = new Ui(this, getSharedPreferences("ra_state", MODE_PRIVATE)
+                .getBoolean("ui_dark", true));
+        getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(ui.bg));
         buildUi();
     }
 
@@ -108,46 +108,58 @@ public class ActivationActivity extends Activity {
     // ---------------------------------------------------------------- UI
 
     private void buildUi() {
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(BG);
+        android.widget.ScrollView scroll = new android.widget.ScrollView(this);
+        scroll.setFillViewport(true);
+        scroll.setVerticalScrollBarEnabled(false);
+
+        LinearLayout root = ui.col();
         root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setPadding(dp(28), dp(48), dp(28), dp(32));
+        root.setPadding(dp(24), dp(36), dp(24), dp(28));
 
-        root.addView(label("AcceptPro", 22, TEXT, true));
-        root.addView(label("Device activation", 13, MUTED, false));
-        root.addView(gap(dp(34)));
+        // ---- brand block (design system, screen 01)
+        android.widget.ImageView logo = new android.widget.ImageView(this);
+        int logoId = getResources().getIdentifier("logo", "drawable", getPackageName());
+        if (logoId != 0) {
+            logo.setImageResource(logoId);
+        }
+        LinearLayout.LayoutParams lg = new LinearLayout.LayoutParams(dp(64), dp(64));
+        lg.gravity = Gravity.CENTER_HORIZONTAL;
+        root.addView(logo, lg);
 
-        root.addView(label("Your device id", 11, MUTED, true));
-        root.addView(gap(dp(8)));
+        LinearLayout wm = ui.row();
+        wm.setGravity(Gravity.CENTER);
+        wm.addView(ui.text("Accept", Ui.H1, ui.ink, true));
+        wm.addView(ui.text("Pro", Ui.H1, ui.primary, true));
+        LinearLayout.LayoutParams wl = ui.wrap();
+        wl.gravity = Gravity.CENTER_HORIZONTAL;
+        wl.topMargin = dp(12);
+        root.addView(wm, wl);
 
-        LinearLayout codeRow = new LinearLayout(this);
-        codeRow.setOrientation(LinearLayout.HORIZONTAL);
-        codeRow.setBackgroundColor(PANEL);
+        TextView tag = ui.body("Auto-accept for gig drivers");
+        tag.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams tl = ui.matchWrap();
+        tl.topMargin = dp(4);
+        root.addView(tag, tl);
+
+        root.addView(ui.spacer(dp(28)));
+
+        // ---- device id (copyable)
+        root.addView(ui.label("Your device id"));
+        root.addView(ui.spacer(dp(8)));
+        LinearLayout codeRow = ui.row();
         codeRow.setGravity(Gravity.CENTER_VERTICAL);
-        codeRow.setPadding(dp(16), dp(16), dp(10), dp(16));
-
-        TextView codeView = new TextView(this);
-        codeView.setText(code);
-        codeView.setTextColor(TEXT);
-        codeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        codeRow.setPadding(dp(14), dp(2), dp(2), dp(2));
+        codeRow.setBackground(ui.shape(ui.surfaceHigh, 12, true));
+        TextView codeView = ui.text(code, Ui.ROW, ui.ink, true);
         codeView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
-        codeView.setGravity(Gravity.CENTER);
         codeView.setSingleLine(true);
         codeView.setLetterSpacing(0.06f);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        codeView.setLayoutParams(lp);
-        codeRow.addView(codeView);
-
-        Button copy = new Button(this);
-        copy.setText("Copy");
-        copy.setTextColor(ACCENT);
-        copy.setBackgroundColor(Color.TRANSPARENT);
-        copy.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        copy.setAllCaps(false);
+        codeRow.addView(codeView, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        View copy = ui.icon("copy", ui.primary, 22);
+        copy.setPadding(dp(14), dp(14), dp(14), dp(14));
         copy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            @Override public void onClick(View v) {
                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 if (cm != null) {
                     cm.setPrimaryClip(ClipData.newPlainText("Device ID", code));
@@ -156,65 +168,99 @@ public class ActivationActivity extends Activity {
             }
         });
         codeRow.addView(copy);
-        root.addView(codeRow);
+        root.addView(codeRow, ui.matchWrap());
 
-        root.addView(gap(dp(10)));
-        root.addView(label("Send this ID to your seller. The licence key they give you\nwill work only on this phone.", 12, MUTED, false));
-        root.addView(gap(dp(34)));
+        root.addView(ui.spacer(dp(8)));
+        root.addView(ui.caption("Send this ID to your seller to get your licence key."));
 
-        root.addView(label("Licence key", 11, MUTED, true));
-        root.addView(gap(dp(8)));
-
-        keyInput = new EditText(this);
-        keyInput.setHint("RA-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX");
-        keyInput.setHintTextColor(0xFF5A6880);
-        keyInput.setTextColor(TEXT);
-        keyInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        keyInput.setTypeface(Typeface.MONOSPACE);
-        keyInput.setBackgroundColor(PANEL);
-        keyInput.setPadding(dp(16), dp(16), dp(16), dp(16));
-        keyInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        root.addView(ui.spacer(dp(20)));
+        root.addView(ui.label("Enter licence key"));
+        root.addView(ui.spacer(dp(8)));
+        keyInput = ui.field("RA-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX", true);
         keyInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(40)});
-        keyInput.setSingleLine(false);
-        keyInput.setMaxLines(2);
-        root.addView(keyInput);
+        root.addView(keyInput, ui.matchWrap());
 
-        root.addView(gap(dp(16)));
-
-        activateBtn = new Button(this);
-        activateBtn.setText("Activate");
-        activateBtn.setTextColor(Color.WHITE);
-        activateBtn.setBackgroundColor(ACCENT);
-        activateBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        activateBtn.setAllCaps(false);
-        activateBtn.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        activateBtn.setPadding(dp(16), dp(18), dp(16), dp(18));
-        activateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        root.addView(ui.spacer(dp(16)));
+        activateBtn = ui.button("Activate", Ui.PRIMARY, new View.OnClickListener() {
+            @Override public void onClick(View v) {
                 activate();
             }
         });
-        root.addView(activateBtn);
+        root.addView(activateBtn, ui.matchWrap());
+
+        TextView how = ui.button("How to get a key?", Ui.LINK, new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                openSite();
+            }
+        });
+        LinearLayout.LayoutParams hl = ui.matchWrap();
+        hl.topMargin = dp(4);
+        root.addView(how, hl);
 
         spinner = new ProgressBar(this);
-        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(dp(28), dp(28));
-        sp.gravity = Gravity.CENTER_HORIZONTAL;
-        sp.topMargin = dp(14);
-        spinner.setLayoutParams(sp);
+        LinearLayout.LayoutParams spn = new LinearLayout.LayoutParams(dp(28), dp(28));
+        spn.gravity = Gravity.CENTER_HORIZONTAL;
+        spn.topMargin = dp(14);
+        spinner.setLayoutParams(spn);
         spinner.setVisibility(View.GONE);
         root.addView(spinner);
 
-        status = label("", 12, MUTED, false);
+        status = ui.text("", Ui.BODY, ui.inkSoft, false);
         status.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams st = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        st.topMargin = dp(10);
+        LinearLayout.LayoutParams st = ui.matchWrap();
+        st.topMargin = dp(12);
         status.setLayoutParams(st);
         root.addView(status);
 
-        setContentView(root);
+        // ---- trust list (design system, screen 01)
+        root.addView(ui.spacer(dp(28)));
+        String[][] trust = {
+                { "shield", "Secure & device bound" },
+                { "lock", "One device per key" },
+                { "check", "Direct from authorised seller" },
+        };
+        for (int i = 0; i < trust.length; i++) {
+            LinearLayout r = ui.row();
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.addView(ui.iconTile(trust[i][0], ui.surfaceHigh, ui.inkSoft));
+            TextView tx = ui.body(trust[i][1]);
+            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            tp.leftMargin = dp(12);
+            r.addView(tx, tp);
+            LinearLayout.LayoutParams rp = ui.matchWrap();
+            rp.topMargin = i == 0 ? 0 : dp(12);
+            root.addView(r, rp);
+        }
+
+        // ---- footer
+        root.addView(ui.spacer(dp(24)));
+        LinearLayout foot = ui.row();
+        foot.addView(ui.caption("Need help?"));
+        foot.addView(ui.hspace(dp(6)));
+        TextView support = ui.button("Contact support", Ui.LINK, new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                openSite();
+            }
+        });
+        support.setMinHeight(0);
+        support.setPadding(0, 0, 0, 0);
+        foot.addView(support);
+        LinearLayout.LayoutParams fp = ui.wrap();
+        fp.gravity = Gravity.CENTER_HORIZONTAL;
+        fp.topMargin = dp(4);
+        root.addView(foot, fp);
+
+        scroll.addView(root, ui.matchWrap());
+        setContentView(scroll);
+    }
+
+    private void openSite() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    android.net.Uri.parse("https://rider-theta.vercel.app/")));
+        } catch (Exception ignored) {
+        }
     }
 
     // ------------------------------------------------------- activation
@@ -227,7 +273,7 @@ public class ActivationActivity extends Activity {
         }
         busy(true);
         status.setText("Contacting licence server…");
-        status.setTextColor(MUTED);
+        status.setTextColor(ui.inkSoft);
 
         new Thread(new Runnable() {
             @Override
@@ -242,7 +288,7 @@ public class ActivationActivity extends Activity {
                     public void run() {
                         if (r.ok) {
                             status.setText("Activated. Starting…");
-                            status.setTextColor(0xFF29C07A);
+                            status.setTextColor(ui.success);
                             goMain();
                         } else {
                             busy(false);
@@ -325,7 +371,8 @@ public class ActivationActivity extends Activity {
 
     private void fail(String msg) {
         status.setText(msg);
-        status.setTextColor(0xFFE5484D);
+        status.setTextColor(ui.error);
+        status.setBackground(ui.shape(ui.errorTint, 12, false));
     }
 
     private void goMain() {
@@ -344,24 +391,6 @@ public class ActivationActivity extends Activity {
         // and device binding are re-checked by the server)
         com.ride.accepter.licence.LicenceGate.maybeRefreshAsync(this, null);
         finish();
-    }
-
-    private TextView label(String text, int sp, int color, boolean bold) {
-        TextView t = new TextView(this);
-        t.setText(text);
-        t.setTextColor(color);
-        t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
-        t.setLetterSpacing(bold ? 0.04f : 0f);
-        if (bold) {
-            t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        }
-        return t;
-    }
-
-    private View gap(int h) {
-        View v = new View(this);
-        v.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h));
-        return v;
     }
 
     private int dp(int v) {

@@ -58,11 +58,8 @@ public class DashboardActivity extends Activity {
     private static final String URL_SHIZUKU_PLAY = "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api";
     private static final String URL_SHIZUKU_GIT  = "https://github.com/RikkaApps/Shizuku/releases";
 
-    // Brand plate — the logo's neon identity, fixed in BOTH themes.
-    private static final int NEON = 0xFF03FFB1, NEON2 = 0xFF02E5FF;
-    private static final int PLATE_A = 0xFF0A2438, PLATE_B = 0xFF030D1A;
-    private static final int PLATE_INK = 0xFFB9FFE4, PLATE_SUB = 0xFF7FB8E8;
-    private static final int PLATE_CHIP = 0xFF08192C, PLATE_EDGE = 0x3303FFB1;
+    // Brand plate + accent — theme-aware design tokens (docs/DESIGN_SYSTEM.md).
+    private int NEON, NEON2, PLATE_A, PLATE_B, PLATE_INK, PLATE_SUB, PLATE_CHIP, PLATE_EDGE;
 
     // Palette — two themes: the logo's neon dark (default) and a clean light.
     // Instance fields so the theme can swap at runtime (see applyTheme).
@@ -121,34 +118,41 @@ public class DashboardActivity extends Activity {
 
     // ----------------------------------------------------------------- theme
 
-    /** Loads the saved mode (default: the logo's neon dark) and swaps every
-     *  palette token. Colors are sampled from the AcceptPro speedmark logo. */
+    /** Loads the saved mode and swaps every palette token.
+     *  Values are the design-system tokens (docs/DESIGN_SYSTEM.md). */
     private void applyTheme() {
         dark = prefs.getBoolean("ui_dark", true);
+        NEON = 0xFF2563EB; NEON2 = 0xFF2563EB;
         if (dark) {
-            BG0 = 0xFF00070F; BG1 = 0xFF000209;
-            CARD = 0xFF091424; CARD_EDGE = 0xFF1B3350;
-            INK = 0xFFE9F6FF; INK_SOFT = 0xFF8AA6C4; INK_FAINT = 0xFF4E6884;
-            GREEN = 0xFF03FFB1; CYAN = 0xFF02E5FF; BLUE = 0xFF52A8FF;
-            PURPLE = 0xFFA78BFA; AMBER = 0xFFFFB454; RED = 0xFFFF6B6B;
-            SW_OFF = 0xFF22384F; SW_KNOB = 0xFFEAF4FF;
-            WARN_A = 0xFF2C2208; WARN_B = 0xFF201806;
-            QUICK_A = 0xFF0B1E34; QUICK_B = 0xFF071524;
-            INPUT_BG = 0xFF0E2035; BTN_SOFT = 0xFF142840;
-            SEL_BG = 0xFF0B2A31; SEL_INK = 0xFF03FFB1; ROW_BG = 0xFF061020;
-            NAV_SEL_BG = 0xFF0B2438;
+            BG0 = 0xFF000000; BG1 = 0xFF000000;
+            CARD = 0xFF0E0F13; CARD_EDGE = 0xFF26282F;
+            INK = 0xFFFFFFFF; INK_SOFT = 0xFF9AA0AB; INK_FAINT = 0xFF6A7078;
+            GREEN = 0xFF22C55E; CYAN = 0xFF2563EB; BLUE = 0xFF2563EB;
+            PURPLE = 0xFF2563EB; AMBER = 0xFFF59E0B; RED = 0xFFEF4444;
+            SW_OFF = 0xFF33363E; SW_KNOB = 0xFFE6E8EC;
+            WARN_A = 0xFF2B2110; WARN_B = 0xFF2B2110;
+            QUICK_A = 0xFF10233F; QUICK_B = 0xFF10233F;
+            INPUT_BG = 0xFF171920; BTN_SOFT = 0xFF171920;
+            SEL_BG = 0xFF10233F; SEL_INK = 0xFF2563EB; ROW_BG = 0xFF171920;
+            NAV_SEL_BG = 0xFF10233F;
+            PLATE_A = 0xFF0E0F13; PLATE_B = 0xFF0E0F13;
+            PLATE_INK = 0xFFFFFFFF; PLATE_SUB = 0xFF9AA0AB;
+            PLATE_CHIP = 0xFF171920; PLATE_EDGE = 0xFF26282F;
         } else {
-            BG0 = 0xFFF6F8FC; BG1 = 0xFFEDF1F8;
-            CARD = 0xFFFFFFFF; CARD_EDGE = 0xFFE2E8F2;
-            INK = 0xFF0F172A; INK_SOFT = 0xFF5A6B87; INK_FAINT = 0xFF93A2BC;
-            GREEN = 0xFF16A34A; CYAN = 0xFF0891B2; BLUE = 0xFF2563EB;
-            PURPLE = 0xFF7C3AED; AMBER = 0xFFD97706; RED = 0xFFDC2626;
-            SW_OFF = 0xFFD3DCE8; SW_KNOB = 0xFFFFFFFF;
-            WARN_A = 0xFFFFF7E6; WARN_B = 0xFFFFF2D9;
-            QUICK_A = 0xFFEFF6FF; QUICK_B = 0xFFE4EEFF;
-            INPUT_BG = 0xFFF1F5FB; BTN_SOFT = 0xFFEEF2F8;
-            SEL_BG = 0xFFEAF1FF; SEL_INK = 0xFF2563EB; ROW_BG = 0xFFF6F8FC;
-            NAV_SEL_BG = 0xFFE8F0FF;
+            BG0 = 0xFFF5F6F8; BG1 = 0xFFF5F6F8;
+            CARD = 0xFFFFFFFF; CARD_EDGE = 0xFFE3E6EB;
+            INK = 0xFF0C0D10; INK_SOFT = 0xFF5F6673; INK_FAINT = 0xFF8A919C;
+            GREEN = 0xFF16A34A; CYAN = 0xFF2563EB; BLUE = 0xFF2563EB;
+            PURPLE = 0xFF2563EB; AMBER = 0xFFB45309; RED = 0xFFDC2626;
+            SW_OFF = 0xFFD7DBE0; SW_KNOB = 0xFFFFFFFF;
+            WARN_A = 0xFFFEF3E2; WARN_B = 0xFFFEF3E2;
+            QUICK_A = 0xFFE9F0FE; QUICK_B = 0xFFE9F0FE;
+            INPUT_BG = 0xFFF0F2F5; BTN_SOFT = 0xFFF0F2F5;
+            SEL_BG = 0xFFE9F0FE; SEL_INK = 0xFF2563EB; ROW_BG = 0xFFF0F2F5;
+            NAV_SEL_BG = 0xFFE9F0FE;
+            PLATE_A = 0xFFFFFFFF; PLATE_B = 0xFFFFFFFF;
+            PLATE_INK = 0xFF0C0D10; PLATE_SUB = 0xFF5F6673;
+            PLATE_CHIP = 0xFFF0F2F5; PLATE_EDGE = 0xFFE3E6EB;
         }
     }
 
@@ -308,7 +312,7 @@ public class DashboardActivity extends Activity {
         brand.addView(hspacer(dp(12)));
         LinearLayout wm = column();
         wm.addView(text("AcceptPro", 19f, Color.WHITE, Typeface.BOLD, 0f));
-        wm.addView(text("neon speed auto-accept", 10.5f, PLATE_SUB, Typeface.NORMAL, 0f));
+        wm.addView(text("Auto-accept for gig drivers", 12f, PLATE_SUB, Typeface.NORMAL, 0f));
         brand.addView(wm);
         top.addView(brand, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -351,7 +355,7 @@ public class DashboardActivity extends Activity {
         LinearLayout g2 = row();
         statRate = tile(g2, BLUE, "Accept rate", "0%");
         g2.addView(hspacer(dp(12)));
-        statEarnings = tile(g2, PURPLE, "Today's earn", "₹0");
+        statEarnings = tile(g2, PURPLE, "Today's earnings", "₹0");
         p.addView(g2, matchWrap());
         p.addView(spacer(dp(20)));
 
@@ -2041,16 +2045,14 @@ public class DashboardActivity extends Activity {
         return outer;
     }
 
+    /** Stat tile: monochrome by design (mock 03). Accent kept for call-site stability. */
     private TextView tile(LinearLayout parent, int accent, String label, String value) {
         LinearLayout t = gradientCard(CARD, CARD);
-        View top = new View(this);
-        top.setBackground(round(accent, dp(1)));
-        t.addView(top, matchWrap(dp(3)));
-        t.addView(spacer(dp(12)));
-        TextView v = text(value, 24f, accent, Typeface.BOLD, 0f);
+        t.addView(spacer(dp(4)));
+        TextView v = text(value, 24f, INK, Typeface.BOLD, 0f);
         t.addView(v);
-        t.addView(spacer(dp(2)));
-        t.addView(label(label, 11f, INK_FAINT));
+        t.addView(spacer(dp(3)));
+        t.addView(text(label, 13f, INK_SOFT, Typeface.NORMAL, 0f));
         parent.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         return v;
     }
