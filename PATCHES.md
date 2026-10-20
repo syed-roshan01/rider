@@ -493,3 +493,81 @@ zone saved from a pincode search (`600028` -> Chennai) as `1.0 km radius - 31 ma
 negative probe `999999zz` -> engine decision done with **no accept** (Go-To gate rejected);
 positive probe `600028` -> `DETECT-ONLY: would have accepted - no tap performed`.
 Evidence: `build/shot_zones_card.png`, `build/shot_zone_test.png`, `build/shot_goto_zone.png`.
+
+---
+
+## K. Login & licence: server-validated, bound to each machine id
+
+**Why:** section A bypassed the vendor's licence/sign-in while our own licence system
+(`license/` + `supabase/functions/`) was built server-side - but the Android client never used
+it. `isLicensed()` trusted a forgeable `exp` pref with no signature check, `goMain()` targeted
+the vendor's `MainActivity`, nothing ever called `/api/v1/refresh`, and the launcher opened the
+Dashboard directly. This section wires the client so every login/licence decision is
+**server-validated** and **bound to one machine id**.
+
+### K1. Client licence core (new: `apk-src/com/ride/accepter/licence/`)
+
+* `LicenceCore.java` - byte-exact Java mirrors of `license/src/core.ts`: key format +
+  checksum (`normalizeKey`, `hashKey`), machine binding (`hashDeviceCode` = sha256 of
+  `"ride-accepter/device-code/v1|" + normalizeDeviceCode(code)`), token verification
+  (`verifyToken`) and the client subset of `evaluateEntitlement`.
+* `Ed25519Verify.java` - dependency-free RFC 8032 verification (java.security Ed25519 only
+  exists from API 33; this build supports 26). Verify-only by design.
+* `LicenceGate.java` - the single gate: prefs state, `fullVerify` (Ed25519 signature over the
+  token with the PINNED public key + machine binding + entitlement rule), `activate()`,
+  `refresh()` (rolling token; the server re-checks revocation/expiry/device binding),
+  `engineGateOk()` (30 s cached verdict for the engine's event gate).
+* Cross-checked before shipping: `tools/licence-vectors.mjs` (oracle = `core.ts`) vs
+  `LicenceVector.java` - **50/50 vectors pass** (device codes, key format + checksum typo
+  detection, RFC 8032 signatures, token forgery / token copy / expiry cases).
+
+### K2. Login screen is the launcher; it lands on the real UI
+
+`AndroidManifest.xml`: `MAIN/LAUNCHER` moved to
+`com.ride.accepter.activation.ActivationActivity` (proven with
+`cmd package resolve-activity` -> `.activation.ActivationActivity`). `goMain()` now targets
+`com.ride.accepter.ui.DashboardActivity` (was the vendor's `com.auto.accept.ui.MainActivity`).
+
+### K3. Enforcement
+
+* `ActivationActivity.isLicensed()` - real verification (was: `!token.isEmpty() && exp > now`).
+* `DashboardActivity.onCreate` **and `onResume`** - guard + server re-validation. onResume
+  matters: a launcher tap on an existing task delivers `onNewIntent` and never re-runs
+  `onCreate`; without it a revoked licence stayed usable from the recents screen (found by
+  on-device testing).
+* Engine gate (`RideAcceptorService.smali` method `ۦۢ۠ۧ(Ljava/lang/Object;)Z`, the
+  `onAccessibilityEvent` gate): now `LicenceGate.engineGateOk(Context) && serviceEnabled`
+  (the one `iget-boolean` replaced by a 2-instruction invoke, with a `.catch Ljava/lang/Throwable;`
+  fallback to the old `serviceEnabled` semantics). New ASCII bridge `probeLicenceGate()` logs
+  the verdict (`AcceptPro-Test: lic: probe: gate=ALLOW|DENY`).
+
+### K4. Verified on device (samsung SM-N770F, machine code `BK4JC-74W07-YMWT5`)
+
+| case | result |
+|---|---|
+| key minted for ANOTHER machine | `POST /api/v1/activate -> 403`, "That key was issued for a different device" |
+| key minted for THIS machine | `-> 200`, `activated; machine binding ok`, Dashboard opens |
+| offline (reverse tunnel removed) | stays usable within the bounded 72 h token TTL |
+| server-side `revoke` + launcher re-entry | `refresh -> REVOKED (server refused)`, bounced to login, `engine gate: DENY` |
+| task re-entry (no onCreate) | `onResume` re-validates: `POST /api/v1/refresh -> 200`, rolling token |
+| shipped build vs PRODUCTION endpoint | `POST /api/v1/activate -> 403` (unknown key), humanised message |
+| machine id stability | same code shown before and after reinstall |
+
+Evidence: `build/shot_login.png`, `shot_wrongdev.png`, `shot_activated.png`, `shot_offline.png`,
+`shot_revoked.png`, `shot_reentry_bounce.png`, `shot_production.png`.
+
+### K5. Notes
+
+* TEST VARIANT used for the local-server E2E (now fully reverted): `SERVER` /
+  `PINNED_PUBLIC_KEY` swapped to the local `license/` server via `adb reverse`, a cleartext
+  exception for `127.0.0.1`, and `REFRESH_THROTTLE_MS = 0`. The shipped APK carries the
+  production Supabase URL + its pinned key (matches `GET /api/v1/public-key` exactly) and
+  HTTPS-only networking. Never wire the phone's Wi-Fi off on this rig - adb itself rides the
+  network; simulate offline by removing the `adb reverse` tunnel instead.
+* `supabase/functions/api/index.ts`: malformed keys now fail with `400 BAD_FORMAT` before the
+  store. The currently deployed copy still answers `500` + internal `detail` for that case -
+  redeploy with `npx supabase functions deploy api --project-ref ckyfcwbnakbaitzurnze` to pick
+  the fix up (the client pre-validates the checksum locally, so users never see that path).
+* Machine id note: `Settings.Secure.ANDROID_ID` is scoped per app signing key, so the code the
+  APP shows differs from the shell's `settings get secure android_id`. Expected and correct -
+  what matters is that the server binds every key and token to the code the app computes.

@@ -39,7 +39,12 @@
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23"/>
     <application android:allowBackup="true" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:extractNativeLibs="false" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:largeHeap="true" android:name="com.auto.accept.app.AutoAcceptApp" android:networkSecurityConfig="@xml/network_security_config" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/Theme.AutoAccept">
         <activity android:exported="false" android:name="com.auto.accept.ui.MainActivity" android:theme="@style/Theme.AutoAccept"/>
-        <activity android:exported="true" android:name="com.ride.accepter.activation.ActivationActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.NoActionBar"/>
+        <activity android:exported="true" android:name="com.ride.accepter.activation.ActivationActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <service android:exported="true" android:label="AcceptPro Service" android:name="com.auto.accept.service.RideAcceptorService" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService"/>
@@ -49,12 +54,7 @@
         <service android:exported="true" android:foregroundServiceType="specialUse" android:name="com.auto.accept.service.OverlayService"/>
         <service android:exported="true" android:foregroundServiceType="specialUse" android:name="com.auto.accept.service.KeepAliveService"/>
         <service android:exported="true" android:name="com.ride.accepter.overlay.ToggleOverlayService"/>
-        <activity android:exported="true" android:name="com.ride.accepter.ui.DashboardActivity" android:theme="@android:style/Theme.Black.NoTitleBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+        <activity android:exported="true" android:name="com.ride.accepter.ui.DashboardActivity" android:theme="@android:style/Theme.Black.NoTitleBar"/>
         <service android:exported="false" android:name="com.auto.accept.service.MyFirebaseService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

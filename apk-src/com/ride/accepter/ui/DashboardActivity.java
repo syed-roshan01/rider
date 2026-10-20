@@ -87,6 +87,21 @@ public class DashboardActivity extends Activity {
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
+        // Licence gate: the dashboard is reachable only with a verified,
+        // machine-bound, unexpired grant (server-validated). Anything else -
+        // forged prefs, a token copied from another phone, a revoked or
+        // expired licence - goes back to the login/activation screen.
+        com.ride.accepter.licence.LicenceGate.Result lic =
+                com.ride.accepter.licence.LicenceGate.fullVerify(this, System.currentTimeMillis());
+        if (!lic.ok) {
+            android.util.Log.i("AcceptPro-Licence", "dashboard blocked: " + lic.reason);
+            com.ride.accepter.licence.LicenceGate.stopEngine(this);
+            startActivity(new android.content.Intent(this,
+                    com.ride.accepter.activation.ActivationActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            finish();
+            return;
+        }
         prefs = getSharedPreferences("ra_state", MODE_PRIVATE);
         applyTheme();
         LinearLayout root = new LinearLayout(this);
@@ -163,6 +178,43 @@ public class DashboardActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
+        // Re-validate on EVERY entry, not just creation: a launcher tap on an
+        // existing task delivers onNewIntent and never re-runs onCreate, which
+        // is exactly how a revoked licence would otherwise stay usable. The
+        // server is authoritative - a refusal clears the grant and stops the
+        // engine (rolling token on success).
+        com.ride.accepter.licence.LicenceGate.Result lic =
+                com.ride.accepter.licence.LicenceGate.fullVerify(this, System.currentTimeMillis());
+        if (!lic.ok) {
+            android.util.Log.i("AcceptPro-Licence", "dashboard blocked: " + lic.reason);
+            com.ride.accepter.licence.LicenceGate.stopEngine(this);
+            startActivity(new android.content.Intent(this,
+                    com.ride.accepter.activation.ActivationActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            finish();
+            return;
+        }
+        com.ride.accepter.licence.LicenceGate.maybeRefreshAsync(this,
+                new com.ride.accepter.licence.LicenceGate.RefreshCb() {
+                    @Override public void onRefresh(String outcome, String detail) {
+                        if ("OK".equals(outcome) || "SKIP".equals(outcome) || "OFFLINE".equals(outcome)) {
+                            return;
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override public void run() {
+                                android.widget.Toast.makeText(DashboardActivity.this,
+                                        "Licence check failed: " + outcome,
+                                        android.widget.Toast.LENGTH_LONG).show();
+                                startActivity(new android.content.Intent(DashboardActivity.this,
+                                        com.ride.accepter.activation.ActivationActivity.class)
+                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                                finish();
+                            }
+                        });
+                    }
+                });
+        // log the engine's licence gate verdict (AcceptPro-Test: lic)
+        callAny("probeLicenceGate", new Class<?>[] {});
         if (permBox != null && current == 0) show(0); else refresh();
     }
 

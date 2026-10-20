@@ -101,8 +101,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
             const deviceCode = String(b.deviceCode ?? '');
             if (!key || !deviceCode) return json(400, { ok: false, reason: 'DEVICE_CODE_REQUIRED' });
 
+            // a mistyped key must fail cleanly BEFORE it reaches the store
+            let keyHash: string;
+            try {
+                keyHash = hashKey(key);
+            } catch {
+                return json(400, { ok: false, reason: 'BAD_FORMAT' });
+            }
+
             const result = await activateLicense({
-                keyHash: hashKey(key),
+                keyHash,
                 deviceCodeHash: hashDeviceCode(deviceCode),
                 appVersion: String(b.appVersion ?? ''),
                 model: String(b.model ?? ''),
@@ -116,7 +124,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
                 return json(403, { ok: false, reason: result.reason });
             }
 
-            const rec = await findLicenseByKeyHash(hashKey(key));
+            const rec = await findLicenseByKeyHash(keyHash);
             if (!rec) return json(403, { ok: false, reason: 'UNKNOWN_KEY' });
 
             const { token, payload } = issueToken(signing(), {
@@ -151,7 +159,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
                 return json(401, { ok: false, reason: e instanceof LicenseError ? e.code : 'BAD_TOKEN' });
             }
 
-            const rec = await findLicenseByKeyHash(hashKey(key));
+            let validateKeyHash: string;
+            try {
+                validateKeyHash = hashKey(key);
+            } catch {
+                return json(400, { ok: false, reason: 'BAD_FORMAT' });
+            }
+            const rec = await findLicenseByKeyHash(validateKeyHash);
             if (!rec) return json(403, { ok: false, reason: 'UNKNOWN_KEY' });
 
             // The identity of the device PRESENTING the request. Derived from
