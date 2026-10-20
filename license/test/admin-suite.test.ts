@@ -13,7 +13,7 @@
 import { test, describe, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac, randomBytes } from 'node:crypto';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { generateKey, hashDeviceCode, keyPrefixOf, normalizeDeviceCode } from '../src/core.ts';
@@ -44,6 +44,7 @@ import {
     normalizeDeviceId,
 } from '../src/panel-plans.ts';
 import { ORDER_ID_RE, newOrderId } from '../src/panel-checkout.ts';
+import { ROUTE_PATTERNS, matchRoute } from '../../api/_routes/router.ts';
 import { MAX_PANEL_LOGS, ORDER_LOCK_TTL_SEC, ORDER_TTL_SEC, PENDING_TTL_SEC, Store } from '../src/store.ts';
 
 // Byte-exact copy strings with hidden dashes, asserted via escapes.
@@ -509,18 +510,110 @@ describe('byte-exact copy strings in BOTH mirrors', () => {
         const apiPanelSrc = readFileSync(new URL('../../api/_lib/panel.ts', import.meta.url), 'utf8');
         assert.ok(apiPanelSrc.includes(`Forbidden ${EM_DASH} super admin only`));
 
-        const apiConvertSrc = readFileSync(new URL('../../api/licenses/convert.ts', import.meta.url), 'utf8');
+        const apiConvertSrc = readFileSync(new URL('../../api/_routes/licenses/convert.ts', import.meta.url), 'utf8');
         assert.ok(apiConvertSrc.includes('Converted to ${plan} plan (key: '));
         assert.ok(apiConvertSrc.includes('keyPrefixOf(newKey)'), 'the reason carries the display prefix');
     });
 
     test('every api/ audit log meta carries the display prefix, never the key', () => {
         for (const f of ['generate.ts', 'revoke.ts', 'delete.ts']) {
-            const src = readFileSync(new URL(`../../api/licenses/${f}`, import.meta.url), 'utf8');
+            const src = readFileSync(new URL(`../../api/_routes/licenses/${f}`, import.meta.url), 'utf8');
             assert.ok(src.includes('key: keyPrefixOf('), `${f} log meta must carry the display prefix`);
         }
         const apiCheckoutSrc = readFileSync(new URL('../../api/_lib/checkout.ts', import.meta.url), 'utf8');
         assert.ok(apiCheckoutSrc.includes('key: keyPrefixOf('));
         assert.ok(apiCheckoutSrc.includes('license_key_hash'), 'orders persist the hash only');
+    });
+});
+
+// ---------------------------------------------------------------------------
+describe('api/ dispatch table (Hobby plan: 12-function cap)', () => {
+    test('the route table is pinned byte-exact', () => {
+        assert.deepEqual([...ROUTE_PATTERNS], [
+            '/api/auth/login',
+            '/api/auth/me',
+            '/api/admins/create',
+            '/api/admins/list',
+            '/api/admins/:id/change-password',
+            '/api/admins/:id/licenses',
+            '/api/admins/:id/toggle',
+            '/api/admins/:id/update-share',
+            '/api/affiliates/create',
+            '/api/affiliates/list',
+            '/api/affiliates/stats',
+            '/api/affiliates/payments/list',
+            '/api/affiliates/payments/:id',
+            '/api/affiliates/:id/change-password',
+            '/api/affiliates/:id/delete',
+            '/api/affiliates/:id/pay',
+            '/api/affiliates/:id/payments',
+            '/api/affiliates/:id/toggle',
+            '/api/affiliates/:id/update-commission',
+            '/api/licenses/list',
+            '/api/licenses/update',
+            '/api/licenses/validate',
+            '/api/licenses/generate',
+            '/api/licenses/revoke',
+            '/api/licenses/delete',
+            '/api/licenses/convert',
+            '/api/whitelabel/create',
+            '/api/whitelabel/list',
+            '/api/whitelabel/:id/change-password',
+            '/api/whitelabel/:id/delete',
+            '/api/whitelabel/:id/licenses',
+            '/api/whitelabel/:id/toggle',
+            '/api/whitelabel/:id/update',
+            '/api/settings/demo',
+            '/api/checkout/plans',
+            '/api/checkout/create-order',
+            '/api/checkout/status',
+            '/api/checkout/claim',
+            '/api/checkout/webhook',
+            '/api/expenses',
+            '/api/logs',
+            '/api/sales',
+            '/api/stats',
+            '/api/withdrawals',
+            '/api/withdrawals/:id',
+            '/api/admin/login',
+            '/api/admin/logout',
+            '/api/admin/audit',
+            '/api/admin/config',
+            '/api/admin/stats',
+            '/api/admin/devices',
+            '/api/admin/devices/:id',
+            '/api/admin/licenses',
+            '/api/admin/licenses/:key/:action',
+        ]);
+    });
+
+    test('path captures land under id / key / action', () => {
+        assert.deepEqual(matchRoute('/api/admins/ABC/toggle')?.params, { id: 'ABC' });
+        assert.deepEqual(matchRoute('/api/admin/licenses/KEY123/revoke')?.params, { key: 'KEY123', action: 'revoke' });
+        assert.deepEqual(matchRoute('/api/affiliates/payments/pay_9')?.params, { id: 'pay_9' });
+        assert.equal(matchRoute('/api/expenses')?.pattern, '/api/expenses');
+        assert.equal(matchRoute('/api/expenses/')?.pattern, '/api/expenses', 'trailing slash tolerated');
+        assert.equal(matchRoute('/api/definitely/unknown'), null);
+    });
+
+    test('exactly four non-underscore entry files (the 12-function invariant)', () => {
+        const entries = readdirSync(new URL('../../api/', import.meta.url), { recursive: true })
+            .map(String)
+            .map((p) => p.replace(/\\/g, '/'))
+            .filter((p) => p.endsWith('.ts') && !p.split('/').some((seg) => seg.startsWith('_')))
+            .sort();
+        assert.deepEqual(entries, ['[s1].ts', '[s1]/[s2].ts', '[s1]/[s2]/[s3].ts', '[s1]/[s2]/[s3]/[s4].ts']);
+    });
+
+    test('dispatch.ts wires every route module exactly once', () => {
+        const dispatchSrc = readFileSync(new URL('../../api/_routes/dispatch.ts', import.meta.url), 'utf8');
+        const specs = [...dispatchSrc.matchAll(/from '\.\/([^']+)\.js'/g)]
+            .map((m) => m[1])
+            .filter((s) => s !== 'router');
+        assert.equal(specs.length, ROUTE_PATTERNS.length, 'one handler import per route');
+        assert.equal(new Set(specs).size, specs.length, 'no duplicate handler imports');
+        for (const s of specs) {
+            assert.ok(existsSync(new URL(`../../api/_routes/${s}.ts`, import.meta.url)), `${s}.ts exists`);
+        }
     });
 });
