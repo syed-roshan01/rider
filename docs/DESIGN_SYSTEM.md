@@ -4,9 +4,10 @@ Codified from the approved UI mockups (dark + light, 5 screen sheets + 2 compone
 Single source of truth in code: `app/java/com/ride/accepter/ui/Ui.java`. Every hex/size below
 lives there as a token — screens never hardcode values.
 
-Principles (non-negotiable): **flat, sharp, crisp** — no gradients, no soft shadows, hairline
-1dp borders, integer sp sizes, 8dp spacing grid, one blue accent, sentence-case labels,
+Principles (non-negotiable): **flat, sharp, crisp** — no decorative gradients, no soft
+shadows, **borderless everything** (hairlines only between rows), integer sp sizes, 8dp spacing grid, one blue accent, sentence-case labels,
 semantic colors only where semantic. Reusable components over per-screen code.
+One state effect is allowed: the hero halo glow while the service runs.
 
 ---
 
@@ -76,7 +77,7 @@ Sentence case everywhere. No letter-spacing.
 | `label` | 12 Medium | field labels, chips, statuses |
 | `caption` | 11 Regular | nav labels, timestamps, fine print |
 
-Wordmark: "Accept" in `ink` + "Pro" in `primary`, one text run (two spans).
+Wordmark: rendered from the theme-variant lockup asset (`assets/logo_lockup_lighttext.png` on dark, `logo_lockup_darktext.png` on light — "Accept" in `ink` + "Pro" in `primary` + tagline).
 
 ## 3. Grid, spacing, shape
 
@@ -84,7 +85,8 @@ Wordmark: "Accept" in `ink` + "Pro" in `primary`, one text run (two spans).
 - Screen margins: 16dp · card padding: 16dp · section gap: 20dp · row gap: 8dp
 - Radii: cards **14dp** · fields/buttons **12dp** · icon tiles **12dp** · chips **999dp** ·
   bottom-sheet/dialog top **20dp**
-- Borders: **1dp `border`** hairlines. No drop shadows in dark; at most a 1dp border in light.
+- Borders: **none anywhere** — cards, fields, chips and buttons are borderless fills against
+  their parent surface. Keep only row separators and the slider thumb ring. No drop shadows in dark.
 - Touch targets: ≥48dp everywhere (rows are 60–64dp tall and fully tappable).
 - Icons: 24dp glyphs in 40dp icon tiles (`surfaceHigh` fill + `border` hairline) or bare.
 
@@ -92,18 +94,18 @@ Wordmark: "Accept" in `ink` + "Pro" in `primary`, one text run (two spans).
 
 | Component | Spec |
 |---|---|
-| **Top bar** | 56dp: logo mark + wordmark left; bell + gear 24dp icon buttons right (gear → Settings). Flat `bg`, bottom hairline optional. |
-| **Hero card** | `surface` + hairline, r14, p16–20. 44dp `primary` circle w/ white power icon; `h1` status; `body` `inkSoft` sub; status chip top-right (dot + `label`). |
-| **Stat tiles** | 2×2 grid, gap 8–12dp. `surface` + hairline r14, p16. Number `display` `ink`, label `body` `inkSoft`. No icons, no accents. |
+| **Top bar** | 56dp: theme-variant logo lockup left (3:1, light-text on dark / dark-text on light); bell + theme 24dp icon buttons right (sun while dark → tap for light; moon while light → tap for dark). Flat `bg`, bottom hairline optional. |
+| **Hero card** | `surface` (borderless), r14, p16–20. 44dp `success` circle w/ white power icon (badge and switch tracks are `primary` blue while stopped and turn `success` green only while the engine runs) — while the service runs the **whole hero card** glows `success` green: a full-bleed rounded-rect wash (r14, exact card corners, subtle ≈10–22% alpha band) plus a breathing halo behind the badge (opacity pulse ≈1.4s); `h1` status; `body` `inkSoft` sub; status chip top-right (dot + `label`). |
+| **Stat tiles** | 2×2 grid, gap 8–12dp. `surface` (borderless) r14, p16. Number `display` `ink`, label `body` `inkSoft`. No icons, no accents. |
 | **Toggle row** | 64dp: icon tile (40dp) + title `row` + sub `body` `inkSoft` + switch. Whole row tappable. |
 | **Action row** | 64dp: icon tile + title + sub + trailing = text button (Grant/Fix/Pair), chevron, or success check. |
 | **App row** | 60dp: brand logo tile (40dp, brand colors) + name `row` + switch. |
 | **Activity row** | 64dp: brand tile + `row` title (app) + `body` "₹120 · 4.8 km" + `caption` "2 min ago" + outcome chip. |
-| **Input field** | 48–52dp, `surfaceHigh` + hairline r12, p14h. `label` above field. Mono for codes/keys. Trailing 20dp copy icon (inside field). |
+| **Input field** | 48–52dp, `surfaceHigh` (borderless) r12, p14h. `label` above field. Mono for codes/keys. Trailing 20dp copy icon (inside field). |
 | **Search field** | same + leading search icon, `body` hint. |
 | **Primary button** | 52dp, `primary` fill r12, `btn` `onPrimary`. Disabled: `switchOff` fill, `inkFaint` text. |
-| **Secondary button** | 40–48dp, transparent + 1dp `border` r12, `btn` `ink` (or `primary` for Grant/Fix/Pair). |
-| **Chip** | 32dp h, r999, p12h, `label`. Selected: `primary` fill + `onPrimary`. Unselected: transparent + hairline + `inkSoft`. Status chip: dot 6dp + text, `successTint`/`errorTint`/`primaryTint` fills. |
+| **Secondary button** | same as primary — every button is a solid `primary` fill r12 with `onPrimary` label (links excepted). |
+| **Chip** | 32dp h, r999, p12h, `label`. Selected: `primary` fill + `onPrimary`. Unselected: `surfaceHigh` fill + `inkSoft`. Status chip: dot 6dp + text, `successTint`/`errorTint`/`primaryTint` fills. |
 | **Range slider** | track 4dp `border`, filled `primary`, thumb 20dp `surface` + 2dp `primary` ring. Dual-thumb for min/max with paired Min/Max fields. |
 | **Switch** | 52×32dp visual, knob 24dp slide 180ms. ON: `primary` track + `switchKnob`. OFF: `switchOff` track. |
 | **Bottom nav** | 64dp `surface`, top hairline. 5 items: 24dp icon + `caption` label. Active: `primary` icon/label on `primaryTint` pill (r999). Inactive: `inkFaint`. |
@@ -151,8 +153,10 @@ timestamps) in every mock · sentence case · integer type sizes · hairlines no
 
 ## 8. Brand assets
 
-Logo mark: blue speedmark chevrons (per mock). `res/drawable/logo` currently holds the old
-neon art — drop the new mark at `app/design/` + `res/drawable/logo` when the asset is ready
-(adaptive icon foreground references `@drawable/logo`, so launcher updates automatically).
+Logo mark: blue speedmark chevrons (per mock). `app/design/app-icon.png` is the canonical mark —
+it ships at `res/drawable/logo.png` (512²), which the adaptive launcher foreground insets
+automatically, so the launcher/favicon updates with it. The horizontal lockups
+(`AcceptPro-Auto-Accept-Logo-light-text/dark-text.png`) ship in `app/assets/` at 720×240 for the
+theme-swapped top bar.
 Brand app tiles for the Apps/History rows come from `app/design/brandlogos/` → trimmed into
 40dp rounded tiles.

@@ -149,7 +149,7 @@ public class ActivationActivity extends Activity {
         LinearLayout codeRow = ui.row();
         codeRow.setGravity(Gravity.CENTER_VERTICAL);
         codeRow.setPadding(dp(14), dp(2), dp(2), dp(2));
-        codeRow.setBackground(ui.shape(ui.surfaceHigh, 12, true));
+        codeRow.setBackground(ui.shape(ui.surfaceHigh, 12, false));
         TextView codeView = ui.text(code, Ui.ROW, ui.ink, true);
         codeView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
         codeView.setSingleLine(true);

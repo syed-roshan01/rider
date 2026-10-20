@@ -308,18 +308,18 @@ public final class Ui {
 
     // ---- surfaces --------------------------------------------------------
 
-    /** Standard card: flat surface + hairline, r14, 16dp padding. */
+    /** Standard card: flat borderless surface, r14, 16dp padding. */
     public LinearLayout card() {
         LinearLayout l = col();
         l.setPadding(dp(16), dp(16), dp(16), dp(16));
-        l.setBackground(shape(surface, 14, true));
+        l.setBackground(shape(surface, 14, false));
         return l;
     }
 
     /** List group: card surface without padding, children clipped to the corners. */
     public LinearLayout group() {
         LinearLayout l = col();
-        l.setBackground(shape(surface, 14, true));
+        l.setBackground(shape(surface, 14, false));
         l.setClipToOutline(true);
         return l;
     }
@@ -383,12 +383,7 @@ public final class Ui {
     }
 
     private int buttonInk(int kind) {
-        switch (kind) {
-            case PRIMARY: return onPrimary;
-            case GHOST: return ink;
-            case DANGER: return error;
-            default: return primary;
-        }
+        return kind == LINK ? primary : onPrimary; // all buttons: white on solid blue
     }
 
     private void styleButton(TextView t, int kind, boolean enabled, int r) {
@@ -399,16 +394,15 @@ public final class Ui {
             return;
         }
         t.setTextColor(buttonInk(kind));
-        switch (kind) {
-            case PRIMARY: press(t, primary, r, false); break;
-            case OUTLINE: pressStroke(t, 0x00000000, r, primary); break;
-            case GHOST: press(t, surface, r, true); break;
-            case DANGER: pressStroke(t, 0x00000000, r, error); break;
-            default: t.setBackground(null); t.setClickable(true); break;
+        if (kind == LINK) { // bare text links stay unstyled
+            t.setBackground(null);
+            t.setClickable(true);
+            return;
         }
+        press(t, primary, r, false); // solid primary, no borders
     }
 
-    /** Icon button: 44dp hit area around a glyph (top bar: bell / gear / back). */
+    /** Icon button: 44dp hit area around a glyph (top bar: bell / theme / back). */
     public LinearLayout iconButton(String name, int color, View.OnClickListener click) {
         LinearLayout b = row();
         b.setGravity(Gravity.CENTER);
@@ -427,7 +421,6 @@ public final class Ui {
         b.setGravity(Gravity.CENTER);
         b.setPadding(dp(10), dp(10), dp(10), dp(10));
         GradientDrawable c = circle(surface);
-        c.setStroke(hairline(), border);
         b.setBackground(new RippleDrawable(ColorStateList.valueOf(ripple), c, null));
         b.setElevation(dp(3));
         b.addView(icon(name, ink, 20));
@@ -445,7 +438,7 @@ public final class Ui {
         LinearLayout c = row();
         c.setGravity(Gravity.CENTER_VERTICAL);
         c.setPadding(dp(12), dp(6), dp(12), dp(6));
-        c.setBackground(shape(fill == 0 ? surface : fill, 999, fill == 0));
+        c.setBackground(shape(fill == 0 ? surfaceHigh : fill, 999, false));
         TextView t = text(s, LABEL, textColor, MEDIUM);
         t.setTag("label");
         c.addView(t);
@@ -540,7 +533,7 @@ public final class Ui {
         e.setTextColor(ink);
         e.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         e.setTypeface(mono ? Typeface.MONOSPACE : TF_REGULAR);
-        e.setBackground(shape(fieldFill, 10, true));
+        e.setBackground(shape(fieldFill, 10, false));
         e.setPadding(dp(14), dp(12), dp(14), dp(12));
         e.setMinHeight(dp(48));
         e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);

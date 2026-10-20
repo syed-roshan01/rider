@@ -1,5 +1,6 @@
 package com.ride.accepter.ui;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,7 +15,9 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +32,7 @@ import android.view.ViewOutlineProvider;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -82,6 +86,9 @@ public class DashboardActivity extends Activity {
 
     private ToggleSwitch engineSw, detectSw;
     private TextView heroStatus, heroSub;
+    private View heroHalo, navHair, heroBadge;
+    private GradientDrawable heroGlow;
+    private ValueAnimator haloAnim;
     private TextView statAccepted, statSkipped, statRate, statEarnings;
     private LinearLayout permBox;
     private boolean engineOn, detectOn = true;
@@ -169,22 +176,31 @@ public class DashboardActivity extends Activity {
         prefs.edit().putBoolean("ui_dark", goDark).commit(); // sync: survives force-stop
         applyTheme();
         tintChrome();
+        // a theme repaint must not re-read live engine state (the service bridge
+        // answers false while unbound and would knock the switches off)
+        boolean e = engineOn, d = detectOn;
         show(current);
+        engineOn = e;
+        detectOn = d;
+        paint();
     }
 
     /** Re-tints the chrome that lives outside the rebuilt page body. */
     private void tintChrome() {
         if (rootBg != null) rootBg.setBackground(round(BG0, 0));
         if (navBg != null) navBg.setBackground(gradient(CARD, CARD, true, 0));
+        if (navHair != null) navHair.setBackgroundColor(CARD_EDGE); // hairline follows the theme too
         Window w = getWindow();
         w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        w.setBackgroundDrawable(new ColorDrawable(BG0)); // fills under translucent system bars
         w.setStatusBarColor(BG0);
-        w.setNavigationBarColor(CARD);
+        w.setNavigationBarColor(BG0);
         if (Build.VERSION.SDK_INT >= 23) {
             View d = w.getDecorView();
             int f = d.getSystemUiVisibility();
-            d.setSystemUiVisibility(dark ? (f & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
-                    : (f | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR));
+            int light = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                    | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            d.setSystemUiVisibility(dark ? (f & ~light) : (f | light));
         }
     }
 
@@ -236,12 +252,19 @@ public class DashboardActivity extends Activity {
         refresh();
     }
 
+    @Override protected void onDestroy() {
+        if (haloAnim != null) haloAnim.cancel(); // infinite pulse must not outlive the screen
+        super.onDestroy();
+    }
+
     // ------------------------------------------------------------------ nav
 
     private View buildNav() {
+        LinearLayout wrap = column();
+        wrap.setBackground(gradient(CARD, CARD, true, 0)); // wrapper carries it so tintChrome re-tints on theme change
+        wrap.addView(navHair = hairline()); // top edge: surface + hairline (design)
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
-        nav.setBackground(gradient(BG0, BG0, true, 0));
         nav.setPadding(dp(4), dp(8), dp(4), dp(10));
         for (int i = 0; i < NAV_LABELS.length; i++) {
             final int idx = i;
@@ -251,6 +274,7 @@ public class DashboardActivity extends Activity {
             item.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) { show(idx); }
             });
+            ui.pressBorderless(item);
             // icon sits in a pill that fills when the tab is active (design panel 2)
             LinearLayout dot = row();
             dot.setGravity(Gravity.CENTER);
@@ -269,16 +293,17 @@ public class DashboardActivity extends Activity {
             nav.addView(item, new LinearLayout.LayoutParams(0,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         }
-        return nav;
+        wrap.addView(nav, matchWrap());
+        return wrap;
     }
 
     private void show(int idx) {
         current = idx;
         for (int i = 0; i < navItems.length; i++) {
             boolean sel = i == idx;
-            navItems[i].setTextColor(sel ? INK : INK_FAINT);
-            navDots[i].setBackground(round(sel ? NEON : 0x00000000, dp(16)));
-            navIcons[i].set(NAV_ICONS[i], sel ? ui.onPrimary : INK_FAINT, dp(21));
+            navItems[i].setTextColor(sel ? ui.primary : ui.inkFaint);
+            navDots[i].setBackground(round(sel ? ui.primaryTint : 0x00000000, dp(16)));
+            navIcons[i].set(NAV_ICONS[i], sel ? ui.primary : ui.inkFaint, dp(21));
         }
         body.removeAllViews();
         ScrollView scroll = new ScrollView(this);
@@ -304,51 +329,53 @@ public class DashboardActivity extends Activity {
     // ------------------------------------------------------------- dashboard
 
     private void buildDashboard(LinearLayout p) {
-        // --- top bar (design): brand left, bell + gear icon buttons right -----
+        // --- top bar (design): brand lockup left, bell + theme icon buttons right ----
         LinearLayout bar = row();
         bar.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout brand = row();
         brand.setGravity(Gravity.CENTER_VERTICAL);
-        int logoId = getResources().getIdentifier("logo", "drawable", getPackageName());
-        if (logoId != 0) {
-            android.widget.ImageView logo = new android.widget.ImageView(this);
-            logo.setImageResource(logoId);
-            brand.addView(logo, new LinearLayout.LayoutParams(dp(28), dp(28)));
-        }
-        brand.addView(hspacer(dp(10)));
-        LinearLayout wm = row();
-        wm.setGravity(Gravity.CENTER_VERTICAL);
-        wm.addView(text("Accept", 19f, PLATE_INK, Typeface.BOLD, 0f));
-        wm.addView(text("Pro", 19f, NEON, Typeface.BOLD, 0f));
-        brand.addView(wm);
+        android.widget.ImageView logo = new android.widget.ImageView(this);
+        logo.setImageBitmap(brandLockup()); // theme-variant lockup from assets
+        logo.setScaleType(android.widget.ImageView.ScaleType.FIT_START);
+        brand.addView(logo, new LinearLayout.LayoutParams(dp(120), dp(40)));
         bar.addView(brand, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         bar.addView(ui.iconButton("bell", PLATE_INK, new View.OnClickListener() {
             @Override public void onClick(View v) { show(3); }
         }));
         bar.addView(hspacer(dp(2)));
-        bar.addView(ui.iconButton("gear", PLATE_INK, new View.OnClickListener() {
-            @Override public void onClick(View v) { show(4); }
+        // theme toggle: sun while dark (tap -> light), moon while light (tap -> dark)
+        bar.addView(ui.iconButton(dark ? "sun" : "moon", PLATE_INK, new View.OnClickListener() {
+            @Override public void onClick(View v) { setTheme(!dark); }
         }));
         p.addView(bar, matchWrap());
         p.addView(spacer(dp(14)));
 
         // --- grouped card (design): hero + the two switch rows in one container --
         LinearLayout stack = column();
-        GradientDrawable plate = gradient(CARD, CARD, true, dp(14));
-        plate.setStroke(dp(1), CARD_EDGE);
-        stack.setBackground(plate);
+        heroGlow = sectionGlowDrawable();
+        stack.setBackground(new LayerDrawable(new Drawable[]{
+                gradient(CARD, CARD, true, dp(14)), heroGlow }));
+        heroGlow.setAlpha(0); // lights up only while the engine runs
         stack.setPadding(dp(16), dp(2), dp(16), dp(2));
 
         LinearLayout hero = row();
         hero.setPadding(0, dp(14), 0, dp(14));
         hero.setGravity(Gravity.CENTER_VERTICAL);
+        // 48dp badge inside a 64dp frame; the halo behind it glows while the engine runs
+        FrameLayout badge = new FrameLayout(this);
+        heroHalo = new View(this);
+        heroHalo.setBackground(haloDrawable());
+        heroHalo.setAlpha(0f);
+        badge.addView(heroHalo, new FrameLayout.LayoutParams(dp(72), dp(72), Gravity.CENTER));
         LinearLayout glyph = row();
         glyph.setGravity(Gravity.CENTER);
-        glyph.setBackground(round(NEON, dp(24)));
+        heroBadge = glyph;
+        glyph.setBackground(round(NEON, dp(24))); // blue when stopped; paint() greens it while running
         glyph.addView(ui.icon("power", ui.onPrimary, 22));
-        hero.addView(glyph, new LinearLayout.LayoutParams(dp(48), dp(48)));
-        hero.addView(hspacer(dp(14)));
+        badge.addView(glyph, new FrameLayout.LayoutParams(dp(48), dp(48), Gravity.CENTER));
+        hero.addView(badge, new LinearLayout.LayoutParams(dp(72), dp(72)));
+        hero.addView(hspacer(dp(10)));
         LinearLayout htxt = column();
         heroStatus = text("Service is stopped", 18f, PLATE_INK, Typeface.BOLD, 0f);
         htxt.addView(heroStatus);
@@ -540,7 +567,7 @@ public class DashboardActivity extends Activity {
     private TextView rangeBox(LinearLayout parent, String tag, String value) {
         LinearLayout b = column();
         b.setPadding(dp(14), dp(10), dp(14), dp(10));
-        b.setBackground(ui.shape(CARD, 12, true));
+        b.setBackground(round(INPUT_BG, dp(12)));
         b.addView(label(tag, 11f, INK_FAINT));
         b.addView(spacer(dp(2)));
         TextView v = text(value, 15f, INK, Typeface.BOLD, 0f);
@@ -721,12 +748,7 @@ public class DashboardActivity extends Activity {
         LinearLayout btns = row();
         btns.addView(bigButton("Add area on map", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) { mapPickerDialog(); }
-        }), new LinearLayout.LayoutParams(0, dp(52), 1.35f));
-        View gap = new View(this);
-        btns.addView(gap, new LinearLayout.LayoutParams(dp(10), dp(52)));
-        btns.addView(bigButton("Test", CYAN, new View.OnClickListener() {
-            @Override public void onClick(View v) { testZoneDialog(); }
-        }), new LinearLayout.LayoutParams(0, dp(52), 1f));
+        }), matchWrap(dp(52)));
         p.addView(btns, matchWrap());
         // The engine service may have bound (or rebound) after our last push - resync
         // so sec_location_filters / sec_location_filter_enabled are never left stale.
@@ -1139,38 +1161,6 @@ public class DashboardActivity extends Activity {
         return null;
     }
 
-    /** Live proof: our verdict shown here, plus the REAL engine decision (detect-only) in logcat. */
-    private void testZoneDialog() {
-        LinearLayout card = dialogCard("Test a drop",
-                "Type a drop address \u00b7 the engine verdict is also logged (adb logcat -s RideToggle).");
-        final EditText in = new EditText(this);
-        in.setSingleLine(true);
-        in.setHint("e.g. 3rd Ave, Anna Nagar, Chennai 600040");
-        in.setTextColor(INK);
-        in.setHintTextColor(INK_FAINT);
-        in.setTextSize(13f);
-        in.setBackground(round(INPUT_BG, dp(12)));
-        in.setPadding(dp(14), dp(10), dp(14), dp(10));
-        card.addView(in, matchWrap(dp(48)));
-        card.addView(spacer(dp(10)));
-        final TextView out = text("Result appears here.", 12f, INK_FAINT, Typeface.NORMAL, 0f);
-        card.addView(out, matchWrap());
-        card.addView(spacer(dp(14)));
-        card.addView(bigButton("Run test", BLUE, new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                String t = in.getText().toString();
-                if (t.trim().length() < 2) { toast("Type a drop address"); return; }
-                String z = matchZone(t);
-                out.setText(z != null ? "\u2713 Go-To match \u00b7 zone: " + z
-                        : "\u2717 no Go-To area matches (engine will skip)");
-                pushLocationToEngine();
-                try { callAny("testZoneEngine", new Class<?>[] { String.class }, t); }
-                catch (Throwable ignored) {}
-            }
-        }));
-        styledDialog(card).show();
-    }
-
     private void pushFilters() {
         double min = prefs.getInt("min_fare", 50);
         double max = prefs.getInt("max_fare", 0);
@@ -1268,9 +1258,7 @@ public class DashboardActivity extends Activity {
     }
 
     private void styleSeg(TextView t, boolean on) {
-        GradientDrawable d = gradient(on ? SEL_BG : BTN_SOFT, on ? SEL_BG : BTN_SOFT, true, dp(12));
-        if (!on) d.setStroke(dp(1), CARD_EDGE);
-        t.setBackground(d);
+        t.setBackground(gradient(on ? SEL_BG : BTN_SOFT, on ? SEL_BG : BTN_SOFT, true, dp(12)));
         t.setTextColor(on ? SEL_INK : INK_SOFT);
     }
 
@@ -1533,7 +1521,7 @@ public class DashboardActivity extends Activity {
         if (action == null) {
             r.addView(ui.icon("check", GREEN, 20));
         } else {
-            r.addView(ui.button(action, Ui.OUTLINE, click));
+            r.addView(ui.button(action, Ui.PRIMARY, click));
         }
         parent.addView(r, matchWrap());
         View hair = new View(this);
@@ -1895,11 +1883,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(34)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(sub, 11f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -1930,11 +1915,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(32)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(value, 12f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -1992,7 +1974,7 @@ public class DashboardActivity extends Activity {
         return box;
     }
 
-    /** Styled option-list dialog; rows echo the app's accent-rail cards. */
+    /** Styled option-list dialog; rows echo the app's flat cards. */
     private void pickerDialog(String title, String sub, String[] labels, int selected,
                               final OnPick cb) {
         LinearLayout box = dialogCard(title, sub);
@@ -2007,11 +1989,6 @@ public class DashboardActivity extends Activity {
             r.setPadding(dp(14), dp(12), dp(14), dp(12));
             r.setBackground(round(sel ? SEL_BG : ROW_BG, dp(12)));
             r.setGravity(Gravity.CENTER_VERTICAL);
-            View rail = new View(this);
-            rail.setBackground(round(sel ? SEL_INK : CARD_EDGE, dp(2)));
-            LinearLayout.LayoutParams rl = new LinearLayout.LayoutParams(dp(3), dp(24));
-            rl.rightMargin = dp(12);
-            r.addView(rail, rl);
             TextView t = text(labels[i], 15f, sel ? SEL_INK : INK,
                     sel ? Typeface.BOLD : Typeface.NORMAL, 0f);
             r.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2091,11 +2068,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(32)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(value, 12f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2173,11 +2147,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(34)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(sub, 11f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2203,11 +2174,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(34)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(sub, 11f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2221,11 +2189,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(32)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(sub, 11f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2248,11 +2213,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(32)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(dp(2), 0, dp(12), 0);
         txt.addView(text(title, 14f, INK, Typeface.BOLD, 0f));
         txt.addView(text(value, 12f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2285,9 +2247,7 @@ public class DashboardActivity extends Activity {
     private TextView tile(LinearLayout parent, String value, String label) {
         LinearLayout t = column();
         t.setPadding(dp(16), dp(14), dp(16), dp(14));
-        GradientDrawable g = gradient(CARD, CARD, true, dp(14));
-        g.setStroke(dp(1), CARD_EDGE);
-        t.setBackground(g);
+        t.setBackground(gradient(CARD, CARD, true, dp(14)));
         TextView v = text(value, 24f, INK, Typeface.BOLD, 0f);
         t.addView(v);
         t.addView(spacer(dp(3)));
@@ -2319,7 +2279,7 @@ public class DashboardActivity extends Activity {
         t.setGravity(Gravity.CENTER);
         t.setPadding(0, dp(13), 0, dp(13));
         t.setBackground(sel ? gradient(BLUE, BLUE, true, dp(12))
-                : gradient(CARD, CARD, true, dp(12)));
+                : gradient(BTN_SOFT, BTN_SOFT, true, dp(12)));
         t.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { setTheme(goDark); }
         });
@@ -2327,23 +2287,19 @@ public class DashboardActivity extends Activity {
     }
 
     private View bigButton(String label, int color, View.OnClickListener l) {
-        TextView t = text(label, 14f, onColor(color), Typeface.BOLD, 0f);
+        TextView t = text(label, 14f, ui.onPrimary, Typeface.BOLD, 0f);
         t.setGravity(Gravity.CENTER);
         t.setPadding(dp(18), dp(16), dp(18), dp(16));
-        t.setBackground(gradient(color, shade(color, 0.82f), true, dp(12)));
+        t.setBackground(gradient(ui.primary, ui.primary, true, dp(12))); // all buttons: solid blue
         t.setOnClickListener(l);
         return t;
     }
 
     private View smallButton(String label, int color, View.OnClickListener l) {
-        TextView t = text(label, 11f, color, Typeface.BOLD, 0f);
+        TextView t = text(label, 11f, ui.onPrimary, Typeface.BOLD, 0f);
         t.setGravity(Gravity.CENTER);
         t.setPadding(dp(13), dp(10), dp(13), dp(10));
-        GradientDrawable d = new GradientDrawable();
-        d.setColor((dark ? 0x2E000000 : 0x14000000) | (color & 0xFFFFFF));
-        d.setCornerRadius(dp(9));
-        d.setStroke(dp(1), color);
-        t.setBackground(d);
+        t.setBackground(round(ui.primary, dp(9))); // all buttons: solid blue, no borders
         t.setOnClickListener(l);
         return t;
     }
@@ -2401,8 +2357,11 @@ public class DashboardActivity extends Activity {
         heroSub.setText(engineOn
                 ? "Watching your ride apps for matching offers."
                 : "Turn on the engine to start watching for rides.");
-        if (engineSw != null) engineSw.show(engineOn, BLUE);
-        if (detectSw != null) detectSw.show(detectOn, BLUE);
+        glow();
+        int heroAccent = engineOn ? ui.success : BLUE; // green only while the engine runs
+        if (heroBadge != null) heroBadge.setBackground(round(engineOn ? ui.success : NEON, dp(24)));
+        if (engineSw != null) engineSw.show(engineOn, heroAccent);
+        if (detectSw != null) detectSw.show(detectOn, heroAccent);
 
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
@@ -2410,6 +2369,63 @@ public class DashboardActivity extends Activity {
         statSkipped.setText(String.valueOf(s));
         statRate.setText(((a + s) == 0 ? 0 : Math.round(100f * a / (a + s))) + "%");
         statEarnings.setText("₹" + sp.getInt("total_earnings", 0));
+    }
+
+    /** Soft radial halo behind the hero badge; green while the engine runs. */
+    private GradientDrawable haloDrawable() {
+        GradientDrawable d = new GradientDrawable();
+        d.setShape(GradientDrawable.OVAL);
+        d.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+        d.setGradientRadius(dp(36));
+        d.setColors(new int[]{ Ui.alpha(ui.success, 0xB0), Ui.alpha(ui.success, 0x66),
+                Ui.alpha(ui.success, 0x00) });
+        d.setUseLevel(false);
+        return d;
+    }
+
+    /** Theme-variant AcceptPro lockup (loaded from assets so the resource table is untouched). */
+    private android.graphics.Bitmap brandLockup() {
+        String f = dark ? "logo_lockup_lighttext.png" : "logo_lockup_darktext.png";
+        try {
+            return android.graphics.BitmapFactory.decodeStream(getAssets().open(f));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Full-card green glow: rounded rect matching the card corners exactly. */
+    private GradientDrawable sectionGlowDrawable() {
+        GradientDrawable d = new GradientDrawable();
+        d.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
+        d.setCornerRadius(dp(14));
+        d.setColors(new int[]{ Ui.alpha(ui.success, 0x18), Ui.alpha(ui.success, 0x38),
+                Ui.alpha(ui.success, 0x18) });
+        return d;
+    }
+
+    /** Opacity-only pulse on the green hero glow while the engine is on. */
+    private void glow() {
+        if (heroHalo == null) return;
+        if (!engineOn) {
+            if (haloAnim != null) haloAnim.cancel();
+            heroHalo.setAlpha(0f);
+            if (heroGlow != null) heroGlow.setAlpha(0);
+            return;
+        }
+        if (haloAnim == null) {
+            haloAnim = ValueAnimator.ofFloat(0.5f, 1f);
+            haloAnim.setDuration(1400);
+            haloAnim.setRepeatMode(ValueAnimator.REVERSE);
+            haloAnim.setRepeatCount(ValueAnimator.INFINITE);
+            haloAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override public void onAnimationUpdate(ValueAnimator a) {
+                    float v = (Float) a.getAnimatedValue();
+                    if (heroHalo != null) heroHalo.setAlpha(v);
+                    if (heroGlow != null) heroGlow.setAlpha((int) (v * 255));
+                }
+            });
+        }
+        if (!haloAnim.isRunning()) haloAnim.start();
     }
 
     private boolean isShizukuInstalled() {
@@ -2471,7 +2487,6 @@ public class DashboardActivity extends Activity {
         GradientDrawable d = new GradientDrawable();
         d.setColor(a);
         d.setCornerRadius(radius);
-        if (a == CARD && b == CARD) d.setStroke(dp(1), CARD_EDGE);
         return d;
     }
 
