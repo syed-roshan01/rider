@@ -25,8 +25,8 @@ try:
 except Exception:
     pass
 
-SMALI = os.path.join('decoded-apktool', 'smali')
-OUT = 'analysis'
+SMALI = os.path.join('app', 'smali')
+OUT = os.path.join('docs', 'recovery-notes', 'analysis')
 os.makedirs(OUT, exist_ok=True)
 
 APP_PREFIX = 'com/auto/accept/'
@@ -231,7 +231,7 @@ with open(os.path.join(OUT, 'all_literals.txt'), 'w', encoding='utf-8') as fh:
                     s = unescape(cm.group(2))
                     if visible(s):
                         fh.write('%s\t%r\n' % (m.key, s))
-print('  wrote analysis/all_literals.txt')
+print('  wrote docs/recovery-notes/analysis/all_literals.txt')
 
 
 # --------------------------------------------------------------------------
@@ -453,7 +453,7 @@ with open(os.path.join(OUT, 'decrypted_constants.txt'), 'w', encoding='utf-8') a
     for k, s, tgt, fld in sorted(XOR_RES, key=lambda r: (r[3] or '~', r[0])):
         if fld:
             fh.write('%-72s = %s\n' % (fld, ascii(s)))
-print('  wrote analysis/decrypted_constants.txt')
+print('  wrote docs/recovery-notes/analysis/decrypted_constants.txt')
 
 
 # --------------------------------------------------------------------------
@@ -723,5 +723,5 @@ report.append('decoded ([SIII) XOR strings: %d  (best-effort; args partly derive
 
 with open(os.path.join(OUT, 'app_flow.txt'), 'w', encoding='utf-8') as fh:
     fh.write('\n'.join(report))
-print('  wrote analysis/app_flow.txt  (%d app classes, dispatcher styles %s)' % (len(app_classes), stats))
-print('\ndone. outputs in ./analysis/')
+print('  wrote docs/recovery-notes/analysis/app_flow.txt  (%d app classes, dispatcher styles %s)' % (len(app_classes), stats))
+print('\ndone. outputs in ./docs/recovery-notes/analysis/')

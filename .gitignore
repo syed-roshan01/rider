@@ -1,1 +1,28 @@
-# Full workspace snapshot requested: nothing excluded.
+# Ride Accepter - ignore rules. (The old "full workspace snapshot" policy is
+# retired: recoverable build output, caches and secrets no longer belong in git.)
+
+# Android build outputs - keep only the signed deliverable
+app/dist/*
+!app/dist/RideAccepter-mod.apk
+
+# apktool build cache (regenerated on every `apktool b`)
+app/build/
+
+# Node
+node_modules/
+.npm-cache/
+
+# Python
+__pycache__/
+
+# Supabase CLI local state
+supabase/.temp/
+
+# Secrets / local env (variable NAMES are documented in .env.example)
+.env
+.env.*
+!.env.example
+
+# OS noise
+.DS_Store
+Thumbs.db

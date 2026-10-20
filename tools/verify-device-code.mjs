@@ -1,5 +1,5 @@
 // Prints device-code test vectors as "androidId|brand|model|CODE" so they can be
-// diffed against the Java implementation (apk-src/.../CodeVector.java).
+// diffed against the Java implementation (app/java/.../CodeVector.java).
 //
 // The two MUST agree exactly: licence keys are bound to this code, so any
 // divergence means every activation fails with DEVICE_MISMATCH.

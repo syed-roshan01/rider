@@ -2,7 +2,7 @@ import re, sys, os
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 sys.path.insert(0, 'tools')
 
-SMALI = os.path.join('decoded-apktool', 'smali')
+SMALI = os.path.join('app', 'smali')
 TARGET = 'Lcom/auto/accept/service/RideAcceptorService;'
 
 # re-use the module by exec'ing just the parsing part

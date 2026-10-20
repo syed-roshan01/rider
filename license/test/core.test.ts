@@ -160,7 +160,7 @@ describe('device binding', () => {
 
     test('GOLDEN: the device-code derivation is frozen', () => {
         // These exact values are pinned on purpose. They are also produced by
-        // the Android client (apk-src/.../DeviceIdentity.java), which MUST
+        // the Android client (app/java/.../DeviceIdentity.java), which MUST
         // agree byte for byte — a licence key is bound to this code, so any
         // change here silently invalidates every device code already issued and
         // every key bound to one. If you must change the derivation, bump the
