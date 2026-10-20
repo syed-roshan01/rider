@@ -1252,14 +1252,22 @@ public class DashboardActivity extends Activity {
     }
 
     private void renderApps(LinearLayout list, boolean showAll) {
+        // One flat card holding every app row, hairline-separated (design panel 4)
+        list.setBackground(gradient(CARD, CARD, true, dp(14)));
+        list.setPadding(dp(4), dp(2), dp(4), dp(2));
         int shown = 0;
         for (String[] a : APPS) {
             String[] brands = a[3].split("\\|");
             boolean installed = findRiderPkg(brands) != null;
             if (!showAll && !installed) continue;
             boolean shizuku = "Ola".equals(a[0]) || "Uber".equals(a[0]);
+            if (shown > 0) {
+                View hair = new View(this);
+                hair.setBackground(round(CARD_EDGE, dp(1)));
+                list.addView(hair, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+            }
             list.addView(appRow(a[0], a[1], a[2], brands, shizuku ? AMBER : GREEN));
-            list.addView(spacer(dp(10)));
             shown++;
         }
         if (shown == 0) {
@@ -1291,8 +1299,8 @@ public class DashboardActivity extends Activity {
                                 final String[] brands, final int accent) {
         final String appName = name;
         final LinearLayout outer = row();
-        outer.setPadding(dp(14), dp(13), dp(16), dp(13));
-        outer.setBackground(gradient(CARD, CARD, true, dp(14)));
+        outer.setPadding(dp(12), dp(11), dp(14), dp(11));
+        outer.setBackground(gradient(CARD, CARD, true, dp(0)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
 
         // platform logo as a proper app icon: white rounded-square tile + official mark
@@ -1308,8 +1316,8 @@ public class DashboardActivity extends Activity {
         icon.setClipToOutline(true);
         int res = getResources().getIdentifier(logoRes, "drawable", getPackageName());
         if (res != 0) icon.setImageResource(res);
-        LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(dp(44), dp(44));
-        ilp.setMargins(dp(12), 0, dp(2), 0);
+        LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(dp(32), dp(32));
+        ilp.setMargins(dp(6), 0, dp(2), 0);
         outer.addView(icon, ilp);
 
         LinearLayout txt = column();
