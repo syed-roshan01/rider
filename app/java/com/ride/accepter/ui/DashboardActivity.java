@@ -513,31 +513,78 @@ public class DashboardActivity extends Activity {
 
     // --------------------------------------------------------------- filters
 
+    /** MIN/MAX value box (design panel 3): tag over value, outlined. */
+    private TextView rangeBox(LinearLayout parent, String tag, String value) {
+        LinearLayout b = column();
+        b.setPadding(dp(14), dp(10), dp(14), dp(10));
+        b.setBackground(ui.shape(CARD, 12, true));
+        b.addView(label(tag, 11f, INK_FAINT));
+        b.addView(spacer(dp(2)));
+        TextView v = text(value, 15f, INK, Typeface.BOLD, 0f);
+        b.addView(v);
+        parent.addView(b, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        return v;
+    }
+
+    /** Range card (design panel 3): title + MIN/MAX boxes + dual-thumb slider. */
+    private void rangeCard(LinearLayout p, String title, String suffix,
+                           final String loKey, int defLo, final String hiKey, int defHi,
+                           float min, float max) {
+        LinearLayout card = gradientCard(CARD, CARD);
+        card.setPadding(dp(16), dp(16), dp(16), dp(16));
+        card.addView(text(title, 16f, INK, Typeface.BOLD, 0f));
+        card.addView(spacer(dp(12)));
+        final int l0 = prefs.getInt(loKey, defLo), h0 = prefs.getInt(hiKey, defHi);
+        LinearLayout boxes = row();
+        final TextView lo = rangeBox(boxes, "MIN", l0 + suffix);
+        boxes.addView(hspacer(dp(12)));
+        final TextView hi = rangeBox(boxes, "MAX", h0 + suffix);
+        card.addView(boxes, matchWrap());
+        card.addView(spacer(dp(14)));
+        Ui.RangeSlider sl = ui.rangeSlider();
+        sl.set(min, max, l0, h0);
+        sl.on(new Ui.RangeSlider.OnRange() {
+            @Override public void changed(float a, float b) {
+                int ia = Math.round(a), ib = Math.round(b);
+                prefs.edit().putInt(loKey, ia).putInt(hiKey, ib).apply();
+                lo.setText(ia + suffix);
+                hi.setText(ib + suffix);
+                pushFilters();
+            }
+        });
+        card.addView(sl, matchWrap(dp(28)));
+        p.addView(card, matchWrap());
+    }
+
     private void buildFilters(final LinearLayout p) {
-        head(p, "Filters", "Only offers matching every rule get accepted. Everything else is skipped.");
-        p.addView(spacer(dp(18)));
+        // Header row (design panel 3): title + Reset link
+        LinearLayout fh = row();
+        fh.setGravity(Gravity.CENTER_VERTICAL);
+        fh.addView(text("Filters", 20f, INK, Typeface.BOLD, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView reset = text("Reset", 13f, NEON, Typeface.BOLD, 0f);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                prefs.edit().remove("min_fare").remove("max_fare")
+                        .remove("min_pickup").remove("max_pickup")
+                        .remove("min_drop").remove("max_drop").apply();
+                pushFilters();
+                show(current);
+            }
+        });
+        fh.addView(reset);
+        p.addView(fh, matchWrap());
+        p.addView(spacer(dp(14)));
 
-        title(p, "Fare");
+        // Fare + the two distance ranges (design panel 3)
+        rangeCard(p, "Fare range (₹)", "", "min_fare", 50, "max_fare", 0, 0, 500);
         p.addView(spacer(dp(12)));
-        p.addView(editRow("Minimum fare", "₹" + prefs.getInt("min_fare", 50) + " and above",
-                "min_fare", 50, GREEN));
-        p.addView(spacer(dp(10)));
-        p.addView(editRow("Maximum fare", prefs.getInt("max_fare", 0) == 0 ? "No upper limit"
-                        : "₹" + prefs.getInt("max_fare", 0) + " and below",
-                "max_fare", 0, PURPLE));
+        rangeCard(p, "Pickup distance (km)", " km", "min_pickup", 0, "max_pickup", 50, 0, 100);
+        p.addView(spacer(dp(12)));
+        rangeCard(p, "Drop distance (km)", " km", "min_drop", 0, "max_drop", 100, 0, 200);
 
         p.addView(spacer(dp(20)));
-        title(p, "Distance");
-        p.addView(spacer(dp(12)));
-        p.addView(editRow("Max pickup distance", prefs.getInt("max_pickup", 50) + " km",
-                "max_pickup", 50, CYAN));
-        p.addView(spacer(dp(10)));
-        p.addView(editRow("Max drop distance", prefs.getInt("max_drop", 100) + " km",
-                "max_drop", 100, CYAN));
-
-        p.addView(spacer(dp(20)));
-        title(p, "Location");
-        p.addView(spacer(dp(12)));
         buildZones(p);
 
         p.addView(spacer(dp(24)));

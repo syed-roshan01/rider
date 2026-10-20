@@ -354,6 +354,64 @@ public final class Ui {
 
     // ---- icons (24-unit grid, stroke glyphs) -----------------------------
 
+    /** Dual-thumb range slider (design panel 3). Build one with ui.rangeSlider(). */
+    public static final class RangeSlider extends View {
+        public interface OnRange { void changed(float lo, float hi); }
+        private final Ui ui;
+        private final Paint tp = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final RectF trk = new RectF();
+        private float min, max = 100, lo, hi;
+        private int drag;
+        private OnRange cb;
+        public RangeSlider(Ui ui) { super(ui.ctx); this.ui = ui; }
+        public void set(float mn, float mx, float l, float h) {
+            min = mn; max = mx; lo = l; hi = h; invalidate();
+        }
+        public void on(OnRange c) { cb = c; }
+        @Override protected void onMeasure(int ws, int hs) {
+            setMeasuredDimension(MeasureSpec.getSize(ws), ui.dp(28));
+        }
+        private float thumb(float v, float w) {
+            float r = ui.dp(10), t = w - 2 * r;
+            return r + (max > min ? t * (v - min) / (max - min) : 0);
+        }
+        @Override protected void onDraw(Canvas canvas) {
+            float w = getWidth(), h = getHeight(), cy = h / 2f, r = ui.dp(10);
+            float x0 = thumb(lo, w), x1 = thumb(hi, w);
+            trk.set(r, cy - ui.dp(2), w - r, cy + ui.dp(2));
+            tp.setColor(ui.surfaceHigh);
+            canvas.drawRoundRect(trk, ui.dp(2), ui.dp(2), tp);
+            trk.set(x0, cy - ui.dp(2), x1, cy + ui.dp(2));
+            tp.setColor(ui.primary);
+            canvas.drawRoundRect(trk, ui.dp(2), ui.dp(2), tp);
+            canvas.drawCircle(x0, cy, r, tp);
+            canvas.drawCircle(x1, cy, r, tp);
+        }
+        @Override public boolean onTouchEvent(android.view.MotionEvent e) {
+            float x = e.getX(), w = getWidth();
+            if (e.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                drag = Math.abs(x - thumb(lo, w)) <= Math.abs(x - thumb(hi, w)) ? 1 : 2;
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
+            } else if (e.getAction() == android.view.MotionEvent.ACTION_MOVE && drag != 0) {
+                float r = ui.dp(10), t = w - 2 * r;
+                float f = t <= 0 ? 0 : (x - r) / t;
+                if (f < 0) f = 0;
+                if (f > 1) f = 1;
+                float v = min + f * (max - min);
+                if (drag == 1) lo = Math.min(v, hi); else hi = Math.max(v, lo);
+                invalidate();
+                if (cb != null) cb.changed(lo, hi);
+            } else {
+                drag = 0;
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);
+            }
+            return true;
+        }
+    }
+
+    /** Range slider factory. */
+    public RangeSlider rangeSlider() { return new RangeSlider(this); }
+
     public static final class IconView extends View {
         private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         private String name = "";
