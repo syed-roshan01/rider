@@ -74,6 +74,10 @@ public class DashboardActivity extends Activity {
 
     private LinearLayout body;
     private final TextView[] navItems = new TextView[5];
+    private final View[] navDots = new View[5];
+    private final Ui.IconView[] navIcons = new Ui.IconView[5];
+    private static final String[] NAV_LABELS = { "Home", "Filters", "Apps", "History", "Settings" };
+    private static final String[] NAV_ICONS = { "home", "filter", "apps", "history", "gear" };
     private int current = 0;
 
     private ToggleSwitch engineSw, detectSw;
@@ -235,22 +239,33 @@ public class DashboardActivity extends Activity {
     private View buildNav() {
         LinearLayout nav = new LinearLayout(this);
         nav.setOrientation(LinearLayout.HORIZONTAL);
-        nav.setBackground(gradient(CARD, CARD, true, 0));
+        nav.setBackground(gradient(BG0, BG0, true, 0));
         nav.setPadding(dp(4), dp(8), dp(4), dp(10));
-        String[] labels = { "Home", "Filters", "Apps", "History", "Settings" };
-        for (int i = 0; i < labels.length; i++) {
+        for (int i = 0; i < NAV_LABELS.length; i++) {
             final int idx = i;
-            TextView t = new TextView(this);
-            t.setText(labels[i]);
-            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
-            t.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-            t.setGravity(Gravity.CENTER);
-            t.setPadding(0, dp(10), 0, dp(10));
-            t.setOnClickListener(new View.OnClickListener() {
+            LinearLayout item = column();
+            item.setGravity(Gravity.CENTER_HORIZONTAL);
+            item.setPadding(0, dp(4), 0, dp(4));
+            item.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) { show(idx); }
             });
+            // icon sits in a pill that fills when the tab is active (design panel 2)
+            LinearLayout dot = row();
+            dot.setGravity(Gravity.CENTER);
+            Ui.IconView ic = ui.icon(NAV_ICONS[i], INK_FAINT, 21);
+            dot.addView(ic);
+            item.addView(dot, new LinearLayout.LayoutParams(dp(42), dp(32)));
+            item.addView(spacer(dp(3)));
+            TextView t = new TextView(this);
+            t.setText(NAV_LABELS[i]);
+            t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            t.setGravity(Gravity.CENTER);
+            item.addView(t, matchWrap());
+            navDots[i] = dot;
+            navIcons[i] = ic;
             navItems[i] = t;
-            nav.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            nav.addView(item, new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         }
         return nav;
     }
@@ -259,8 +274,9 @@ public class DashboardActivity extends Activity {
         current = idx;
         for (int i = 0; i < navItems.length; i++) {
             boolean sel = i == idx;
-            navItems[i].setTextColor(sel ? BLUE : INK_FAINT);
-            navItems[i].setBackground(sel ? round(NAV_SEL_BG, dp(10)) : null);
+            navItems[i].setTextColor(sel ? INK : INK_FAINT);
+            navDots[i].setBackground(round(sel ? NEON : 0x00000000, dp(16)));
+            navIcons[i].set(NAV_ICONS[i], sel ? ui.onPrimary : INK_FAINT, dp(21));
         }
         body.removeAllViews();
         ScrollView scroll = new ScrollView(this);
