@@ -91,7 +91,8 @@ public class DashboardActivity extends Activity {
     private ValueAnimator haloAnim;
     private TextView statAccepted, statSkipped, statRate, statEarnings;
     private LinearLayout permBox;
-    private boolean engineOn, detectOn = true;
+    private boolean engineOn, detectOn; // live mode by default; detect-only is opt-in
+    private boolean engineLive; // granted AND enabled - the engine truly running
     private SharedPreferences prefs;
 
     @Override protected void onCreate(Bundle b) {
@@ -112,6 +113,8 @@ public class DashboardActivity extends Activity {
             return;
         }
         prefs = getSharedPreferences("ra_state", MODE_PRIVATE);
+        engineOn = prefs.getBoolean("engine_on", true); // survives app closes
+        detectOn = prefs.getBoolean("detect_on", false); // default LIVE: detect-only is opt-in
         applyTheme();
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -394,6 +397,7 @@ public class DashboardActivity extends Activity {
         eng.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 engineOn = !engineOn;
+                prefs.edit().putBoolean("engine_on", engineOn).commit();
                 call("setServiceEnabled", boolean.class, engineOn);
                 paint();
             }
@@ -407,6 +411,7 @@ public class DashboardActivity extends Activity {
         det.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 detectOn = !detectOn;
+                prefs.edit().putBoolean("detect_on", detectOn).commit();
                 call("setDetectOnly", boolean.class, detectOn);
                 paint();
             }
@@ -581,18 +586,30 @@ public class DashboardActivity extends Activity {
     private void rangeCard(LinearLayout p, String title, String suffix,
                            final String loKey, int defLo, final String hiKey, int defHi,
                            float min, float max) {
+        final String onKey = loKey + "_on";
         LinearLayout card = gradientCard(CARD, CARD);
         card.setPadding(dp(16), dp(16), dp(16), dp(16));
-        card.addView(text(title, 16f, INK, Typeface.BOLD, 0f));
+
+        // header: title + enable toggle (turn on to configure the range)
+        LinearLayout head = row();
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        final TextView ttl = text(title, 16f, INK, Typeface.BOLD, 0f);
+        head.addView(ttl, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        final Ui.ToggleSwitch sw = ui.toggle();
+        head.addView(sw);
+        card.addView(head, matchWrap());
         card.addView(spacer(dp(12)));
+
         final int l0 = prefs.getInt(loKey, defLo), h0 = prefs.getInt(hiKey, defHi);
+        final LinearLayout content = column(); // greyed + locked while the toggle is off
         LinearLayout boxes = row();
         final TextView lo = rangeBox(boxes, "MIN", l0 + suffix);
         boxes.addView(hspacer(dp(12)));
         final TextView hi = rangeBox(boxes, "MAX", h0 + suffix);
-        card.addView(boxes, matchWrap());
-        card.addView(spacer(dp(14)));
-        Ui.RangeSlider sl = ui.rangeSlider();
+        content.addView(boxes, matchWrap());
+        content.addView(spacer(dp(14)));
+        final Ui.RangeSlider sl = ui.rangeSlider();
         sl.set(min, max, l0, h0);
         sl.on(new Ui.RangeSlider.OnRange() {
             @Override public void changed(float a, float b) {
@@ -603,8 +620,29 @@ public class DashboardActivity extends Activity {
                 pushFilters();
             }
         });
-        card.addView(sl, matchWrap(dp(28)));
+        content.addView(sl, matchWrap(dp(28)));
+        card.addView(content, matchWrap());
         p.addView(card, matchWrap());
+
+        sw.show(prefs.getBoolean(onKey, true));
+        applyRangeState(ttl, content, sl, sw.isOn());
+        sw.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                boolean nv = !((Ui.ToggleSwitch) v).isOn();
+                ((Ui.ToggleSwitch) v).show(nv);
+                prefs.edit().putBoolean(onKey, nv).apply();
+                applyRangeState(ttl, content, sl, nv);
+                pushFilters();
+            }
+        });
+    }
+
+    /** Disabled range card: greyed content + locked slider; the filter passes everything. */
+    private void applyRangeState(TextView title, LinearLayout content,
+                                 Ui.RangeSlider slider, boolean on) {
+        title.setAlpha(on ? 1f : 0.4f);
+        content.setAlpha(on ? 1f : 0.4f);
+        slider.setEnabled(on);
     }
 
     private void buildFilters(final LinearLayout p) {
@@ -618,7 +656,8 @@ public class DashboardActivity extends Activity {
             @Override public void onClick(View v) {
                 prefs.edit().remove("min_fare").remove("max_fare")
                         .remove("min_pickup").remove("max_pickup")
-                        .remove("min_drop").remove("max_drop").apply();
+                        .remove("min_drop").remove("max_drop")
+                        .remove("min_fare_on").remove("min_pickup_on").remove("min_drop_on").apply();
                 pushFilters();
                 show(current);
             }
@@ -794,13 +833,15 @@ public class DashboardActivity extends Activity {
         LinearLayout card = dialogCard("Remove " + name + "?", "This area will no longer be grabbed first.");
         card.addView(spacer(dp(16)));
         LinearLayout btns = row();
+        final Dialog d = styledDialog(card); // up front so both buttons can dismiss it
         btns.addView(smallButton("Cancel", BLUE, new View.OnClickListener() {
-            @Override public void onClick(View v) { }
+            @Override public void onClick(View v) { d.dismiss(); }
         }), new LinearLayout.LayoutParams(0, dp(46), 1f));
         View gap = new View(this);
         btns.addView(gap, new LinearLayout.LayoutParams(dp(10), dp(46)));
         btns.addView(smallButton("Remove", RED, new View.OnClickListener() {
             @Override public void onClick(View v) {
+                d.dismiss(); // close first: idx was captured and goes stale once the list changes
                 try {
                     org.json.JSONArray zones = loadZones();
                     org.json.JSONArray keep = new org.json.JSONArray();
@@ -812,7 +853,6 @@ public class DashboardActivity extends Activity {
             }
         }), new LinearLayout.LayoutParams(0, dp(46), 1f));
         card.addView(btns, matchWrap());
-        final Dialog d = styledDialog(card);
         d.show();
     }
 
@@ -837,7 +877,25 @@ public class DashboardActivity extends Activity {
             @Override public void onClick(View v) { geoSearch(q.getText().toString()); }
         }), new LinearLayout.LayoutParams(dp(96), dp(46)));
         card.addView(sr, matchWrap());
+        final LinearLayout sug = column(); // live place suggestions while typing
+        card.addView(sug, matchWrap());
         card.addView(spacer(dp(10)));
+        final int[] seq = { 0 };
+        q.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void afterTextChanged(android.text.Editable s) {
+                final String t = s.toString().trim();
+                final int me = ++seq[0];
+                sug.removeAllViews();
+                if (t.length() < 3) return;
+                q.postDelayed(new Runnable() { // debounce: geocode once typing pauses
+                    @Override public void run() {
+                        if (me == seq[0]) geoSuggest(t, sug, me, seq);
+                    }
+                }, 450);
+            }
+        });
 
         // Reuse one WebView for the app's lifetime - constructing one boots
         // Chromium (hundreds of ms) and this ran on every Filters rebuild.
@@ -913,6 +971,63 @@ public class DashboardActivity extends Activity {
         }).start();
     }
 
+    /** Live place suggestions under the search field (top 4, updates as you type). */
+    private void geoSuggest(final String q, final LinearLayout sug,
+                            final int me, final int[] seq) {
+        new Thread(new Runnable() {
+            @Override public void run() {
+                final java.util.ArrayList<String> lines = new java.util.ArrayList<String>();
+                final java.util.ArrayList<double[]> pts = new java.util.ArrayList<double[]>();
+                try {
+                    java.util.List<android.location.Address> rs = new android.location.Geocoder(
+                            DashboardActivity.this, java.util.Locale.ENGLISH)
+                            .getFromLocationName(q, 4);
+                    if (rs != null) {
+                        for (int i = 0; i < rs.size(); i++) {
+                            android.location.Address a = rs.get(i);
+                            String line = a.getAddressLine(0);
+                            if (line == null || line.length() == 0) line = a.toString();
+                            lines.add(line);
+                            pts.add(new double[] { a.getLatitude(), a.getLongitude() });
+                        }
+                    }
+                } catch (Throwable ignored) {}
+                runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        if (me != seq[0] || sug.getParent() == null) return; // stale or closed
+                        sug.removeAllViews();
+                        if (lines.isEmpty()) {
+                            TextView none = text("No matches \u00b7 try a pincode or a fuller name",
+                                    11f, INK_FAINT, Typeface.NORMAL, 0f);
+                            none.setPadding(dp(12), dp(6), dp(12), dp(6));
+                            sug.addView(none, matchWrap());
+                            return;
+                        }
+                        for (int i = 0; i < lines.size(); i++) {
+                            final double[] pt = pts.get(i);
+                            TextView r = text(lines.get(i), 12f, INK, Typeface.NORMAL, 0f);
+                            r.setMaxLines(2);
+                            r.setPadding(dp(12), dp(8), dp(12), dp(8));
+                            r.setBackground(gradient(BTN_SOFT, BTN_SOFT, true, dp(10)));
+                            r.setOnClickListener(new View.OnClickListener() {
+                                @Override public void onClick(View v) {
+                                    mapLat = pt[0]; mapLng = pt[1];
+                                    if (mapWeb != null) {
+                                        mapWeb.loadUrl("javascript:try{setPoint(" + pt[0] + ","
+                                                + pt[1] + ",true);}catch(e){}");
+                                    }
+                                    sug.removeAllViews();
+                                }
+                            });
+                            sug.addView(r, matchWrap());
+                            sug.addView(spacer(dp(6)));
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void showSearchResults(final java.util.ArrayList<String> lines,
                                    final java.util.ArrayList<double[]> pts) {
         LinearLayout card = dialogCard("Search results", "Tap the right place to move the pin.");
@@ -966,11 +1081,17 @@ public class DashboardActivity extends Activity {
         card.addView(spacer(dp(12)));
         final LinearLayout radRow = row();
         final int[] radii = { 500, 1000, 2000, 5000, 10000 };
-        final String[] radLabels = { "500 m", "1 km", "2 km", "5 km", "10 km" };
         final java.util.ArrayList<TextView> chips = new java.util.ArrayList<TextView>();
         for (int i = 0; i < radii.length; i++) {
             final int rr = radii[i];
-            final TextView chip = segPill(radLabels[i], rr == 1000);
+            String lab = rr >= 1000 ? (rr / 1000) + "\nkm" : rr + "\nm"; // value + unit line
+            final TextView chip = segPill(lab, rr == 1000);
+            android.text.SpannableString sp = new android.text.SpannableString(lab);
+            sp.setSpan(new android.text.style.AbsoluteSizeSpan(10, true),
+                    lab.indexOf('\n') + 1, lab.length(), 0);
+            chip.setText(sp);
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            chip.setPadding(dp(8), dp(5), dp(8), dp(5));
             chips.add(chip);
             chip.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
@@ -978,10 +1099,10 @@ public class DashboardActivity extends Activity {
                     for (TextView c : chips) styleSeg(c, c == chip);
                 }
             });
-            radRow.addView(chip, new LinearLayout.LayoutParams(0, dp(38), 1f));
+            radRow.addView(chip, new LinearLayout.LayoutParams(0, dp(44), 1f));
             if (i < radii.length - 1) {
                 View g = new View(this);
-                radRow.addView(g, new LinearLayout.LayoutParams(dp(6), dp(38)));
+                radRow.addView(g, new LinearLayout.LayoutParams(dp(6), dp(44)));
             }
         }
         radRow.setVisibility(View.GONE);
@@ -1161,18 +1282,34 @@ public class DashboardActivity extends Activity {
         return null;
     }
 
+    private final android.os.Handler toastHandler =
+            new android.os.Handler(android.os.Looper.getMainLooper());
+    private final Runnable savedToastRun = new Runnable() {
+        @Override public void run() { toast("Filters saved ✓"); }
+    };
+
+    /** One "saved" toast per interaction burst (slider drags fire many change events). */
+    private void toastSaved() {
+        toastHandler.removeCallbacks(savedToastRun);
+        toastHandler.postDelayed(savedToastRun, 800);
+    }
+
     private void pushFilters() {
-        double min = prefs.getInt("min_fare", 50);
-        double max = prefs.getInt("max_fare", 0);
-        double mp = prefs.getInt("max_pickup", 50);
-        double md = prefs.getInt("max_drop", 100);
+        boolean fareOn = prefs.getBoolean("min_fare_on", true);
+        boolean pickOn = prefs.getBoolean("min_pickup_on", true);
+        boolean dropOn = prefs.getBoolean("min_drop_on", true);
+        // a disabled card pushes a pass-all range so the engine skips that dimension
+        double min = fareOn ? prefs.getInt("min_fare", 50) : 0;
+        double max = fareOn ? prefs.getInt("max_fare", 0) : 0;
+        double mp = pickOn ? prefs.getInt("max_pickup", 50) : 100000.0;
+        double md = dropOn ? prefs.getInt("max_drop", 100) : 100000.0;
         try {
             Class.forName(ENGINE).getMethod("setFilters", double.class, double.class,
                     double.class, double.class).invoke(null, min, max > 0 ? max : 100000.0, mp, md);
             Class.forName(ENGINE).getMethod("setFilterFlags", boolean.class, boolean.class)
                     .invoke(null, true, true);
         } catch (Throwable ignored) {}
-        toast("Filters saved ✓");
+        toastSaved();
     }
 
     // ------------------------------------------------------------------ apps
@@ -1203,8 +1340,7 @@ public class DashboardActivity extends Activity {
         head(p, "Apps", "Choose which ride apps we watch for incoming offers.");
         p.addView(spacer(dp(16)));
 
-        // one-time defaults: installed rider apps ON, every unlisted platform OFF
-        applyAppDefaults();
+        // one-time defaults (installed rider apps ON) run deferred with the list below
 
         // segmented switch: Installed (default) | All apps
         LinearLayout seg = row();
@@ -1219,7 +1355,14 @@ public class DashboardActivity extends Activity {
         p.addView(spacer(dp(4)));
         final LinearLayout list = column();
         p.addView(list, matchWrap());
-        renderApps(list, appsShowAll);
+        renderAppsSkeleton(list); // paint placeholders on the very first frame
+        list.post(new Runnable() { // real rows land one frame later
+            @Override public void run() {
+                applyAppDefaults();
+                list.removeAllViews();
+                renderApps(list, appsShowAll);
+            }
+        });
 
         segA.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -1262,6 +1405,41 @@ public class DashboardActivity extends Activity {
         t.setTextColor(on ? SEL_INK : INK_SOFT);
     }
 
+    /** Placeholder rows so the Apps tab paints instantly while rows resolve. */
+    private void renderAppsSkeleton(LinearLayout list) {
+        list.setBackground(gradient(CARD, CARD, true, dp(14)));
+        list.setPadding(dp(4), dp(2), dp(4), dp(2));
+        for (int i = 0; i < 5; i++) {
+            if (i > 0) {
+                View hair = new View(this);
+                hair.setBackground(round(CARD_EDGE, dp(1)));
+                list.addView(hair, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+            }
+            LinearLayout r = row();
+            r.setPadding(dp(18), dp(16), dp(18), dp(16));
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            View ico = new View(this);
+            ico.setBackground(round(BTN_SOFT, dp(11)));
+            r.addView(ico, new LinearLayout.LayoutParams(dp(32), dp(32)));
+            r.addView(spacer(dp(14)));
+            LinearLayout bars = column();
+            View b1 = new View(this);
+            b1.setBackground(round(BTN_SOFT, dp(6)));
+            bars.addView(b1, new LinearLayout.LayoutParams(dp(110), dp(12)));
+            bars.addView(spacer(dp(8)));
+            View b2 = new View(this);
+            b2.setBackground(round(BTN_SOFT, dp(5)));
+            bars.addView(b2, new LinearLayout.LayoutParams(dp(64), dp(10)));
+            r.addView(bars, new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            View tog = new View(this);
+            tog.setBackground(round(BTN_SOFT, dp(10)));
+            r.addView(tog, new LinearLayout.LayoutParams(dp(40), dp(20)));
+            list.addView(r, matchWrap());
+        }
+    }
+
     private void renderApps(LinearLayout list, boolean showAll) {
         // One flat card holding every app row, hairline-separated (design panel 4)
         list.setBackground(gradient(CARD, CARD, true, dp(14)));
@@ -1287,8 +1465,12 @@ public class DashboardActivity extends Activity {
         }
     }
 
+    private static boolean appDefaultsDone; // once per process, not per tab visit
+
     /** One-time default state: only installed rider apps are ON, everything else OFF. */
     private void applyAppDefaults() {
+        if (appDefaultsDone) return;
+        appDefaultsDone = true;
         SharedPreferences ep = enginePrefs();
         for (String[] a : APPS) {
             String key = "app_enabled_" + a[0];
@@ -1370,16 +1552,24 @@ public class DashboardActivity extends Activity {
     /** Installed rider/partner package for this platform, or null. Requires the brand
      *  keyword AND a rider-side marker, so consumer apps (com.olacabs.customer,
      *  com.zeptoconsumerapp, com.rapido.passenger, ...) are never counted. */
+    private java.util.List<String> installedCache; // one package listing per session
+
     private String findRiderPkg(String[] brands) {
         try {
-            java.util.List<android.content.pm.PackageInfo> pkgs =
-                    getPackageManager().getInstalledPackages(0);
-            for (android.content.pm.PackageInfo pi : pkgs) {
-                String p = pi.packageName.toLowerCase(java.util.Locale.ROOT);
+            if (installedCache == null) {
+                java.util.List<android.content.pm.PackageInfo> pkgs =
+                        getPackageManager().getInstalledPackages(0);
+                java.util.ArrayList<String> names =
+                        new java.util.ArrayList<String>(pkgs.size());
+                for (android.content.pm.PackageInfo pi : pkgs) names.add(pi.packageName);
+                installedCache = names;
+            }
+            for (String full : installedCache) {
+                String p = full.toLowerCase(java.util.Locale.ROOT);
                 boolean brand = false;
                 for (String b : brands) if (p.contains(b)) { brand = true; break; }
                 if (!brand) continue;
-                for (String m : RIDER_MARKERS) if (p.contains(m)) return pi.packageName;
+                for (String m : RIDER_MARKERS) if (p.contains(m)) return full;
             }
         } catch (Throwable ignored) {}
         return null;
@@ -2345,21 +2535,39 @@ public class DashboardActivity extends Activity {
         }
     }
 
+    /** True only when our accessibility service is actually enabled in system settings. */
+    private boolean a11yGranted() {
+        try {
+            String flat = android.provider.Settings.Secure.getString(getContentResolver(),
+                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            return flat != null && flat.contains(getPackageName() + "/");
+        } catch (Throwable t) { return false; }
+    }
+
     private void refresh() {
-        engineOn = read("getEngineEnabled", engineOn);
-        detectOn = read("getDetectOnly", detectOn);
+        // persisted intent is the single source of truth - never resurrect the
+        // UI from the live bridge (engine-side debug paths used to flip it)
+        engineOn = prefs.getBoolean("engine_on", true);
+        detectOn = prefs.getBoolean("detect_on", false); // never silently block taps
+        call("setServiceEnabled", boolean.class, engineOn); // keep the service in sync
+        call("setDetectOnly", boolean.class, detectOn);
         paint();
     }
 
     private void paint() {
         if (heroStatus == null) return;
-        heroStatus.setText(engineOn ? "Service is running" : "Service is stopped");
-        heroSub.setText(engineOn
-                ? "Watching your ride apps for matching offers."
+        boolean granted = a11yGranted();
+        engineLive = granted && engineOn; // only true when the engine can really work
+        heroStatus.setText(!granted ? "Accessibility needed"
+                : engineOn ? "Service is running" : "Service is paused");
+        heroSub.setText(!granted
+                ? "Grant AcceptPro Service in Settings \u27a1 Accessibility, then it starts itself."
+                : engineOn ? "Watching your ride apps for matching offers."
                 : "Turn on the engine to start watching for rides.");
         glow();
-        int heroAccent = engineOn ? ui.success : BLUE; // green only while the engine runs
-        if (heroBadge != null) heroBadge.setBackground(round(engineOn ? ui.success : NEON, dp(24)));
+        int heroAccent = engineLive ? ui.success : (granted ? BLUE : AMBER);
+        if (heroBadge != null) heroBadge.setBackground(round(
+                engineLive ? ui.success : (granted ? NEON : AMBER), dp(24)));
         if (engineSw != null) engineSw.show(engineOn, heroAccent);
         if (detectSw != null) detectSw.show(detectOn, heroAccent);
 
@@ -2406,7 +2614,7 @@ public class DashboardActivity extends Activity {
     /** Opacity-only pulse on the green hero glow while the engine is on. */
     private void glow() {
         if (heroHalo == null) return;
-        if (!engineOn) {
+        if (!engineLive) { // breathe only while the engine is truly running
             if (haloAnim != null) haloAnim.cancel();
             heroHalo.setAlpha(0f);
             if (heroGlow != null) heroGlow.setAlpha(0);
@@ -2460,8 +2668,12 @@ public class DashboardActivity extends Activity {
                 .format(new java.util.Date(ms));
     }
 
+    private android.widget.Toast lastToast;
+
     private void toast(String m) {
-        android.widget.Toast.makeText(this, m, android.widget.Toast.LENGTH_SHORT).show();
+        if (lastToast != null) lastToast.cancel(); // never queue repeats
+        lastToast = android.widget.Toast.makeText(this, m, android.widget.Toast.LENGTH_SHORT);
+        lastToast.show();
     }
 
     // --------------------------------------------------------------- helpers

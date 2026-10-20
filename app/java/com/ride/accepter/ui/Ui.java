@@ -797,6 +797,7 @@ public final class Ui {
         }
 
         @Override public boolean onTouchEvent(MotionEvent e) {
+            if (!isEnabled()) return false; // locked while the card toggle is off
             float x = e.getX(), w = getWidth();
             int a = e.getActionMasked();
             if (a == MotionEvent.ACTION_DOWN) {

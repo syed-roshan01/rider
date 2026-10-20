@@ -2869,6 +2869,16 @@
 
 .method private final executeAccept(Landroid/view/accessibility/AccessibilityNodeInfo;DDLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
     .locals 20
+
+    # AcceptPro dry-run audit: echo offer + live settings + verdict (RideDecision)
+    move-wide/from16 v2, p2
+
+    move-wide/from16 v4, p4
+
+    sget v6, Lcom/auto/accept/service/RideAcceptorService;->lastFare:I
+
+    invoke-static {v2, v3, v4, v5, v6}, Lcom/ride/accepter/DebugLog;->decide(DDI)V
+
     sget-boolean v0, Lcom/auto/accept/service/RideAcceptorService;->detectOnly:Z
 
     if-eqz v0, :live
@@ -34062,7 +34072,7 @@
     return v0
 .end method
 
-.field public static volatile detectOnly:Z = true
+.field public static volatile detectOnly:Z = false
 
 .method public static setDetectOnly(Z)V
     .locals 2
@@ -34542,7 +34552,12 @@
 
 .method private static toggleFromUi(Landroid/view/accessibility/AccessibilityEvent;Lcom/auto/accept/service/RideAcceptorService;)V
     .locals 2
-    invoke-virtual {p0}, Landroid/view/accessibility/AccessibilityEvent;->getEventType()I
+
+    # AcceptPro mod: DISABLED. The original flipped serviceEnabled on every
+    # TYPE_VIEW_CLICKED inside com.ride.accepter (i.e. any tap in the dashboard),
+    # which silently undid the user's engine toggle. The dashboard switch is the
+    # single source of truth now (persisted in ra_state.engine_on).
+    return-void
 
     move-result v1
 
@@ -35211,7 +35226,26 @@
 
     invoke-super {p0}, Landroid/accessibilityservice/AccessibilityService;->onServiceConnected()V
     sput-object p0, Lcom/auto/accept/service/RideAcceptorService;->overlayToggleTarget:Lcom/auto/accept/service/RideAcceptorService;
-    iput-boolean v7, p0, Lcom/auto/accept/service/RideAcceptorService;->serviceEnabled:Z
+
+    # AcceptPro mod: restore the user's persisted engine state instead of
+    # force-enabling on every (re)connect, so the toggle survives app closes.
+    # ra_state.engine_on is written by the dashboard toggle; default stays ON
+    # (v7) for first run, matching the original behaviour.
+    const-string v0, "ra_state"
+
+    const/4 v2, 0x0
+
+    invoke-virtual {p0, v0, v2}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+
+    move-result-object v0
+
+    const-string v2, "engine_on"
+
+    invoke-interface {v0, v2, v7}, Landroid/content/SharedPreferences;->getBoolean(Ljava/lang/String;Z)Z
+
+    move-result v2
+
+    iput-boolean v2, p0, Lcom/auto/accept/service/RideAcceptorService;->serviceEnabled:Z
 
     new-instance v0, Landroid/accessibilityservice/AccessibilityServiceInfo;
 
