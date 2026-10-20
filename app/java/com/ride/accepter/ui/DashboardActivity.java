@@ -1368,45 +1368,95 @@ public class DashboardActivity extends Activity {
 
     // --------------------------------------------------------------- history
 
+    private int histFilter;   // 0 = All, 1 = Accepted, 2 = Skipped (design panel 5)
+
+    /** Segmented filter pill (design panel 5). */
+    private void addSeg(LinearLayout parent, String name, final int code) {
+        TextView t = text(name, 13f, histFilter == code ? ui.onPrimary : INK_SOFT,
+                Typeface.BOLD, 0f);
+        t.setGravity(Gravity.CENTER);
+        t.setPadding(0, dp(9), 0, dp(9));
+        t.setBackground(round(histFilter == code ? NEON : CARD_EDGE, dp(10)));
+        t.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { histFilter = code; show(current); }
+        });
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        lp.setMargins(dp(4), 0, dp(4), 0);
+        parent.addView(t, lp);
+    }
+
     private void buildHistory(LinearLayout p) {
         head(p, "History", "Every offer we saw, and what we did with it.");
+        p.addView(spacer(dp(14)));
 
-        SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
-        int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
-        LinearLayout g = row();
-        tile(g, String.valueOf(a), "Accepted");
-        g.addView(hspacer(dp(12)));
-        tile(g, String.valueOf(s), "Skipped");
-        p.addView(g, matchWrap());
+        // Segmented filter (design panel 5)
+        LinearLayout seg = row();
+        addSeg(seg, "All", 0);
+        addSeg(seg, "Accepted", 1);
+        addSeg(seg, "Skipped", 2);
+        p.addView(seg, matchWrap());
         p.addView(spacer(dp(18)));
 
+        SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
+        int acc = sp.getInt("accepted_count", 0), skp = sp.getInt("skipped_count", 0);
+        String today = new java.text.SimpleDateFormat("d MMM yyyy",
+                java.util.Locale.getDefault()).format(new java.util.Date());
+
+        // Day group header (design panel 5): date + Accepted / Skipped / Earnings
+        LinearLayout gh = row();
+        gh.setGravity(Gravity.CENTER_VERTICAL);
+        gh.addView(text("Today · " + today, 13f, INK, Typeface.BOLD, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        gh.addView(label(acc + " Accepted", 11f, GREEN));
+        gh.addView(hspacer(dp(8)));
+        gh.addView(label(skp + " Skipped", 11f, RED));
+        gh.addView(hspacer(dp(8)));
+        gh.addView(label("₹" + sp.getInt("total_earnings", 0) + " Earnings", 11f, INK_SOFT));
+        p.addView(gh, matchWrap());
+        p.addView(spacer(dp(10)));
+
         String[] entries = readLog();
-        if (entries.length == 0) {
-            LinearLayout empty = gradientCard(CARD, CARD);
-            empty.addView(text("No rides yet", 15f, INK, Typeface.BOLD, 0f));
-            empty.addView(spacer(dp(4)));
-            empty.addView(text("Turn on the engine and the rides you see will be listed here.",
-                    12f, INK_SOFT, Typeface.NORMAL, 0f));
+        int shown = 0;
+        for (int i = entries.length - 1; i >= 0; i--) {
+            String[] parts = entries[i].split("\\|", 3);
+            String fare = parts.length > 0 ? parts[0] : "—";
+            String decision = parts.length > 1 ? parts[1] : "—";
+            String at = parts.length > 2 ? parts[2] : "";
+            boolean ok = "ACCEPTED".equals(decision);
+            if (histFilter == 1 && !ok) continue;
+            if (histFilter == 2 && ok) continue;
+            LinearLayout r = row();
+            r.setPadding(dp(16), dp(13), dp(16), dp(13));
+            r.setBackground(gradient(CARD, CARD, true, dp(14)));
+            r.setGravity(Gravity.CENTER_VERTICAL);
+            r.addView(text(fare, 15f, INK, Typeface.BOLD, 0f),
+                    new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            r.addView(label(at, 11f, INK_FAINT));
+            r.addView(hspacer(dp(10)));
+            r.addView(ui.chip(ok ? "Accepted" : "Skipped",
+                    ok ? ui.successTint : ui.errorTint, ok ? ui.success : ui.error));
+            p.addView(r, matchWrap());
+            p.addView(spacer(dp(9)));
+            shown++;
+        }
+
+        if (shown == 0) {
+            LinearLayout empty = column();
+            empty.setGravity(Gravity.CENTER_HORIZONTAL);
+            empty.setPadding(dp(24), dp(36), dp(24), dp(36));
+            empty.setBackground(gradient(CARD, CARD, true, dp(14)));
+            empty.addView(ui.icon("history", INK_FAINT, 28));
+            empty.addView(spacer(dp(12)));
+            TextView eh = text("No rides yet", 16f, INK, Typeface.BOLD, 0f);
+            eh.setGravity(Gravity.CENTER);
+            empty.addView(eh);
+            empty.addView(spacer(dp(6)));
+            TextView es = text("Offers we detect will show up here in real time.",
+                    12f, INK_SOFT, Typeface.NORMAL, 0f);
+            es.setGravity(Gravity.CENTER);
+            empty.addView(es);
             p.addView(empty, matchWrap());
-        } else {
-            for (int i = entries.length - 1; i >= 0; i--) {
-                String[] parts = entries[i].split("\\|", 3);
-                String fare = parts.length > 0 ? parts[0] : "—";
-                String decision = parts.length > 1 ? parts[1] : "—";
-                String when = parts.length > 2 ? parts[2] : "";
-                boolean ok = "ACCEPTED".equals(decision);
-                LinearLayout r = row();
-                r.setPadding(dp(16), dp(14), dp(16), dp(14));
-                r.setBackground(gradient(CARD, CARD, true, dp(14)));
-                r.setGravity(Gravity.CENTER_VERTICAL);
-                LinearLayout t = column();
-                t.addView(text(fare, 16f, INK, Typeface.BOLD, 0f));
-                t.addView(label(ok ? "Accepted" : "Skipped", 11f, ok ? GREEN : AMBER));
-                r.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-                r.addView(label(when, 11f, INK_FAINT), gravityCentered());
-                p.addView(r, matchWrap());
-                p.addView(spacer(dp(10)));
-            }
         }
 
         p.addView(spacer(dp(20)));
