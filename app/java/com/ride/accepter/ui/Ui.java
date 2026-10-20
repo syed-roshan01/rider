@@ -214,6 +214,7 @@ public final class Ui {
         c.setPadding(dp(12), dp(6), dp(12), dp(6));
         c.setBackground(shape(fill == 0 ? surface : fill, 999, fill == 0));
         TextView t = text(s, LABEL, textColor, true);
+        t.setTag("label");
         c.addView(t);
         return c;
     }
@@ -228,8 +229,16 @@ public final class Ui {
         dot.setBackground(shape(dotColor, 999, false));
         c.addView(dot, new LinearLayout.LayoutParams(dp(6), dp(6)));
         c.addView(hspace(dp(6)));
-        c.addView(text(s, LABEL, dotColor, true));
+        TextView lbl = text(s, LABEL, dotColor, true);
+        lbl.setTag("label");
+        c.addView(lbl);
         return c;
+    }
+
+    /** Update the label of a chip built by chip()/statusChip() (both tag it). */
+    public void chipText(LinearLayout chip, String s) {
+        View v = chip.findViewWithTag("label");
+        if (v instanceof TextView) ((TextView) v).setText(s);
     }
 
     /** Semantic banner (success / error / warning / info). */

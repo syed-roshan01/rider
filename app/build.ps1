@@ -197,7 +197,10 @@ function Task-Verify {
     $da = DexLen $ORIG_APK; $db = DexLen $Out
     "    classes.dex: original=$da  rebuilt=$db"
     if ($da -ne $db) {
-        Say "WARNING: classes.dex size changed ($da -> $db). Expected identical for an unmodified smali tree." 'Yellow'
+        Say "NOTE: classes.dex size changed ($da -> $db)." 'Yellow'
+        Say "      Expected ONLY when app\smali is intentionally patched (currently: the" 'Yellow'
+        Say "      licence engine gate). An UNMODIFIED smali tree round-trips" 'Yellow'
+        Say "      byte-identical -- verified against reference\orig-decode." 'Yellow'
     } else {
         Say 'OK: classes.dex byte-identical' 'Green'
     }
@@ -210,7 +213,11 @@ function Task-Install {
     $devs = & $ADB devices | Select-String -Pattern '\w+\s+device$'
     if (-not $devs) { throw 'no device/emulator connected (adb devices)' }
     $devs | ForEach-Object { "    $_" }
-    Invoke-Step "installing $Out" $ADB @('install', '-r', '-d', $Out)
+    # Several adb transports can enumerate the same handset (Wi-Fi debugging +
+    # mDNS); a bare 'adb install' then dies with "more than one device". Pin one.
+    $target = if ($env:ANDROID_SERIAL) { $env:ANDROID_SERIAL } else { ($devs[0].Line -split '\s+')[0] }
+    Say "    target: $target"
+    Invoke-Step "installing $Out" $ADB @('-s', $target, 'install', '-r', '-d', $Out)
 }
 
 switch ($Task) {

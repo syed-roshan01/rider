@@ -78,7 +78,8 @@ public class DashboardActivity extends Activity {
 
     private ToggleSwitch engineSw, detectSw;
     private TextView heroStatus, heroSub, heroBadge;
-    private TextView chipAccepted, chipSkipped, statRate, statEarnings;
+    private LinearLayout chipAccepted, chipSkipped;
+    private TextView statRate, statEarnings;
     private LinearLayout permBox;
     private boolean engineOn, detectOn = true;
     private SharedPreferences prefs;
@@ -348,8 +349,8 @@ public class DashboardActivity extends Activity {
         hero.addView(heroSub);
         hero.addView(spacer(dp(14)));
         LinearLayout chips = row();
-        chipAccepted = ui.statusChip("Accepted today: 0", GREEN, PLATE_CHIP);
-        chipSkipped = ui.statusChip("Skipped today: 0", AMBER, PLATE_CHIP);
+        chipAccepted = ui.statusChip("Accepted today: 0", GREEN, ui.successTint);
+        chipSkipped = ui.statusChip("Skipped today: 0", RED, ui.errorTint);
         chips.addView(chipAccepted, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         chips.addView(hspacer(dp(8)));
@@ -629,11 +630,8 @@ public class DashboardActivity extends Activity {
         m.setPadding(dp(16), dp(14), dp(16), dp(14));
         m.setBackground(gradient(CARD, CARD, true, dp(14)));
         m.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(AMBER, dp(2)));
-        m.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(42)));
         LinearLayout mt = column();
-        mt.setPadding(dp(14), 0, dp(10), 0);
+        mt.setPadding(0, 0, dp(10), 0);
         mt.addView(text("Go-To areas", 15f, INK, Typeface.BOLD, 0f));
         boolean on = prefs.getBoolean("location_filter", false);
         zonesMasterSub = label(on ? "On \u00b7 only rides dropping at your areas are taken"
@@ -693,11 +691,8 @@ public class DashboardActivity extends Activity {
             r.setPadding(dp(14), dp(12), dp(10), dp(12));
             r.setBackground(gradient(CARD, CARD, true, dp(14)));
             r.setGravity(Gravity.CENTER_VERTICAL);
-            View rail = new View(this);
-            rail.setBackground(round(GREEN, dp(2)));
-            r.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(40)));
             LinearLayout t = column();
-            t.setPadding(dp(14), 0, dp(8), 0);
+            t.setPadding(0, 0, dp(8), 0);
             t.addView(text(z.optString("n", "Area"), 14f, INK, Typeface.BOLD, 0f));
             boolean ex = z.optBoolean("ex", true);
             int rm = z.optInt("r", 0);
@@ -1264,10 +1259,6 @@ public class DashboardActivity extends Activity {
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
 
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(46)));
-
         // platform logo as a proper app icon: white rounded-square tile + official mark
         String pkg = findRiderPkg(brands);
         android.widget.ImageView icon = new android.widget.ImageView(this);
@@ -1597,25 +1588,17 @@ public class DashboardActivity extends Activity {
 
     // --------------------------------------------------------------- widgets
 
+    /** Page heading (design-system H1) + subtitle. No decorative rails. */
     private void head(LinearLayout p, String title, String sub) {
-        View k = new View(this);
-        k.setBackground(gradient(GREEN, CYAN, false, dp(2)));
-        p.addView(k, new LinearLayout.LayoutParams(dp(44), dp(4)));
-        p.addView(spacer(dp(12)));
-        p.addView(text(title, 24f, INK, Typeface.BOLD, 0f));
+        p.addView(text(title, 20f, INK, Typeface.BOLD, 0f));
         p.addView(spacer(dp(6)));
         p.addView(text(sub, 13f, INK_SOFT, Typeface.NORMAL, 0f));
     }
 
+    /** Section label (design-system H2): plain 16sp ink, no decoration. */
     private void title(LinearLayout p, String s) {
-        LinearLayout r = row();
-        r.setGravity(Gravity.CENTER_VERTICAL);
-        View k = new View(this);
-        k.setBackground(gradient(GREEN, CYAN, false, dp(2)));
-        r.addView(k, new LinearLayout.LayoutParams(dp(4), dp(16)));
-        r.addView(hspacer(dp(9)));
-        r.addView(text(s, 15f, INK, Typeface.BOLD, 0f));
-        p.addView(r, matchWrap());
+        p.addView(text(s, 16f, INK, Typeface.BOLD, 0f));
+        p.addView(spacer(dp(2)));
     }
 
     private LinearLayout gradientCard(int a, int b) {
@@ -1651,11 +1634,8 @@ public class DashboardActivity extends Activity {
         outer.setPadding(dp(16), dp(15), dp(16), dp(15));
         outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
-        View rail = new View(this);
-        rail.setBackground(round(accent, dp(2)));
-        outer.addView(rail, new LinearLayout.LayoutParams(dp(3), dp(36)));
         LinearLayout txt = column();
-        txt.setPadding(dp(14), 0, dp(12), 0);
+        txt.setPadding(0, 0, dp(12), 0);
         txt.addView(text(title, 15f, INK, Typeface.BOLD, 0f));
         txt.addView(text(sub, 11f, INK_SOFT, Typeface.NORMAL, 0f));
         outer.addView(txt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
@@ -2181,8 +2161,8 @@ public class DashboardActivity extends Activity {
 
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
-        chipAccepted.setText("Accepted today: " + a);
-        chipSkipped.setText("Skipped today: " + s);
+        ui.chipText(chipAccepted, "Accepted today: " + a);
+        ui.chipText(chipSkipped, "Skipped today: " + s);
         statRate.setText(((a + s) == 0 ? 0 : Math.round(100f * a / (a + s))) + "%");
         statEarnings.setText("₹" + sp.getInt("total_earnings", 0));
     }
