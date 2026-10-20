@@ -60,6 +60,7 @@ public class DashboardActivity extends Activity {
 
     // Brand plate + accent — theme-aware design tokens (docs/DESIGN_SYSTEM.md).
     private int NEON, NEON2, PLATE_A, PLATE_B, PLATE_INK, PLATE_SUB, PLATE_CHIP, PLATE_EDGE;
+    private Ui ui;
 
     // Palette — two themes: the logo's neon dark (default) and a clean light.
     // Instance fields so the theme can swap at runtime (see applyTheme).
@@ -77,7 +78,7 @@ public class DashboardActivity extends Activity {
 
     private ToggleSwitch engineSw, detectSw;
     private TextView heroStatus, heroSub, heroBadge;
-    private TextView statAccepted, statSkipped, statRate, statEarnings;
+    private TextView chipAccepted, chipSkipped, statRate, statEarnings;
     private LinearLayout permBox;
     private boolean engineOn, detectOn = true;
     private SharedPreferences prefs;
@@ -122,6 +123,7 @@ public class DashboardActivity extends Activity {
      *  Values are the design-system tokens (docs/DESIGN_SYSTEM.md). */
     private void applyTheme() {
         dark = prefs.getBoolean("ui_dark", true);
+        ui = new Ui(this, dark);
         NEON = 0xFF2563EB; NEON2 = 0xFF2563EB;
         if (dark) {
             BG0 = 0xFF000000; BG1 = 0xFF000000;
@@ -284,38 +286,38 @@ public class DashboardActivity extends Activity {
     // ------------------------------------------------------------- dashboard
 
     private void buildDashboard(LinearLayout p) {
-        // Brand plate — the logo's neon identity, identical in both themes
-        LinearLayout hero = column();
-        hero.setPadding(dp(20), dp(20), dp(20), dp(22));
-        GradientDrawable plate = gradient(PLATE_A, PLATE_B, true, dp(20));
-        plate.setStroke(dp(1), PLATE_EDGE);
-        hero.setBackground(plate);
-
-        // brand row: logo chip + wordmark/tagline ......... theme pill
-        LinearLayout top = row();
-        top.setGravity(Gravity.CENTER_VERTICAL);
+        // --- top bar (mock 02): wordmark + status pill + theme toggle ---------
+        LinearLayout bar = row();
+        bar.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout brand = row();
         brand.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout chip = row();
         chip.setGravity(Gravity.CENTER_VERTICAL);
         chip.setPadding(dp(6), dp(6), dp(6), dp(6));
         GradientDrawable chipBg = gradient(PLATE_CHIP, PLATE_CHIP, true, dp(12));
-        chipBg.setStroke(dp(1), 0x4D03FFB1);
+        chipBg.setStroke(dp(1), PLATE_EDGE);
         chip.setBackground(chipBg);
         int logoId = getResources().getIdentifier("logo", "drawable", getPackageName());
         if (logoId != 0) {
             android.widget.ImageView logo = new android.widget.ImageView(this);
             logo.setImageResource(logoId);
-            chip.addView(logo, new LinearLayout.LayoutParams(dp(36), dp(36)));
+            chip.addView(logo, new LinearLayout.LayoutParams(dp(32), dp(32)));
         }
         brand.addView(chip);
-        brand.addView(hspacer(dp(12)));
-        LinearLayout wm = column();
-        wm.addView(text("AcceptPro", 19f, Color.WHITE, Typeface.BOLD, 0f));
-        wm.addView(text("Auto-accept for gig drivers", 12f, PLATE_SUB, Typeface.NORMAL, 0f));
+        brand.addView(hspacer(dp(10)));
+        LinearLayout wm = row();
+        wm.setGravity(Gravity.CENTER_VERTICAL);
+        wm.addView(text("Accept", 20f, PLATE_INK, Typeface.BOLD, 0f));
+        wm.addView(text("Pro", 20f, NEON, Typeface.BOLD, 0f));
         brand.addView(wm);
-        top.addView(brand, new LinearLayout.LayoutParams(0,
+        bar.addView(brand, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        heroBadge = label("○  Standby", 11f, PLATE_SUB);
+        heroBadge.setGravity(Gravity.CENTER);
+        heroBadge.setPadding(dp(12), dp(6), dp(12), dp(6));
+        heroBadge.setBackground(round(PLATE_CHIP, dp(20)));
+        bar.addView(heroBadge, gravityCentered());
+        bar.addView(hspacer(dp(8)));
         TextView themeQuick = label(dark ? "DARK" : "LIGHT", 10f, onColor(NEON));
         themeQuick.setGravity(Gravity.CENTER);
         themeQuick.setPadding(dp(12), dp(6), dp(12), dp(6));
@@ -323,34 +325,42 @@ public class DashboardActivity extends Activity {
         themeQuick.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { setTheme(!dark); }
         });
-        top.addView(themeQuick, gravityCentered());
-        hero.addView(top, matchWrap());
-        hero.addView(spacer(dp(16)));
-        View speed = new View(this);
-        speed.setBackground(gradient(NEON, NEON2, false, dp(2)));
-        hero.addView(speed, new LinearLayout.LayoutParams(dp(84), dp(3)));
+        bar.addView(themeQuick, gravityCentered());
+        p.addView(bar, matchWrap());
+        p.addView(spacer(dp(16)));
+
+        // --- hero card (mock 02): status + outcome chips -----------------------
+        LinearLayout hero = column();
+        hero.setPadding(dp(16), dp(18), dp(16), dp(18));
+        GradientDrawable plate = gradient(CARD, CARD, true, dp(14));
+        plate.setStroke(dp(1), CARD_EDGE);
+        hero.setBackground(plate);
+        View rule = new View(this);
+        rule.setBackground(round(NEON, dp(1)));
+        hero.addView(rule, matchWrap(dp(2)));
         hero.addView(spacer(dp(14)));
-        heroBadge = label("○  Standby", 11f, PLATE_SUB);
-        heroBadge.setPadding(dp(12), dp(6), dp(12), dp(6));
-        heroBadge.setBackground(round(0x1AFFFFFF, dp(20)));
-        hero.addView(heroBadge);
-        hero.addView(spacer(dp(10)));
-        heroStatus = text("Service is stopped", 26f, PLATE_INK, Typeface.BOLD, 0f);
-        heroStatus.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+
+        heroStatus = text("Service is stopped", 20f, PLATE_INK, Typeface.BOLD, 0f);
         hero.addView(heroStatus);
-        hero.addView(spacer(dp(6)));
+        hero.addView(spacer(dp(5)));
         heroSub = text("Turn on the engine to start watching for rides.", 13f, PLATE_SUB,
                 Typeface.NORMAL, 0f);
         hero.addView(heroSub);
+        hero.addView(spacer(dp(14)));
+        LinearLayout chips = row();
+        chipAccepted = ui.statusChip("Accepted today: 0", GREEN, PLATE_CHIP);
+        chipSkipped = ui.statusChip("Skipped today: 0", AMBER, PLATE_CHIP);
+        chips.addView(chipAccepted, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        chips.addView(hspacer(dp(8)));
+        chips.addView(chipSkipped, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        hero.addView(chips, matchWrap());
         p.addView(hero, matchWrap());
         p.addView(spacer(dp(14)));
 
-        // Stats
-        LinearLayout g1 = row();
-        statAccepted = tile(g1, GREEN, "Accepted", "0");
-        g1.addView(hspacer(dp(12)));
-        statSkipped = tile(g1, AMBER, "Skipped", "0");
-        p.addView(g1, matchWrap());
+        // Today (mock 02)
+        title(p, "Today");
         p.addView(spacer(dp(12)));
         LinearLayout g2 = row();
         statRate = tile(g2, BLUE, "Accept rate", "0%");
@@ -499,9 +509,10 @@ public class DashboardActivity extends Activity {
             boolean ok = "ACCEPTED".equals(decision);
             LinearLayout r = row();
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.addView(text(fare, 16f, INK, Typeface.BOLD, 0f),
-                    new LinearLayout.LayoutParams(dp(88), ViewGroup.LayoutParams.WRAP_CONTENT));
-            r.addView(label(ok ? "Accepted" : "Skipped", 11f, ok ? GREEN : AMBER),
+            r.addView(ui.chip(ok ? "Accepted" : "Skipped",
+                            ok ? ui.successTint : ui.errorTint, ok ? ui.success : ui.error));
+            r.addView(hspacer(dp(10)));
+            r.addView(text(fare, 15f, INK, Typeface.BOLD, 0f),
                     new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
             r.addView(label(when, 11f, INK_FAINT), gravityCentered());
             feed.addView(r, matchWrap());
@@ -2163,15 +2174,15 @@ public class DashboardActivity extends Activity {
                 : "Turn on the engine to start watching for rides.");
         heroBadge.setText(engineOn ? "●  Online" : "○  Standby");
         heroBadge.setTextColor(engineOn ? NEON : PLATE_SUB);
-        tint(heroBadge, engineOn ? 0x3303FFB1 : 0x1AFFFFFF);
+        tint(heroBadge, engineOn ? ui.primaryTint : PLATE_CHIP);
 
         if (engineSw != null) engineSw.show(engineOn, GREEN);
         if (detectSw != null) detectSw.show(detectOn, CYAN);
 
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
-        statAccepted.setText(String.valueOf(a));
-        statSkipped.setText(String.valueOf(s));
+        chipAccepted.setText("Accepted today: " + a);
+        chipSkipped.setText("Skipped today: " + s);
         statRate.setText(((a + s) == 0 ? 0 : Math.round(100f * a / (a + s))) + "%");
         statEarnings.setText("₹" + sp.getInt("total_earnings", 0));
     }
