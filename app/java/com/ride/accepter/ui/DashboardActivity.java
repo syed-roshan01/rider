@@ -215,7 +215,13 @@ public class DashboardActivity extends Activity {
                 });
         // log the engine's licence gate verdict (AcceptPro-Test: lic)
         callAny("probeLicenceGate", new Class<?>[] {});
-        if (permBox != null && current == 0) show(0); else refresh();
+        if (permBox != null && current == 0) {
+            // refresh only the permission rows - rebuilding the whole tab on
+            // every resume resets scroll position and re-inflates for nothing
+            permBox.removeAllViews();
+            buildPermissions(permBox);
+        }
+        refresh();
     }
 
     // ------------------------------------------------------------------ nav
@@ -742,10 +748,18 @@ public class DashboardActivity extends Activity {
         card.addView(sr, matchWrap());
         card.addView(spacer(dp(10)));
 
-        mapWeb = new android.webkit.WebView(this);
-        mapWeb.getSettings().setJavaScriptEnabled(true);
-        mapWeb.getSettings().setDomStorageEnabled(true);
-        mapWeb.setBackgroundColor(0xFF0B1622);
+        // Reuse one WebView for the app's lifetime - constructing one boots
+        // Chromium (hundreds of ms) and this ran on every Filters rebuild.
+        if (mapWeb != null && mapWeb.getParent() instanceof ViewGroup) {
+            ((ViewGroup) mapWeb.getParent()).removeView(mapWeb);
+        }
+        if (mapWeb == null) {
+            mapWeb = new android.webkit.WebView(this);
+            mapWeb.getSettings().setJavaScriptEnabled(true);
+            mapWeb.getSettings().setDomStorageEnabled(true);
+            mapWeb.setBackgroundColor(0xFF0B1622);
+        }
+        mapWeb.removeJavascriptInterface("Bridge");
         mapWeb.addJavascriptInterface(new Object() {
             @android.webkit.JavascriptInterface
             public void onCenter(double lat, double lng) { mapLat = lat; mapLng = lng; }
@@ -1551,13 +1565,19 @@ public class DashboardActivity extends Activity {
 
         LinearLayout info = gradientCard(CARD, CARD);
         info.addView(label("Device code", 11f, INK_FAINT));
-        info.addView(text("BK4JC-74W07-YMWT5", 14f, INK, Typeface.BOLD, 0f));
+        info.addView(text(com.ride.accepter.licence.LicenceGate.deviceCode(this), 14f, INK, Typeface.BOLD, 0f));
         info.addView(spacer(dp(10)));
         info.addView(label("Licence", 11f, INK_FAINT));
-        info.addView(text("Active · validated via cloud", 14f, GREEN, Typeface.BOLD, 0f));
+        long licExp = com.ride.accepter.licence.LicenceGate.licenceExpiry(this);
+        String licStatus = com.ride.accepter.licence.LicenceGate.storedStatus(this);
+        String licLine = licExp > 0
+                ? ("Active until " + expiryText(licExp)
+                        + (licStatus.isEmpty() || "OK".equals(licStatus) ? "" : " · " + licStatus))
+                : "Not activated";
+        info.addView(text(licLine, 14f, licExp > 0 ? GREEN : RED, Typeface.BOLD, 0f));
         p.addView(info, matchWrap());
         p.addView(spacer(dp(14)));
-        p.addView(text("AcceptPro · rebuilt build", 11f, INK_FAINT, Typeface.NORMAL, 0f));
+        p.addView(text("AcceptPro · v6", 11f, INK_FAINT, Typeface.NORMAL, 0f));
     }
 
     // --------------------------------------------------------------- widgets
@@ -2178,6 +2198,12 @@ public class DashboardActivity extends Activity {
 
     private void open(Intent i) {
         try { startActivity(i); } catch (Exception e) { toast("Can't open that setting"); }
+    }
+
+    private String expiryText(long ms) {
+        return java.text.DateFormat.getDateTimeInstance(
+                java.text.DateFormat.MEDIUM, java.text.DateFormat.SHORT)
+                .format(new java.util.Date(ms));
     }
 
     private void toast(String m) {

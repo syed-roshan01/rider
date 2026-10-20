@@ -114,11 +114,11 @@ public class ActivationActivity extends Activity {
         root.setGravity(Gravity.CENTER_HORIZONTAL);
         root.setPadding(dp(28), dp(48), dp(28), dp(32));
 
-        root.addView(label("RIDE ACCEPTER", 22, TEXT, true));
+        root.addView(label("AcceptPro", 22, TEXT, true));
         root.addView(label("Device activation", 13, MUTED, false));
         root.addView(gap(dp(34)));
 
-        root.addView(label("YOUR DEVICE ID", 11, MUTED, true));
+        root.addView(label("Your device id", 11, MUTED, true));
         root.addView(gap(dp(8)));
 
         LinearLayout codeRow = new LinearLayout(this);
@@ -130,19 +130,21 @@ public class ActivationActivity extends Activity {
         TextView codeView = new TextView(this);
         codeView.setText(code);
         codeView.setTextColor(TEXT);
-        codeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
+        codeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         codeView.setTypeface(Typeface.MONOSPACE, Typeface.BOLD);
         codeView.setGravity(Gravity.CENTER);
+        codeView.setSingleLine(true);
+        codeView.setLetterSpacing(0.06f);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         codeView.setLayoutParams(lp);
         codeRow.addView(codeView);
 
         Button copy = new Button(this);
-        copy.setText("COPY");
+        copy.setText("Copy");
         copy.setTextColor(ACCENT);
         copy.setBackgroundColor(Color.TRANSPARENT);
         copy.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        copy.setAllCaps(true);
+        copy.setAllCaps(false);
         copy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,14 +162,14 @@ public class ActivationActivity extends Activity {
         root.addView(label("Send this ID to your seller. The licence key they give you\nwill work only on this phone.", 12, MUTED, false));
         root.addView(gap(dp(34)));
 
-        root.addView(label("LICENSE KEY", 11, MUTED, true));
+        root.addView(label("Licence key", 11, MUTED, true));
         root.addView(gap(dp(8)));
 
         keyInput = new EditText(this);
         keyInput.setHint("RA-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX");
         keyInput.setHintTextColor(0xFF5A6880);
         keyInput.setTextColor(TEXT);
-        keyInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        keyInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         keyInput.setTypeface(Typeface.MONOSPACE);
         keyInput.setBackgroundColor(PANEL);
         keyInput.setPadding(dp(16), dp(16), dp(16), dp(16));
@@ -181,11 +183,11 @@ public class ActivationActivity extends Activity {
         root.addView(gap(dp(16)));
 
         activateBtn = new Button(this);
-        activateBtn.setText("ACTIVATE");
+        activateBtn.setText("Activate");
         activateBtn.setTextColor(Color.WHITE);
         activateBtn.setBackgroundColor(ACCENT);
         activateBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        activateBtn.setAllCaps(true);
+        activateBtn.setAllCaps(false);
         activateBtn.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         activateBtn.setPadding(dp(16), dp(18), dp(16), dp(18));
         activateBtn.setOnClickListener(new View.OnClickListener() {
@@ -349,7 +351,7 @@ public class ActivationActivity extends Activity {
         t.setText(text);
         t.setTextColor(color);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
-        t.setLetterSpacing(bold ? 0.12f : 0f);
+        t.setLetterSpacing(bold ? 0.04f : 0f);
         if (bold) {
             t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         }
