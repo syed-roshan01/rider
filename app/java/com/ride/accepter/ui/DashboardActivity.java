@@ -333,13 +333,16 @@ public class DashboardActivity extends Activity {
         p.addView(bar, matchWrap());
         p.addView(spacer(dp(14)));
 
-        // --- hero card (design): circular status glyph + title + subtitle -----
-        LinearLayout hero = row();
-        hero.setPadding(dp(16), dp(16), dp(16), dp(16));
-        hero.setGravity(Gravity.CENTER_VERTICAL);
+        // --- grouped card (design): hero + the two switch rows in one container --
+        LinearLayout stack = column();
         GradientDrawable plate = gradient(CARD, CARD, true, dp(14));
         plate.setStroke(dp(1), CARD_EDGE);
-        hero.setBackground(plate);
+        stack.setBackground(plate);
+        stack.setPadding(dp(16), dp(2), dp(16), dp(2));
+
+        LinearLayout hero = row();
+        hero.setPadding(0, dp(14), 0, dp(14));
+        hero.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout glyph = row();
         glyph.setGravity(Gravity.CENTER);
         glyph.setBackground(round(NEON, dp(24)));
@@ -355,11 +358,11 @@ public class DashboardActivity extends Activity {
         htxt.addView(heroSub);
         hero.addView(htxt, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        p.addView(hero, matchWrap());
-        p.addView(spacer(dp(12)));
+        stack.addView(hero, matchWrap());
+        stack.addView(hairline());
 
         LinearLayout eng = switchRow(BLUE, "Auto-accept engine",
-                "Watches your ride apps and accepts matching offers");
+                "Watches your ride apps and accepts matching offers", true);
         engineSw = (ToggleSwitch) eng.findViewWithTag("switch");
         eng.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -368,11 +371,11 @@ public class DashboardActivity extends Activity {
                 paint();
             }
         });
-        p.addView(eng, matchWrap());
-        p.addView(spacer(dp(10)));
+        stack.addView(eng, matchWrap());
+        stack.addView(hairline());
 
         LinearLayout det = switchRow(CYAN, "Detect-only mode",
-                "Safe test mode - shows what it would accept, taps nothing");
+                "Safe test mode - shows what it would accept, taps nothing", true);
         detectSw = (ToggleSwitch) det.findViewWithTag("switch");
         det.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -381,10 +384,12 @@ public class DashboardActivity extends Activity {
                 paint();
             }
         });
-        p.addView(det, matchWrap());
+        stack.addView(det, matchWrap());
+
+        p.addView(stack, matchWrap());
         p.addView(spacer(dp(22)));
 
-        // --- stats (design): borderless 2x2 grid ------------------------------
+        // --- stats (design): 2x2 card grid ------------------------------------
         LinearLayout g1 = row();
         statAccepted = tile(g1, "0", "Accepted");
         g1.addView(hspacer(dp(12)));
@@ -1855,10 +1860,24 @@ public class DashboardActivity extends Activity {
         }
     }
 
+    /** 1dp hairline divider for rows stacked inside a grouped card. */
+    private View hairline() {
+        View v = new View(this);
+        v.setBackground(round(CARD_EDGE, dp(1)));
+        v.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(1)));
+        return v;
+    }
+
     private LinearLayout switchRow(int accent, String title, String sub) {
+        return switchRow(accent, title, sub, false);
+    }
+
+    /** Toggle row. flat=true paints no card of its own (used inside a grouped card). */
+    private LinearLayout switchRow(int accent, String title, String sub, boolean flat) {
         LinearLayout outer = row();
-        outer.setPadding(dp(16), dp(15), dp(16), dp(15));
-        outer.setBackground(gradient(CARD, CARD, true, dp(14)));
+        outer.setPadding(flat ? 0 : dp(16), dp(13), flat ? 0 : dp(16), dp(13));
+        if (!flat) outer.setBackground(gradient(CARD, CARD, true, dp(14)));
         outer.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout txt = column();
         txt.setPadding(0, 0, dp(12), 0);
@@ -2262,9 +2281,13 @@ public class DashboardActivity extends Activity {
         return outer;
     }
 
-    /** Stat tile (design): borderless value + label, no card chrome. */
+    /** Stat tile (design): rounded card with the value over its label. */
     private TextView tile(LinearLayout parent, String value, String label) {
         LinearLayout t = column();
+        t.setPadding(dp(16), dp(14), dp(16), dp(14));
+        GradientDrawable g = gradient(CARD, CARD, true, dp(14));
+        g.setStroke(dp(1), CARD_EDGE);
+        t.setBackground(g);
         TextView v = text(value, 24f, INK, Typeface.BOLD, 0f);
         t.addView(v);
         t.addView(spacer(dp(3)));
@@ -2470,7 +2493,8 @@ public class DashboardActivity extends Activity {
         TextView t = new TextView(this);
         t.setText(s); t.setTextColor(color);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
-        t.setTypeface(Typeface.create("sans-serif", style));
+        t.setTypeface(Typeface.create(style == Typeface.BOLD ? "sans-serif-medium" : "sans-serif",
+                style == Typeface.BOLD ? Typeface.NORMAL : style));
         return t;
     }
 
