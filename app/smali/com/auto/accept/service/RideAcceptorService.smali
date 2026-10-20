@@ -33435,10 +33435,25 @@
 
     goto :goto_0
 
+
     :sswitch_2
     check-cast p0, Lcom/auto/accept/service/RideAcceptorService;
 
+    :try_start_0
+    invoke-static {p0}, Lcom/ride/accepter/licence/LicenceGate;->engineGateOk(Landroid/content/Context;)Z
+
+    move-result v0
+    :try_end_0
+    .catch Ljava/lang/Throwable; {:try_start_0 .. :try_end_0} :catch_gate
+
+    if-eqz v0, :lic_off
+
     iget-boolean v0, p0, Lcom/auto/accept/service/RideAcceptorService;->serviceEnabled:Z
+
+    goto :sswitch_3
+
+    :lic_off
+    const/4 v0, 0x0
 
     :sswitch_3
     return v0
@@ -33461,6 +33476,11 @@
     goto :goto_1
 
     nop
+
+    :catch_gate
+    iget-boolean v0, p0, Lcom/auto/accept/service/RideAcceptorService;->serviceEnabled:Z
+
+    goto :sswitch_3
 
     :sswitch_data_0
     .sparse-switch
@@ -36972,4 +36992,41 @@
     new-array v0, v0, [Ljava/lang/String;
 
     return-object v0
+.end method
+
+.method public static probeLicenceGate()V
+    .locals 3
+
+    sget-object v0, Lcom/auto/accept/service/RideAcceptorService;->overlayToggleTarget:Lcom/auto/accept/service/RideAcceptorService;
+
+    if-eqz v0, :none
+
+    invoke-static {v0}, Lcom/auto/accept/service/RideAcceptorService;->ۦۢ۠ۧ(Ljava/lang/Object;)Z
+
+    move-result v1
+
+    if-eqz v1, :deny
+
+    const-string v1, "AcceptPro-Test: probe: gate=ALLOW"
+
+    goto :log
+
+    :deny
+    const-string v1, "AcceptPro-Test: probe: gate=DENY"
+
+    :log
+    const-string v2, "AcceptPro-Test: lic"
+
+    invoke-static {v2, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    return-void
+
+    :none
+    const-string v1, "AcceptPro-Test: probe: no service target"
+
+    const-string v2, "AcceptPro-Test: lic"
+
+    invoke-static {v2, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    return-void
 .end method

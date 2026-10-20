@@ -128,8 +128,12 @@ node license/test/e2e.test.ts                                     # end-to-end
 (`node --test` is not usable in this sandbox — it spawns child processes — so the files are
 run directly and use `node:test` in-process.)
 
-## Next step
+## Client integration — DONE
 
-Wire the Android client to this: a licence screen that calls `/api/v1/activate`, caches the
-signed token + public key, verifies offline on each launch (using the same
-`verifyToken` + `evaluateEntitlement` rule), and calls `/api/v1/refresh` opportunistically.
+The Android client is wired in (`app/java/com/ride/accepter/licence/`, documented in
+`PATCHES.md` §K): the login screen (which is the launcher) shows this machine's device code,
+calls `/api/v1/activate` with a key minted for that code, caches the signed token, verifies it
+**offline on every entry** (Ed25519 signature + `hw` machine binding + the entitlement rule)
+and calls `/api/v1/refresh` opportunistically (rolling token). The server's verdict on
+revocation / expiry / device binding is final: a refusal clears the grant and stops the
+auto-accept engine, whose event gate runs the same check.

@@ -92,12 +92,17 @@ public class ActivationActivity extends Activity {
     }
 
     private boolean isLicensed() {
-        SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
-        long exp = p.getLong("expiresAt", 0);
-        String token = p.getString("token", "");
-        // Local, offline check only. The server re-validates on every refresh;
-        // this just avoids a round trip on a normal launch.
-        return !token.isEmpty() && exp > System.currentTimeMillis();
+        // Real offline verification: Ed25519 signature over the cached token
+        // (pinned key), the machine binding (token.hw == this phone's
+        // hashDeviceCode) and the entitlement rule - the same check the engine
+        // gate applies. A forged prefs edit or a token copied from another
+        // phone can never pass this.
+        com.ride.accepter.licence.LicenceGate.Result r =
+                com.ride.accepter.licence.LicenceGate.fullVerify(this, System.currentTimeMillis());
+        if (!r.ok) {
+            android.util.Log.i("AcceptPro-Licence", "launch check: " + r.reason);
+        }
+        return r.ok;
     }
 
     // ---------------------------------------------------------------- UI
@@ -225,84 +230,39 @@ public class ActivationActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    JSONObject body = new JSONObject();
-                    body.put("key", key);
-                    body.put("deviceCode", code);
-                    body.put("appVersion", 6);
-                    body.put("model", Build.MODEL);
-                    body.put("brand", Build.BRAND);
-                    JSONObject device = new JSONObject();
-                    device.put("androidId", androidId());
-                    device.put("model", Build.MODEL);
-                    device.put("brand", Build.BRAND);
-                    body.put("device", device);
-
-                    JSONObject r = post("/api/v1/activate", body);
-
-                    // Refuse to trust a server that presents a key other than
-                    // the one compiled into this build.
-                    if (r != null && r.optBoolean("ok", false)
-                            && !PINNED_PUBLIC_KEY.equals(r.optString("publicKey", ""))) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                busy(false);
-                                fail("Server key does not match this app build. Activation refused.");
-                            }
-                        });
-                        return;
-                    }
-
-                    if (r != null && r.optBoolean("ok", false)) {
-                        final String token = r.getString("token");
-                        final long expiresAt = r.optLong("expiresAt", 0);
-                        final String pub = r.optString("publicKey", "");
-                        getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-                                .putString("token", token)
-                                .putLong("expiresAt", expiresAt)
-                                .putString("publicKey", pub)
-                                .putString("key", key)
-                                .apply();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                status.setText("Activated. Starting…");
-                                status.setTextColor(0xFF29C07A);
-                                goMain();
-                            }
-                        });
-                    } else {
-                        final String reason = r == null ? "SERVER_UNREACHABLE" : r.optString("reason", "FAILED");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                busy(false);
-                                fail(humanise(reason) + (lastError == null ? "" : "  [" + lastError + "]"));
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    final String msg = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                // LicenceGate does the whole flow: local key-format check,
+                // server activation (the key must be minted for THIS machine),
+                // pinned-key refusal and local token verification.
+                final com.ride.accepter.licence.LicenceGate.Result r =
+                        com.ride.accepter.licence.LicenceGate.activate(ActivationActivity.this, key);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (r.ok) {
+                            status.setText("Activated. Starting…");
+                            status.setTextColor(0xFF29C07A);
+                            goMain();
+                        } else {
                             busy(false);
-                            fail("Could not reach the licence server. Check your connection. (" + msg + ")");
+                            fail(humanise(r.reason));
                         }
-                    });
-                }
+                    }
+                });
             }
         }).start();
     }
 
     private String humanise(String reason) {
         if ("UNKNOWN_KEY".equals(reason)) return "That key does not exist. Check for typos and try again.";
+        if ("BAD_FORMAT".equals(reason)) return "That key is not valid. Check for typos and try again.";
         if ("DEVICE_MISMATCH".equals(reason)) return "That key was issued for a different device. Send your seller this Device ID.";
         if ("DEVICE_LIMIT".equals(reason)) return "This key already has its device slots full.";
         if ("REVOKED".equals(reason)) return "That key has been revoked. Contact your seller.";
         if ("EXPIRED".equals(reason)) return "That key has expired. Ask your seller to extend it.";
-        if ("SERVER_UNREACHABLE".equals(reason)) return "Could not reach the licence server. Check your connection.";
+        if ("NOT_ACTIVATED".equals(reason)) return "This key has not been activated yet.";
+        if ("TOKEN_EXPIRED".equals(reason)) return "Your licence session expired. Connect to the internet and reopen the app.";
+        if ("BAD_TOKEN".equals(reason)) return "The licence could not be verified on this device. Activate again with your key.";
+        if ("OFFLINE".equals(reason) || "SERVER_UNREACHABLE".equals(reason)) return "Could not reach the licence server. Check your connection.";
         return "Activation failed: " + reason;
     }
 
@@ -369,13 +329,18 @@ public class ActivationActivity extends Activity {
     private void goMain() {
         try {
             Intent i = new Intent();
-            i.setClassName(getPackageName(), "com.auto.accept.ui.MainActivity");
+            // the real UI of this build is the AcceptPro dashboard, not the
+            // vendor's MainActivity
+            i.setClassName(getPackageName(), "com.ride.accepter.ui.DashboardActivity");
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         } catch (Throwable t) {
-            fail("Installed build is missing MainActivity: " + t.getMessage());
+            fail("Installed build is missing DashboardActivity: " + t.getMessage());
             return;
         }
+        // opportunistic server-side re-validation (rolling token; revocation
+        // and device binding are re-checked by the server)
+        com.ride.accepter.licence.LicenceGate.maybeRefreshAsync(this, null);
         finish();
     }
 
