@@ -77,9 +77,8 @@ public class DashboardActivity extends Activity {
     private int current = 0;
 
     private ToggleSwitch engineSw, detectSw;
-    private TextView heroStatus, heroSub, heroBadge;
-    private LinearLayout chipAccepted, chipSkipped;
-    private TextView statRate, statEarnings;
+    private TextView heroStatus, heroSub;
+    private TextView statAccepted, statSkipped, statRate, statEarnings;
     private LinearLayout permBox;
     private boolean engineOn, detectOn = true;
     private SharedPreferences prefs;
@@ -287,91 +286,58 @@ public class DashboardActivity extends Activity {
     // ------------------------------------------------------------- dashboard
 
     private void buildDashboard(LinearLayout p) {
-        // --- top bar (mock 02): wordmark + status pill + theme toggle ---------
+        // --- top bar (design): brand left, bell + gear icon buttons right -----
         LinearLayout bar = row();
         bar.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout brand = row();
         brand.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout chip = row();
-        chip.setGravity(Gravity.CENTER_VERTICAL);
-        chip.setPadding(dp(6), dp(6), dp(6), dp(6));
-        GradientDrawable chipBg = gradient(PLATE_CHIP, PLATE_CHIP, true, dp(12));
-        chipBg.setStroke(dp(1), PLATE_EDGE);
-        chip.setBackground(chipBg);
         int logoId = getResources().getIdentifier("logo", "drawable", getPackageName());
         if (logoId != 0) {
             android.widget.ImageView logo = new android.widget.ImageView(this);
             logo.setImageResource(logoId);
-            chip.addView(logo, new LinearLayout.LayoutParams(dp(32), dp(32)));
+            brand.addView(logo, new LinearLayout.LayoutParams(dp(28), dp(28)));
         }
-        brand.addView(chip);
         brand.addView(hspacer(dp(10)));
         LinearLayout wm = row();
         wm.setGravity(Gravity.CENTER_VERTICAL);
-        wm.addView(text("Accept", 20f, PLATE_INK, Typeface.BOLD, 0f));
-        wm.addView(text("Pro", 20f, NEON, Typeface.BOLD, 0f));
+        wm.addView(text("Accept", 19f, PLATE_INK, Typeface.BOLD, 0f));
+        wm.addView(text("Pro", 19f, NEON, Typeface.BOLD, 0f));
         brand.addView(wm);
         bar.addView(brand, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        heroBadge = label("○  Standby", 11f, PLATE_SUB);
-        heroBadge.setGravity(Gravity.CENTER);
-        heroBadge.setPadding(dp(12), dp(6), dp(12), dp(6));
-        heroBadge.setBackground(round(PLATE_CHIP, dp(20)));
-        bar.addView(heroBadge, gravityCentered());
-        bar.addView(hspacer(dp(8)));
-        TextView themeQuick = label(dark ? "DARK" : "LIGHT", 10f, onColor(NEON));
-        themeQuick.setGravity(Gravity.CENTER);
-        themeQuick.setPadding(dp(12), dp(6), dp(12), dp(6));
-        themeQuick.setBackground(round(NEON, dp(9)));
-        themeQuick.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { setTheme(!dark); }
-        });
-        bar.addView(themeQuick, gravityCentered());
+        bar.addView(ui.iconButton("bell", PLATE_INK, new View.OnClickListener() {
+            @Override public void onClick(View v) { show(3); }
+        }));
+        bar.addView(hspacer(dp(2)));
+        bar.addView(ui.iconButton("gear", PLATE_INK, new View.OnClickListener() {
+            @Override public void onClick(View v) { show(4); }
+        }));
         p.addView(bar, matchWrap());
-        p.addView(spacer(dp(16)));
+        p.addView(spacer(dp(14)));
 
-        // --- hero card (mock 02): status + outcome chips -----------------------
-        LinearLayout hero = column();
-        hero.setPadding(dp(16), dp(18), dp(16), dp(18));
+        // --- hero card (design): circular status glyph + title + subtitle -----
+        LinearLayout hero = row();
+        hero.setPadding(dp(16), dp(16), dp(16), dp(16));
+        hero.setGravity(Gravity.CENTER_VERTICAL);
         GradientDrawable plate = gradient(CARD, CARD, true, dp(14));
         plate.setStroke(dp(1), CARD_EDGE);
         hero.setBackground(plate);
-        View rule = new View(this);
-        rule.setBackground(round(NEON, dp(1)));
-        hero.addView(rule, matchWrap(dp(2)));
-        hero.addView(spacer(dp(14)));
-
-        heroStatus = text("Service is stopped", 20f, PLATE_INK, Typeface.BOLD, 0f);
-        hero.addView(heroStatus);
-        hero.addView(spacer(dp(5)));
-        heroSub = text("Turn on the engine to start watching for rides.", 13f, PLATE_SUB,
+        LinearLayout glyph = row();
+        glyph.setGravity(Gravity.CENTER);
+        glyph.setBackground(round(NEON, dp(24)));
+        glyph.addView(ui.icon("power", ui.onPrimary, 22));
+        hero.addView(glyph, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        hero.addView(hspacer(dp(14)));
+        LinearLayout htxt = column();
+        heroStatus = text("Service is stopped", 18f, PLATE_INK, Typeface.BOLD, 0f);
+        htxt.addView(heroStatus);
+        htxt.addView(spacer(dp(3)));
+        heroSub = text("Turn on the engine to start watching for rides.", 12f, PLATE_SUB,
                 Typeface.NORMAL, 0f);
-        hero.addView(heroSub);
-        hero.addView(spacer(dp(14)));
-        LinearLayout chips = row();
-        chipAccepted = ui.statusChip("Accepted today: 0", GREEN, ui.successTint);
-        chipSkipped = ui.statusChip("Skipped today: 0", RED, ui.errorTint);
-        chips.addView(chipAccepted, new LinearLayout.LayoutParams(0,
+        htxt.addView(heroSub);
+        hero.addView(htxt, new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        chips.addView(hspacer(dp(8)));
-        chips.addView(chipSkipped, new LinearLayout.LayoutParams(0,
-                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        hero.addView(chips, matchWrap());
         p.addView(hero, matchWrap());
-        p.addView(spacer(dp(14)));
-
-        // Today (mock 02)
-        title(p, "Today");
-        p.addView(spacer(dp(12)));
-        LinearLayout g2 = row();
-        statRate = tile(g2, BLUE, "Accept rate", "0%");
-        g2.addView(hspacer(dp(12)));
-        statEarnings = tile(g2, PURPLE, "Today's earnings", "₹0");
-        p.addView(g2, matchWrap());
-        p.addView(spacer(dp(20)));
-
-        // Controls
-        title(p, "Controls");
         p.addView(spacer(dp(12)));
 
         LinearLayout eng = switchRow(GREEN, "Auto-accept engine",
@@ -398,7 +364,21 @@ public class DashboardActivity extends Activity {
             }
         });
         p.addView(det, matchWrap());
-        p.addView(spacer(dp(20)));
+        p.addView(spacer(dp(22)));
+
+        // --- stats (design): borderless 2x2 grid ------------------------------
+        LinearLayout g1 = row();
+        statAccepted = tile(g1, "0", "Accepted");
+        g1.addView(hspacer(dp(12)));
+        statSkipped = tile(g1, "0", "Skipped");
+        p.addView(g1, matchWrap());
+        p.addView(spacer(dp(18)));
+        LinearLayout g2 = row();
+        statRate = tile(g2, "0%", "Accept rate");
+        g2.addView(hspacer(dp(12)));
+        statEarnings = tile(g2, "₹0", "Today's earnings");
+        p.addView(g2, matchWrap());
+        p.addView(spacer(dp(22)));
 
         // Permissions
         title(p, "Permissions");
@@ -411,7 +391,16 @@ public class DashboardActivity extends Activity {
         p.addView(permBox, matchWrap());
         p.addView(spacer(dp(20)));
 
-        title(p, "Recent activity");
+        LinearLayout ra = row();
+        ra.setGravity(Gravity.CENTER_VERTICAL);
+        ra.addView(text("Recent activity", 16f, INK, Typeface.BOLD, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView seeAll = text("See all", 13f, NEON, Typeface.BOLD, 0f);
+        seeAll.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { show(3); }
+        });
+        ra.addView(seeAll);
+        p.addView(ra, matchWrap());
         p.addView(spacer(dp(12)));
         p.addView(activityFeed());
     }
@@ -510,12 +499,12 @@ public class DashboardActivity extends Activity {
             boolean ok = "ACCEPTED".equals(decision);
             LinearLayout r = row();
             r.setGravity(Gravity.CENTER_VERTICAL);
-            r.addView(ui.chip(ok ? "Accepted" : "Skipped",
-                            ok ? ui.successTint : ui.errorTint, ok ? ui.success : ui.error));
-            r.addView(hspacer(dp(10)));
             r.addView(text(fare, 15f, INK, Typeface.BOLD, 0f),
                     new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-            r.addView(label(when, 11f, INK_FAINT), gravityCentered());
+            r.addView(label(when, 11f, INK_FAINT));
+            r.addView(hspacer(dp(10)));
+            r.addView(ui.chip(ok ? "Accepted" : "Skipped",
+                    ok ? ui.successTint : ui.errorTint, ok ? ui.success : ui.error));
             feed.addView(r, matchWrap());
             if (shown < 4) feed.addView(spacer(dp(10)));
         }
@@ -1338,9 +1327,9 @@ public class DashboardActivity extends Activity {
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
         LinearLayout g = row();
-        tile(g, GREEN, "Accepted", String.valueOf(a));
+        tile(g, String.valueOf(a), "Accepted");
         g.addView(hspacer(dp(12)));
-        tile(g, AMBER, "Skipped", String.valueOf(s));
+        tile(g, String.valueOf(s), "Skipped");
         p.addView(g, matchWrap());
         p.addView(spacer(dp(18)));
 
@@ -2036,15 +2025,15 @@ public class DashboardActivity extends Activity {
         return outer;
     }
 
-    /** Stat tile: monochrome by design (mock 03). Accent kept for call-site stability. */
-    private TextView tile(LinearLayout parent, int accent, String label, String value) {
-        LinearLayout t = gradientCard(CARD, CARD);
-        t.addView(spacer(dp(4)));
+    /** Stat tile (design): borderless value + label, no card chrome. */
+    private TextView tile(LinearLayout parent, String value, String label) {
+        LinearLayout t = column();
         TextView v = text(value, 24f, INK, Typeface.BOLD, 0f);
         t.addView(v);
         t.addView(spacer(dp(3)));
         t.addView(text(label, 13f, INK_SOFT, Typeface.NORMAL, 0f));
-        parent.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        parent.addView(t, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         return v;
     }
 
@@ -2152,17 +2141,13 @@ public class DashboardActivity extends Activity {
         heroSub.setText(engineOn
                 ? "Watching your ride apps for matching offers."
                 : "Turn on the engine to start watching for rides.");
-        heroBadge.setText(engineOn ? "●  Online" : "○  Standby");
-        heroBadge.setTextColor(engineOn ? NEON : PLATE_SUB);
-        tint(heroBadge, engineOn ? ui.primaryTint : PLATE_CHIP);
-
         if (engineSw != null) engineSw.show(engineOn, GREEN);
         if (detectSw != null) detectSw.show(detectOn, CYAN);
 
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
-        ui.chipText(chipAccepted, "Accepted today: " + a);
-        ui.chipText(chipSkipped, "Skipped today: " + s);
+        statAccepted.setText(String.valueOf(a));
+        statSkipped.setText(String.valueOf(s));
         statRate.setText(((a + s) == 0 ? 0 : Math.round(100f * a / (a + s))) + "%");
         statEarnings.setText("₹" + sp.getInt("total_earnings", 0));
     }

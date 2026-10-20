@@ -241,6 +241,18 @@ public final class Ui {
         if (v instanceof TextView) ((TextView) v).setText(s);
     }
 
+    /** Icon button: 44dp hit area around a glyph (design top bar: bell / gear). */
+    public LinearLayout iconButton(String name, int color, View.OnClickListener click) {
+        LinearLayout b = row();
+        b.setGravity(Gravity.CENTER);
+        b.setPadding(dp(11), dp(11), dp(11), dp(11));
+        b.addView(icon(name, color, 22));
+        b.setClickable(true);
+        b.setFocusable(true);
+        b.setOnClickListener(click);
+        return b;
+    }
+
     /** Semantic banner (success / error / warning / info). */
     public TextView banner(String msg, int kind) {
         int fill, txt;
