@@ -380,17 +380,6 @@ public class DashboardActivity extends Activity {
         p.addView(g2, matchWrap());
         p.addView(spacer(dp(22)));
 
-        // Permissions
-        title(p, "Permissions");
-        p.addView(spacer(dp(4)));
-        p.addView(text("AcceptPro needs these to work. Grant any that are missing.",
-                12f, INK_SOFT, Typeface.NORMAL, 0f));
-        p.addView(spacer(dp(12)));
-        permBox = column();
-        buildPermissions(permBox);
-        p.addView(permBox, matchWrap());
-        p.addView(spacer(dp(20)));
-
         LinearLayout ra = row();
         ra.setGravity(Gravity.CENTER_VERTICAL);
         ra.addView(text("Recent activity", 16f, INK, Typeface.BOLD, 0f),
@@ -403,6 +392,17 @@ public class DashboardActivity extends Activity {
         p.addView(ra, matchWrap());
         p.addView(spacer(dp(12)));
         p.addView(activityFeed());
+        p.addView(spacer(dp(22)));
+
+        // Permissions - below the fold: the sheet's Home puts Recent activity here.
+        title(p, "Permissions");
+        p.addView(spacer(dp(4)));
+        p.addView(text("AcceptPro needs these to work. Grant any that are missing.",
+                12f, INK_SOFT, Typeface.NORMAL, 0f));
+        p.addView(spacer(dp(12)));
+        permBox = column();
+        buildPermissions(permBox);
+        p.addView(permBox, matchWrap());
     }
 
     private void buildPermissions(LinearLayout box) {

@@ -427,12 +427,24 @@ public final class Ui {
                 g.moveTo(10, 20); g.lineTo(14, 20);
                 canvas.drawPath(g, p);
             } else if ("gear".equals(name)) {
-                canvas.drawCircle(12, 12, 3.2f, p);
+                // proper cog: 8 teeth on a ring with a hollow hub. (Was a circle +
+                // 8 spokes, which read as a sun.)
+                float rIn = 6.4f, rOut = 9.2f;
                 for (int i = 0; i < 8; i++) {
-                    double a = Math.PI / 4 * i;
-                    g.moveTo((float) (12 + 5.4 * Math.cos(a)), (float) (12 + 5.4 * Math.sin(a)));
-                    g.lineTo((float) (12 + 8 * Math.cos(a)), (float) (12 + 8 * Math.sin(a)));
+                    double c = Math.PI / 4 * i;
+                    double a0 = c - 0.20, a1 = c + 0.20, b1 = c + Math.PI / 4 - 0.20;
+                    float x0 = (float) (12 + rOut * Math.cos(a0)), y0 = (float) (12 + rOut * Math.sin(a0));
+                    float x1 = (float) (12 + rOut * Math.cos(a1)), y1 = (float) (12 + rOut * Math.sin(a1));
+                    float x2 = (float) (12 + rIn * Math.cos(a1)),  y2 = (float) (12 + rIn * Math.sin(a1));
+                    float x3 = (float) (12 + rIn * Math.cos(b1)),  y3 = (float) (12 + rIn * Math.sin(b1));
+                    if (i == 0) g.moveTo(x0, y0); else g.lineTo(x0, y0);
+                    g.lineTo(x1, y1);
+                    g.lineTo(x2, y2);
+                    g.lineTo(x3, y3);
                 }
+                g.close();
+                g.setFillType(Path.FillType.EVEN_ODD);
+                g.addCircle(12, 12, 2.8f, Path.Direction.CW);
                 canvas.drawPath(g, p);
             } else if ("home".equals(name)) {
                 g.moveTo(4, 11); g.lineTo(12, 4); g.lineTo(20, 11);
