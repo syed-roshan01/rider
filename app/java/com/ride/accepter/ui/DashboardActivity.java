@@ -789,13 +789,13 @@ public class DashboardActivity extends Activity {
 
     /** Map picker: Leaflet map with a fixed centre pin + Geocoder search (places and pincodes). */
     private void mapPickerDialog() {
-        LinearLayout card = dialogCard("Add Go-To area",
-                "Search a place or pincode, move the map so the pin sits on your area.");
+        LinearLayout card = dialogCard("Select area",
+                "Search pincode or area, then move the map so the pin sits on your area.");
         LinearLayout sr = row();
         sr.setGravity(Gravity.CENTER_VERTICAL);
         final EditText q = new EditText(this);
         q.setSingleLine(true);
-        q.setHint("Place name or pincode");
+        q.setHint("Search pincode or area");
         q.setTextColor(INK);
         q.setHintTextColor(INK_FAINT);
         q.setTextSize(13f);
@@ -925,87 +925,38 @@ public class DashboardActivity extends Activity {
         card.addView(name, matchWrap(dp(48)));
         card.addView(spacer(dp(12)));
 
-        LinearLayout modes = row();
-        final TextView mEx = segPill("Exact area", true);
-        final TextView mRad = segPill("Nearby radius", false);
-        modes.addView(mEx, new LinearLayout.LayoutParams(0, dp(42), 1f));
-        View g1 = new View(this);
-        modes.addView(g1, new LinearLayout.LayoutParams(dp(10), dp(42)));
-        modes.addView(mRad, new LinearLayout.LayoutParams(0, dp(42), 1f));
-        card.addView(modes, matchWrap());
-
-        card.addView(spacer(dp(12)));
-        final LinearLayout radRow = row();
-        final int[] radii = { 500, 1000, 2000, 5000, 10000 };
-        final String[] radLabels = { "500 m", "1 km", "2 km", "5 km", "10 km" };
-        final java.util.ArrayList<TextView> chips = new java.util.ArrayList<TextView>();
-        for (int i = 0; i < radii.length; i++) {
-            final int rr = radii[i];
-            final TextView chip = segPill(radLabels[i], rr == 1000);
-            chips.add(chip);
-            chip.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                    try { draft.put("r", rr); draft.put("ex", false); } catch (Throwable ignored) {}
-                    for (TextView c : chips) styleSeg(c, c == chip);
-                }
-            });
-            radRow.addView(chip, new LinearLayout.LayoutParams(0, dp(38), 1f));
-            if (i < radii.length - 1) {
-                View g = new View(this);
-                radRow.addView(g, new LinearLayout.LayoutParams(dp(6), dp(38)));
-            }
-        }
-        radRow.setVisibility(View.GONE);
-        card.addView(radRow, matchWrap());
-
+        // Radius (design panel 7): "Radius (km)" + live value + single-value slider
+        card.addView(spacer(dp(14)));
+        LinearLayout rh = row();
+        rh.setGravity(Gravity.CENTER_VERTICAL);
+        rh.addView(text("Radius (km)", 15f, INK, Typeface.BOLD, 0f),
+                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        final TextView radVal = label("1 km", 13f, NEON);
+        rh.addView(radVal);
+        card.addView(rh, matchWrap());
         card.addView(spacer(dp(8)));
-        LinearLayout custom = row();
-        custom.setGravity(Gravity.CENTER_VERTICAL);
-        custom.addView(label("Custom radius (km)", 12f, INK_SOFT));
-        View g2 = new View(this);
-        custom.addView(g2, new LinearLayout.LayoutParams(dp(10), dp(40)));
-        final EditText kmIn = new EditText(this);
-        kmIn.setSingleLine(true);
-        kmIn.setHint("e.g. 1.5");
-        kmIn.setTextColor(INK);
-        kmIn.setHintTextColor(INK_FAINT);
-        kmIn.setTextSize(13f);
-        kmIn.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        kmIn.setBackground(round(INPUT_BG, dp(12)));
-        kmIn.setPadding(dp(12), dp(8), dp(12), dp(8));
-        custom.addView(kmIn, new LinearLayout.LayoutParams(0, dp(42), 1f));
-        custom.setVisibility(View.GONE);
-        card.addView(custom, matchWrap());
-
-        mEx.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                try { draft.put("ex", true); draft.put("r", 0); } catch (Throwable ignored) {}
-                styleSeg(mEx, true); styleSeg(mRad, false);
-                radRow.setVisibility(View.GONE); custom.setVisibility(View.GONE);
-            }
-        });
-        mRad.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                styleSeg(mEx, false); styleSeg(mRad, true);
-                radRow.setVisibility(View.VISIBLE); custom.setVisibility(View.VISIBLE);
-                try { draft.put("ex", false); if (draft.optInt("r", 0) == 0) draft.put("r", 1000); }
+        final Ui.RangeSlider radSlider = ui.rangeSlider();
+        radSlider.set(0, 10, 0, 1);
+        radSlider.on(new Ui.RangeSlider.OnRange() {
+            @Override public void changed(float a, float b) {
+                int km = Math.round(Math.max(a, b));
+                radSlider.set(0, 10, 0, km);   // pin the low thumb at 0 -> one value
+                radVal.setText(km == 0 ? "Exact" : km + " km");
+                try { draft.put("r", km * 1000); draft.put("ex", km == 0); }
                 catch (Throwable ignored) {}
             }
         });
+        card.addView(radSlider, matchWrap(dp(28)));
+        try { draft.put("r", 1000); draft.put("ex", false); } catch (Throwable ignored) {}
 
-        card.addView(spacer(dp(14)));
+        card.addView(spacer(dp(16)));
         final Dialog d = styledDialog(card);
-        card.addView(bigButton("Save area", GREEN, new View.OnClickListener() {
+        card.addView(bigButton("Use this point", NEON, new View.OnClickListener() {
             @Override public void onClick(View v) {
                 try {
-                    String txt = kmIn.getText().toString().trim();
-                    if (!draft.optBoolean("ex", true) && txt.length() > 0) {
-                        double km = Double.parseDouble(txt);
-                        if (km > 0 && km <= 50) draft.put("r", (int) (km * 1000));
-                    }
                     String nm = name.getText().toString().trim();
                     draft.put("n", nm.length() > 0 ? nm : ("Area @ " + round4(lat) + "," + round4(lng)));
-                } catch (Throwable t) { toast("Check the radius value"); return; }
+                } catch (Throwable t) { toast("Could not save that area"); return; }
                 d.dismiss();
                 toast("Preparing match words\u2026");
                 saveZoneAsync(draft);
