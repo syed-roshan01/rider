@@ -35,9 +35,16 @@ export interface PanelSession {
     exp: number;
 }
 
+/**
+ * Gate error strings -- the spec's verbatim wire contract, typed as literals so
+ * the AuthGate union narrows after `if (gate.error)`. A plain `string` admits
+ * the falsy '' and leaves `session` possibly-undefined at every call site.
+ */
+export type AuthGateError = 'Unauthorized' | 'Forbidden — super admin only';
+
 export type AuthGate =
     | { session: PanelSession; error?: undefined; status?: undefined }
-    | { error: string; status: number; session?: undefined };
+    | { error: AuthGateError; status: number; session?: undefined };
 
 const TOKEN_TTL_SEC = 8 * 60 * 60; // 8h, matching jose's setExpirationTime('8h')
 

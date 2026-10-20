@@ -27,6 +27,7 @@ import {
     DEFAULT_FEATURES,
     deviceIdDisplay,
     engineMaxDevices,
+    getPanelLicense,
     mintRaKey,
     patchEngineLicense,
     planDurationDays,

@@ -9,10 +9,10 @@
 import type {
     AffiliateRecord,
     ExpenseRecord,
-    PanelLicense,
     PaymentRecord,
     WithdrawalRecord,
 } from './panelStore.js';
+import type { PanelLicense } from './panelLicense.js';
 
 /**
  * Price / discount clamp (generate + convert):

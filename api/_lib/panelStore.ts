@@ -167,8 +167,8 @@ export interface PanelLog {
 
 export interface DemoSettings {
     enabled: boolean;
-    updatedAt: number;
-    updatedBy: string;
+    updatedAt?: number;
+    updatedBy?: string;
 }
 
 const nowSec = (): number => Math.floor(Date.now() / 1000);
