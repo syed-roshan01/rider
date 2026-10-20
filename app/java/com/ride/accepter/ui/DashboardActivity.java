@@ -109,7 +109,7 @@ public class DashboardActivity extends Activity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         rootBg = root;
-        root.setBackground(gradient(BG0, BG1, true, 0));
+        root.setBackground(round(BG0, 0));
         body = new LinearLayout(this);
         body.setOrientation(LinearLayout.VERTICAL);
         root.addView(body, new LinearLayout.LayoutParams(
@@ -128,37 +128,39 @@ public class DashboardActivity extends Activity {
     private void applyTheme() {
         dark = prefs.getBoolean("ui_dark", true);
         ui = new Ui(this, dark);
-        NEON = 0xFF2563EB; NEON2 = 0xFF2563EB;
+        // AcceptPro neutral design system: near-black / white surfaces, one blue accent.
+        // Green remains reserved for semantic success states; it is not a brand surface.
+        NEON = 0xFF2F80FF; NEON2 = 0xFF2F80FF;
         if (dark) {
-            BG0 = 0xFF000000; BG1 = 0xFF000000;
-            CARD = 0xFF0E0F13; CARD_EDGE = 0xFF26282F;
-            INK = 0xFFFFFFFF; INK_SOFT = 0xFF9AA0AB; INK_FAINT = 0xFF6A7078;
-            GREEN = 0xFF22C55E; CYAN = 0xFF2563EB; BLUE = 0xFF2563EB;
-            PURPLE = 0xFF2563EB; AMBER = 0xFFF59E0B; RED = 0xFFEF4444;
-            SW_OFF = 0xFF33363E; SW_KNOB = 0xFFE6E8EC;
-            WARN_A = 0xFF2B2110; WARN_B = 0xFF2B2110;
-            QUICK_A = 0xFF10233F; QUICK_B = 0xFF10233F;
-            INPUT_BG = 0xFF171920; BTN_SOFT = 0xFF171920;
-            SEL_BG = 0xFF10233F; SEL_INK = 0xFF2563EB; ROW_BG = 0xFF171920;
-            NAV_SEL_BG = 0xFF10233F;
-            PLATE_A = 0xFF0E0F13; PLATE_B = 0xFF0E0F13;
-            PLATE_INK = 0xFFFFFFFF; PLATE_SUB = 0xFF9AA0AB;
-            PLATE_CHIP = 0xFF171920; PLATE_EDGE = 0xFF26282F;
+            BG0 = 0xFF08090B; BG1 = 0xFF08090B;
+            CARD = 0xFF111318; CARD_EDGE = 0xFF292D35;
+            INK = 0xFFF5F7FA; INK_SOFT = 0xFFADB3BE; INK_FAINT = 0xFF777F8C;
+            GREEN = 0xFF35C98A; CYAN = 0xFF2F80FF; BLUE = 0xFF2F80FF;
+            PURPLE = 0xFF2F80FF; AMBER = 0xFFF3B34C; RED = 0xFFFF6666;
+            SW_OFF = 0xFF383C45; SW_KNOB = 0xFFF4F6F9;
+            WARN_A = 0xFF211C13; WARN_B = 0xFF211C13;
+            QUICK_A = 0xFF17243A; QUICK_B = 0xFF17243A;
+            INPUT_BG = 0xFF191C22; BTN_SOFT = 0xFF191C22;
+            SEL_BG = 0xFF17243A; SEL_INK = 0xFF78ADFF; ROW_BG = 0xFF191C22;
+            NAV_SEL_BG = 0xFF17243A;
+            PLATE_A = 0xFF111318; PLATE_B = 0xFF111318;
+            PLATE_INK = 0xFFF5F7FA; PLATE_SUB = 0xFFADB3BE;
+            PLATE_CHIP = 0xFF191C22; PLATE_EDGE = 0xFF292D35;
         } else {
-            BG0 = 0xFFF5F6F8; BG1 = 0xFFF5F6F8;
-            CARD = 0xFFFFFFFF; CARD_EDGE = 0xFFE3E6EB;
-            INK = 0xFF0C0D10; INK_SOFT = 0xFF5F6673; INK_FAINT = 0xFF8A919C;
-            GREEN = 0xFF16A34A; CYAN = 0xFF2563EB; BLUE = 0xFF2563EB;
-            PURPLE = 0xFF2563EB; AMBER = 0xFFB45309; RED = 0xFFDC2626;
-            SW_OFF = 0xFFD7DBE0; SW_KNOB = 0xFFFFFFFF;
-            WARN_A = 0xFFFEF3E2; WARN_B = 0xFFFEF3E2;
-            QUICK_A = 0xFFE9F0FE; QUICK_B = 0xFFE9F0FE;
-            INPUT_BG = 0xFFF0F2F5; BTN_SOFT = 0xFFF0F2F5;
-            SEL_BG = 0xFFE9F0FE; SEL_INK = 0xFF2563EB; ROW_BG = 0xFFF0F2F5;
-            NAV_SEL_BG = 0xFFE9F0FE;
+            BG0 = 0xFFF7F8FA; BG1 = 0xFFF7F8FA;
+            CARD = 0xFFFFFFFF; CARD_EDGE = 0xFFE1E5EB;
+            INK = 0xFF15171B; INK_SOFT = 0xFF5D6572; INK_FAINT = 0xFF858D99;
+            GREEN = 0xFF16865A; CYAN = 0xFF1769E0; BLUE = 0xFF1769E0;
+            PURPLE = 0xFF1769E0; AMBER = 0xFF9A5B00; RED = 0xFFCB3038;
+            SW_OFF = 0xFFD6DAE1; SW_KNOB = 0xFFFFFFFF;
+            WARN_A = 0xFFFFF6E8; WARN_B = 0xFFFFF6E8;
+            QUICK_A = 0xFFEAF2FF; QUICK_B = 0xFFEAF2FF;
+            INPUT_BG = 0xFFF2F4F7; BTN_SOFT = 0xFFF2F4F7;
+            SEL_BG = 0xFFEAF2FF; SEL_INK = 0xFF145CC4; ROW_BG = 0xFFF2F4F7;
+            NAV_SEL_BG = 0xFFEAF2FF;
             PLATE_A = 0xFFFFFFFF; PLATE_B = 0xFFFFFFFF;
-            PLATE_INK = 0xFF0C0D10; PLATE_SUB = 0xFF5F6673;
-            PLATE_CHIP = 0xFFF0F2F5; PLATE_EDGE = 0xFFE3E6EB;
+            PLATE_INK = 0xFF15171B; PLATE_SUB = 0xFF5D6572;
+            PLATE_CHIP = 0xFFF2F4F7; PLATE_EDGE = 0xFFE1E5EB;
         }
     }
 
@@ -172,7 +174,7 @@ public class DashboardActivity extends Activity {
 
     /** Re-tints the chrome that lives outside the rebuilt page body. */
     private void tintChrome() {
-        if (rootBg != null) rootBg.setBackground(gradient(BG0, BG1, true, 0));
+        if (rootBg != null) rootBg.setBackground(round(BG0, 0));
         if (navBg != null) navBg.setBackground(gradient(CARD, CARD, true, 0));
         Window w = getWindow();
         w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -254,7 +256,7 @@ public class DashboardActivity extends Activity {
             dot.setGravity(Gravity.CENTER);
             Ui.IconView ic = ui.icon(NAV_ICONS[i], INK_FAINT, 21);
             dot.addView(ic);
-            item.addView(dot, new LinearLayout.LayoutParams(dp(42), dp(32)));
+            item.addView(dot, new LinearLayout.LayoutParams(dp(42), dp(36)));
             item.addView(spacer(dp(3)));
             TextView t = new TextView(this);
             t.setText(NAV_LABELS[i]);
@@ -356,7 +358,7 @@ public class DashboardActivity extends Activity {
         p.addView(hero, matchWrap());
         p.addView(spacer(dp(12)));
 
-        LinearLayout eng = switchRow(GREEN, "Auto-accept engine",
+        LinearLayout eng = switchRow(BLUE, "Auto-accept engine",
                 "Watches your ride apps and accepts matching offers");
         engineSw = (ToggleSwitch) eng.findViewWithTag("switch");
         eng.setOnClickListener(new View.OnClickListener() {
@@ -604,7 +606,7 @@ public class DashboardActivity extends Activity {
         buildZones(p);
 
         p.addView(spacer(dp(24)));
-        p.addView(bigButton("Save filters", GREEN, new View.OnClickListener() {
+        p.addView(bigButton("Save filters", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) { pushFilters(); }
         }));
     }
@@ -630,7 +632,7 @@ public class DashboardActivity extends Activity {
         "<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\"></script>" +
         "<style>html,body,#m{margin:0;height:100%;width:100%;background:#0b1622}" +
         "#pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);z-index:1000;" +
-        "font-size:34px;color:#03FFB1;text-shadow:0 0 6px #000;pointer-events:none;font-family:sans-serif}" +
+        "font-size:34px;color:#2F80FF;text-shadow:0 0 4px #000;pointer-events:none;font-family:sans-serif}" +
         "</style></head><body><div id=\"m\"></div><div id=\"pin\">&#9670;</div><script>" +
         "var map=null;try{" +
         "map=L.map('m').setView([INIT_LAT,INIT_LNG],INIT_ZOOM);" +
@@ -692,12 +694,12 @@ public class DashboardActivity extends Activity {
         m.addView(mt, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         zonesMasterSw = new ToggleSwitch(this);
         m.addView(zonesMasterSw, gravityCentered());
-        zonesMasterSw.show(on, AMBER);
+        zonesMasterSw.show(on, BLUE);
         m.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 boolean now = !prefs.getBoolean("location_filter", false);
                 prefs.edit().putBoolean("location_filter", now).commit();
-                zonesMasterSw.show(now, AMBER);
+                zonesMasterSw.show(now, BLUE);
                 zonesMasterSub.setText(now ? "On \u00b7 only rides dropping at your areas are taken"
                         : "Off \u00b7 all areas accepted");
                 pushLocationToEngine();
@@ -712,7 +714,7 @@ public class DashboardActivity extends Activity {
 
         p.addView(spacer(dp(12)));
         LinearLayout btns = row();
-        btns.addView(bigButton("Add area on map", GREEN, new View.OnClickListener() {
+        btns.addView(bigButton("Add area on map", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) { mapPickerDialog(); }
         }), new LinearLayout.LayoutParams(0, dp(52), 1.35f));
         View gap = new View(this);
@@ -765,7 +767,7 @@ public class DashboardActivity extends Activity {
         LinearLayout card = dialogCard("Remove " + name + "?", "This area will no longer be grabbed first.");
         card.addView(spacer(dp(16)));
         LinearLayout btns = row();
-        btns.addView(smallButton("Cancel", GREEN, new View.OnClickListener() {
+        btns.addView(smallButton("Cancel", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) { }
         }), new LinearLayout.LayoutParams(0, dp(46), 1f));
         View gap = new View(this);
@@ -789,13 +791,13 @@ public class DashboardActivity extends Activity {
 
     /** Map picker: Leaflet map with a fixed centre pin + Geocoder search (places and pincodes). */
     private void mapPickerDialog() {
-        LinearLayout card = dialogCard("Select area",
-                "Search pincode or area, then move the map so the pin sits on your area.");
+        LinearLayout card = dialogCard("Add Go-To area",
+                "Search a place or pincode, move the map so the pin sits on your area.");
         LinearLayout sr = row();
         sr.setGravity(Gravity.CENTER_VERTICAL);
         final EditText q = new EditText(this);
         q.setSingleLine(true);
-        q.setHint("Search pincode or area");
+        q.setHint("Place name or pincode");
         q.setTextColor(INK);
         q.setHintTextColor(INK_FAINT);
         q.setTextSize(13f);
@@ -843,7 +845,7 @@ public class DashboardActivity extends Activity {
         mapWeb.loadDataWithBaseURL("https://tile.openstreetmap.org/", html, "text/html", "utf-8", null);
         card.addView(mapWeb, matchWrap(dp(300)));
         card.addView(spacer(dp(12)));
-        card.addView(bigButton("Use this point", GREEN, new View.OnClickListener() {
+        card.addView(bigButton("Use this point", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mapWeb.loadUrl("javascript:try{var c=map.getCenter();Bridge.onUse(c.lat,c.lng);}catch(e){}");
             }
@@ -925,38 +927,87 @@ public class DashboardActivity extends Activity {
         card.addView(name, matchWrap(dp(48)));
         card.addView(spacer(dp(12)));
 
-        // Radius (design panel 7): "Radius (km)" + live value + single-value slider
-        card.addView(spacer(dp(14)));
-        LinearLayout rh = row();
-        rh.setGravity(Gravity.CENTER_VERTICAL);
-        rh.addView(text("Radius (km)", 15f, INK, Typeface.BOLD, 0f),
-                new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-        final TextView radVal = label("1 km", 13f, NEON);
-        rh.addView(radVal);
-        card.addView(rh, matchWrap());
+        LinearLayout modes = row();
+        final TextView mEx = segPill("Exact area", true);
+        final TextView mRad = segPill("Nearby radius", false);
+        modes.addView(mEx, new LinearLayout.LayoutParams(0, dp(42), 1f));
+        View g1 = new View(this);
+        modes.addView(g1, new LinearLayout.LayoutParams(dp(10), dp(42)));
+        modes.addView(mRad, new LinearLayout.LayoutParams(0, dp(42), 1f));
+        card.addView(modes, matchWrap());
+
+        card.addView(spacer(dp(12)));
+        final LinearLayout radRow = row();
+        final int[] radii = { 500, 1000, 2000, 5000, 10000 };
+        final String[] radLabels = { "500 m", "1 km", "2 km", "5 km", "10 km" };
+        final java.util.ArrayList<TextView> chips = new java.util.ArrayList<TextView>();
+        for (int i = 0; i < radii.length; i++) {
+            final int rr = radii[i];
+            final TextView chip = segPill(radLabels[i], rr == 1000);
+            chips.add(chip);
+            chip.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    try { draft.put("r", rr); draft.put("ex", false); } catch (Throwable ignored) {}
+                    for (TextView c : chips) styleSeg(c, c == chip);
+                }
+            });
+            radRow.addView(chip, new LinearLayout.LayoutParams(0, dp(38), 1f));
+            if (i < radii.length - 1) {
+                View g = new View(this);
+                radRow.addView(g, new LinearLayout.LayoutParams(dp(6), dp(38)));
+            }
+        }
+        radRow.setVisibility(View.GONE);
+        card.addView(radRow, matchWrap());
+
         card.addView(spacer(dp(8)));
-        final Ui.RangeSlider radSlider = ui.rangeSlider();
-        radSlider.set(0, 10, 0, 1);
-        radSlider.on(new Ui.RangeSlider.OnRange() {
-            @Override public void changed(float a, float b) {
-                int km = Math.round(Math.max(a, b));
-                radSlider.set(0, 10, 0, km);   // pin the low thumb at 0 -> one value
-                radVal.setText(km == 0 ? "Exact" : km + " km");
-                try { draft.put("r", km * 1000); draft.put("ex", km == 0); }
+        LinearLayout custom = row();
+        custom.setGravity(Gravity.CENTER_VERTICAL);
+        custom.addView(label("Custom radius (km)", 12f, INK_SOFT));
+        View g2 = new View(this);
+        custom.addView(g2, new LinearLayout.LayoutParams(dp(10), dp(40)));
+        final EditText kmIn = new EditText(this);
+        kmIn.setSingleLine(true);
+        kmIn.setHint("e.g. 1.5");
+        kmIn.setTextColor(INK);
+        kmIn.setHintTextColor(INK_FAINT);
+        kmIn.setTextSize(13f);
+        kmIn.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        kmIn.setBackground(round(INPUT_BG, dp(12)));
+        kmIn.setPadding(dp(12), dp(8), dp(12), dp(8));
+        custom.addView(kmIn, new LinearLayout.LayoutParams(0, dp(42), 1f));
+        custom.setVisibility(View.GONE);
+        card.addView(custom, matchWrap());
+
+        mEx.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                try { draft.put("ex", true); draft.put("r", 0); } catch (Throwable ignored) {}
+                styleSeg(mEx, true); styleSeg(mRad, false);
+                radRow.setVisibility(View.GONE); custom.setVisibility(View.GONE);
+            }
+        });
+        mRad.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                styleSeg(mEx, false); styleSeg(mRad, true);
+                radRow.setVisibility(View.VISIBLE); custom.setVisibility(View.VISIBLE);
+                try { draft.put("ex", false); if (draft.optInt("r", 0) == 0) draft.put("r", 1000); }
                 catch (Throwable ignored) {}
             }
         });
-        card.addView(radSlider, matchWrap(dp(28)));
-        try { draft.put("r", 1000); draft.put("ex", false); } catch (Throwable ignored) {}
 
-        card.addView(spacer(dp(16)));
+        card.addView(spacer(dp(14)));
         final Dialog d = styledDialog(card);
-        card.addView(bigButton("Use this point", NEON, new View.OnClickListener() {
+        card.addView(bigButton("Save area", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) {
                 try {
+                    String txt = kmIn.getText().toString().trim();
+                    if (!draft.optBoolean("ex", true) && txt.length() > 0) {
+                        double km = Double.parseDouble(txt);
+                        if (km > 0 && km <= 50) draft.put("r", (int) (km * 1000));
+                    }
                     String nm = name.getText().toString().trim();
                     draft.put("n", nm.length() > 0 ? nm : ("Area @ " + round4(lat) + "," + round4(lng)));
-                } catch (Throwable t) { toast("Could not save that area"); return; }
+                } catch (Throwable t) { toast("Check the radius value"); return; }
                 d.dismiss();
                 toast("Preparing match words\u2026");
                 saveZoneAsync(draft);
@@ -1100,7 +1151,7 @@ public class DashboardActivity extends Activity {
         final TextView out = text("Result appears here.", 12f, INK_FAINT, Typeface.NORMAL, 0f);
         card.addView(out, matchWrap());
         card.addView(spacer(dp(14)));
-        card.addView(bigButton("Run test", CYAN, new View.OnClickListener() {
+        card.addView(bigButton("Run test", BLUE, new View.OnClickListener() {
             @Override public void onClick(View v) {
                 String t = in.getText().toString();
                 if (t.trim().length() < 2) { toast("Type a drop address"); return; }
@@ -2241,10 +2292,10 @@ public class DashboardActivity extends Activity {
     /** Theme chooser pill; the active one wears the logo's neon accent. */
     private View themePill(String name, final boolean goDark) {
         boolean sel = dark == goDark;
-        TextView t = text(name, 14f, sel ? onColor(GREEN) : INK_SOFT, Typeface.BOLD, 0f);
+        TextView t = text(name, 14f, sel ? onColor(BLUE) : INK_SOFT, Typeface.BOLD, 0f);
         t.setGravity(Gravity.CENTER);
         t.setPadding(0, dp(13), 0, dp(13));
-        t.setBackground(sel ? gradient(GREEN, shade(GREEN, 0.85f), true, dp(12))
+        t.setBackground(sel ? gradient(BLUE, BLUE, true, dp(12))
                 : gradient(CARD, CARD, true, dp(12)));
         t.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { setTheme(goDark); }
@@ -2327,8 +2378,8 @@ public class DashboardActivity extends Activity {
         heroSub.setText(engineOn
                 ? "Watching your ride apps for matching offers."
                 : "Turn on the engine to start watching for rides.");
-        if (engineSw != null) engineSw.show(engineOn, GREEN);
-        if (detectSw != null) detectSw.show(detectOn, CYAN);
+        if (engineSw != null) engineSw.show(engineOn, BLUE);
+        if (detectSw != null) detectSw.show(detectOn, BLUE);
 
         SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
         int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
@@ -2392,12 +2443,12 @@ public class DashboardActivity extends Activity {
             ((GradientDrawable) v.getBackground()).setColor(c);
     }
 
+    /** Solid tonal surfaces; avoid decorative gradients for a restrained native UI. */
     private GradientDrawable gradient(int a, int b, boolean vert, int radius) {
-        GradientDrawable d = new GradientDrawable(
-                vert ? GradientDrawable.Orientation.TOP_BOTTOM : GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[] { a, b });
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(a);
         d.setCornerRadius(radius);
-        if (a == CARD && b == CARD) { d.setColor(CARD); d.setStroke(dp(1), CARD_EDGE); }
+        if (a == CARD && b == CARD) d.setStroke(dp(1), CARD_EDGE);
         return d;
     }
 
