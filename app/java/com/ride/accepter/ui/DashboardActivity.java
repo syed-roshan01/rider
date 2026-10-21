@@ -1607,8 +1607,8 @@ public class DashboardActivity extends Activity {
         p.addView(seg, matchWrap());
         p.addView(spacer(dp(18)));
 
-        SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
-        int acc = sp.getInt("accepted_count", 0), skp = sp.getInt("skipped_count", 0);
+        int[] t = com.ride.accepter.util.RideHistory.tiles(this);
+        int acc = t[0], skp = t[1];
         String today = new java.text.SimpleDateFormat("d MMM yyyy",
                 java.util.Locale.getDefault()).format(new java.util.Date());
 
@@ -1621,7 +1621,7 @@ public class DashboardActivity extends Activity {
         gh.addView(hspacer(dp(8)));
         gh.addView(label(skp + " Skipped", 11f, RED));
         gh.addView(hspacer(dp(8)));
-        gh.addView(label("₹" + sp.getInt("total_earnings", 0) + " Earnings", 11f, INK_SOFT));
+        gh.addView(label("₹" + t[2] + " Earnings", 11f, INK_SOFT));
         p.addView(gh, matchWrap());
         p.addView(spacer(dp(10)));
 
@@ -1671,9 +1671,7 @@ public class DashboardActivity extends Activity {
         p.addView(spacer(dp(20)));
         p.addView(bigButton("Reset daily stats", RED, new View.OnClickListener() {
             @Override public void onClick(View v) {
-                getSharedPreferences("ride_history", MODE_PRIVATE).edit()
-                        .putInt("accepted_count", 0).putInt("skipped_count", 0)
-                        .putInt("total_earnings", 0).apply();
+                com.ride.accepter.util.RideHistory.reset(DashboardActivity.this);
                 show(current);
                 toast("Daily stats reset ✓");
             }
@@ -2497,8 +2495,9 @@ public class DashboardActivity extends Activity {
     // ---------------------------------------------------------------- state
 
     private String[] readLog() {
-        String raw = getSharedPreferences("ride_history", MODE_PRIVATE).getString("entries", "");
-        return raw.isEmpty() ? new String[0] : raw.split("\n");
+        // engine's real contract: ride_history / history_json (JSON {app,fare,accepted,ts,loc});
+        // the old "entries" pipe key was never written by anything -> "No rides yet" forever
+        return com.ride.accepter.util.RideHistory.lines(this);
     }
 
     private boolean hasA11y() {
@@ -2571,12 +2570,12 @@ public class DashboardActivity extends Activity {
         if (engineSw != null) engineSw.show(engineOn, heroAccent);
         if (detectSw != null) detectSw.show(detectOn, heroAccent);
 
-        SharedPreferences sp = getSharedPreferences("ride_history", MODE_PRIVATE);
-        int a = sp.getInt("accepted_count", 0), s = sp.getInt("skipped_count", 0);
+        int[] t = com.ride.accepter.util.RideHistory.tiles(this);
+        int a = t[0], s = t[1];
         statAccepted.setText(String.valueOf(a));
         statSkipped.setText(String.valueOf(s));
         statRate.setText(((a + s) == 0 ? 0 : Math.round(100f * a / (a + s))) + "%");
-        statEarnings.setText("₹" + sp.getInt("total_earnings", 0));
+        statEarnings.setText("₹" + t[2]);
     }
 
     /** Soft radial halo behind the hero badge; green while the engine runs. */
