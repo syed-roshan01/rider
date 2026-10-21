@@ -574,3 +574,71 @@ Evidence: `docs/screenshots/shot_login.png`, `shot_wrongdev.png`, `shot_activate
 * Machine id note: `Settings.Secure.ANDROID_ID` is scoped per app signing key, so the code the
   APP shows differs from the shell's `settings get secure android_id`. Expected and correct -
   what matters is that the server binds every key and token to the code the app computes.
+
+## L. Session findings - accept pipeline correctness (filters, metrics, extraction)
+
+Found while debugging "rides are not auto-accepted" and "accepted rides show no metrics" on the
+live rig (Samsung RF8R10RPPME + Rapido Captain), 2026-10. Log evidence was ~135 MB of continuous
+`adb logcat` capture (`app/dist/ride-logcat-live.log`, gitignored) analysed by verdict counts.
+
+### L1. Filter polarity bug (FIXED)
+
+The appended FILTER ENFORCEMENT block in `executeAccept` compared with **inverted polarity**: it
+rejected when `fare >= minFare`, `fare <= maxFare`, `pickupKm <= maxPickup`, `dropKm <= maxDrop` -
+i.e. it rejected offers that SATISFIED the rules, and `:acceptgo` was unreachable whenever
+`fareFilterOn` or `distanceFilterOn` was set. Symptom in logcat: `RideDecision` logged
+`[LIVE] TAPPING ACCEPT` in the same millisecond as `RideToggle` logged
+`FILTERS: REJECTED offer - outside configured rules`. Fixed by flipping the four branches
+(L2904/L2910 `if-lez -> if-gtz`, L2925 `if-gez -> if-ltz`, L2931 `if-lez -> if-gtz`); the
+`:rejected` label has exactly those four incoming jumps (verified by grep). After the fix
+`FILTERS: passed - proceeding to accept` fires and the accept ladder runs (tap confirmed working
+on device).
+
+### L2. History contract mismatch (FIXED in the UI)
+
+The engine writes plain prefs `ride_history` / key `history_json` = JSON
+`[{app,fare,accepted,ts,loc}]` (`logHistoryIfNew` -> `z4/e` thread). The rebuilt dashboard read
+`entries` (pipe lines) + `accepted_count`/`skipped_count`/`total_earnings` from the SAME file -
+keys nothing ever writes - so the tiles stayed 0 Accepted / 0 Skipped / 0% / Rs0 and the feed
+said "No rides yet" no matter how many rides landed. `com.ride.accepter.util.RideHistory` is now
+the single reader (falls back to `com.ride.accepter_preferences`
+`accepted_count`/`skipped_count`/`today_earnings` when history is empty).
+
+### L3. Engine success bookkeeping never runs (OPEN)
+
+`ACCEPTED:` success logging (`✅ ... ACCEPTED:`) and `logHistoryIfNew` have ZERO occurrences in
+the whole capture even though taps land and rides are accepted. The engine's post-tap success
+region is silently skipped - the `.catch Ljava/lang/Exception;` in `executeAccept` is the likely
+swallow point. Until a write hook is added at `:acceptgo`/`:rejected` (plan: `RideHistory.record()`
+invoked from the ASCII bridge block), the UI cannot show accepts at all.
+
+### L4. Field-name collision (OPEN)
+
+The engine keeps INSTANCE `minFare:I`/`maxFare:I` (+ `maxPickupKm:F`/`maxDropKm:F`), while the
+appended bridges declare STATIC `minFare:D`/`maxFare:D`/`maxPickup:D`/`maxDrop:D`. DEX allows
+same-name fields with different type descriptors, but `DebugLog.statik("minFare")` resolves by
+name only and may bind the wrong one - and on failure it silently falls back to defaults
+(min 0 / max 100000) so the audit line can lie about the live rules. Plan: rename the statics
+(`raMinFare` etc.). Suspected contributor to the remaining audit-vs-block reject disagreements.
+
+### L5. Distance extraction mis-scales metres (OPEN - OfferExtractor written, unwired)
+
+The scanner's `extractDistance`/"first two distance hits" parsing ignores units: card chips like
+`75m` arrive as `pickup 75.0km` (real values seen live: 45.0-201.0 "km" = metres). Harmless while
+distance caps sit at the 100000 sentinel, poisonous the moment real pickup/drop windows are set.
+`com.ride.accepter.engine.OfferExtractor` (unit-normalized, label-anchored to the card contract
+`₹70 / 1km / area name / 7km`) is written and waiting for a 2-site smali wiring into
+`scanNodeAllApps`. Also pending there: `com.ride.accepter.engine.TapActuator` (label-bounds tap
+ladder with success verification + per-offer dedupe).
+
+### L6. Operational landmines
+
+* Every `adb install -r` wipes `enabled_accessibility_services` - re-put it plus
+  `accessibility_enabled 1` after each install or detection silently dies
+  (`dumpsys accessibility` -> `Bound services:{}`).
+* Detect-only returns BEFORE the filter block, so its `DETECT-ONLY: would have accepted - no tap
+  performed` line says nothing about the filters - the `RideDecision` audit echo is the source of
+  truth for what the rules did.
+* Unknown-fare policy (planned): `lastFare == 0` means "not detected" - with `minFare > 0` that
+  rejects real rides (`fare Rs0 < min Rs36`). Rule to implement: unknown fare must not block, but
+  must log loudly.
