@@ -2901,13 +2901,13 @@
 
     cmpl-double v0, p2, v0
 
-    if-lez v0, :rejected
+    if-gtz v0, :rejected
 
     sget-wide v0, Lcom/auto/accept/service/RideAcceptorService;->maxDrop:D
 
     cmpl-double v0, p4, v0
 
-    if-lez v0, :rejected
+    if-gtz v0, :rejected
 
     :farecheck
     sget-boolean v0, Lcom/auto/accept/service/RideAcceptorService;->fareFilterOn:Z
@@ -2922,13 +2922,13 @@
 
     cmpg-double v2, v0, v2
 
-    if-gez v2, :rejected
+    if-ltz v2, :rejected
 
     sget-wide v2, Lcom/auto/accept/service/RideAcceptorService;->maxFare:D
 
     cmpl-double v0, v0, v2
 
-    if-lez v0, :rejected
+    if-gtz v0, :rejected
 
     :filtersok
     const-string v0, "RideToggle"
