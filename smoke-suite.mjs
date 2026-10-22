@@ -193,21 +193,24 @@ try {
     ok('discount math stored', r.data?.license?.discountAmount === 200 && r.data?.license?.discountedPrice === 800, r.raw);
     ok('affiliate commission stored', near(r.data?.license?.affiliateCommissionAmount, 80), r.raw);
     r = await post('/api/licenses/generate', {
-        clientName: 'Smoke Clamp', licenseMode: 'cloud', plan: 'custom', customDays: 10, price: 1000, discountedPrice: 1200,
+        clientName: 'Smoke Clamp', licenseMode: 'cloud', plan: 'custom', customDays: 10, machineId: CODE,
+        deviceLimit: 9, features: { mobile: false }, price: 1000, discountedPrice: 1200,
     }, { token: T });
     ok('discount clamped to price', r.status === 200 && r.data?.license?.discountedPrice === 1000 && r.data?.license?.discountAmount === 0, r.raw);
-    r = await post('/api/licenses/generate', { licenseMode: 'desktop', plan: 'monthly', machineId: CODE }, { token: T });
-    ok('generate missing clientName 400', r.status === 400 && r.data?.error === 'clientName, license mode and plan are required', r.raw);
+    ok('generate is always app/1 device/no features', r.status === 200 && r.data?.license?.licenseMode === 'app'
+        && r.data?.license?.deviceLimit === 1 && Object.keys(r.data?.license?.features ?? {}).length === 0, r.raw);
+    r = await post('/api/licenses/generate', { plan: 'monthly' }, { token: T });
+    ok('generate missing machineId 400', r.status === 400 && r.data?.error === 'machineId and plan are required', r.raw);
     r = await post('/api/licenses/generate', {
-        clientName: 'Smoke Trial', licenseMode: 'desktop', plan: 'trial', machineId: CODE, price: 0,
+        plan: 'trial', machineId: CODE, price: 0,
     }, { token: T });
-    ok('generate trial RA- key', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
+    ok('generate trial RA- key (client fields optional)', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
     const trialKey = r.data?.key;
     r = await get('/api/licenses/list', { token: T });
     ok('licenses list array', r.status === 200 && Array.isArray(r.data) && r.data.length >= 2, r.raw);
     r = await post('/api/licenses/validate', { key: 'RA-AAAAA-AAAAA-AAAAA-AAAAA-AAAAA', machineId: CODE });
     ok('validate unknown key', r.status === 200 && r.data?.valid === false && r.data?.error === 'Key not registered', r.raw);
-    r = await post('/api/licenses/validate', { key: paidKey, machineId: CODE });
+    r = await post('/api/licenses/validate', { key: paidKey, machineId: CODE, mode: 'app' });
     ok('validate is a 200-shaped parity answer', r.status === 200 && typeof r.data?.valid === 'boolean', r.raw);
     r = await post('/api/licenses/update', { key: paidKey, notes: 'smoke edit', price: 900 }, { token: T });
     ok('license update', r.status === 200 && r.data?.license?.notes === 'smoke edit', r.raw);
@@ -225,7 +228,7 @@ try {
     const revKey = r.data?.key;
     r = await post('/api/licenses/revoke', { key: revKey, reason: 'smoke revoke' }, { token: T });
     ok('revoke paid', r.status === 200 && r.data?.success === true, r.raw);
-    r = await post('/api/licenses/validate', { key: revKey, machineId: CODE });
+    r = await post('/api/licenses/validate', { key: revKey, machineId: CODE, mode: 'app' });
     ok('validate revoked key', r.status === 200 && r.data?.valid === false && /revoked/i.test(r.data?.error ?? ''), r.raw);
     r = await post('/api/licenses/convert', { oldKey: revKey, plan: 'yearly', price: 700 }, { token: T });
     ok('revoked key convertible', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
@@ -292,13 +295,15 @@ try {
     const wlT = r.data?.token;
     r = await get('/api/auth/me', { token: wlT });
     ok('whitelabel me has usage+partnership', r.status === 200 && r.data?.usage && r.data?.partnership, r.raw);
-    r = await post('/api/licenses/generate', { clientName: 'WL one', licenseMode: 'cloud', plan: 'monthly' }, { token: wlT });
-    ok('whitelabel disallowed mode 403', r.status === 403 && r.data?.error === 'License type "cloud" is not allowed for this account', r.raw);
-    r = await post('/api/licenses/generate', { clientName: 'WL one', licenseMode: 'desktop', plan: 'yearly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
+    ok('whitelabel disallowed mode 403', r.status === 403 && r.data?.error === 'License type "app" is not allowed for this account', r.raw);
+    r = await post(`/api/whitelabel/${wlId}/update`, { allowedModes: ['app'] }, { token: T });
+    ok('whitelabel mode allow-list update', r.status === 200 && r.data?.success === true, r.raw);
+    r = await post('/api/licenses/generate', { plan: 'yearly', machineId: CODE }, { token: wlT });
     ok('whitelabel disallowed plan 403', r.status === 403 && r.data?.error === 'Key duration "yearly" is not allowed for this account', r.raw);
-    r = await post('/api/licenses/generate', { clientName: 'WL one', licenseMode: 'desktop', plan: 'monthly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
     ok('whitelabel generate within quota', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
-    r = await post('/api/licenses/generate', { clientName: 'WL two', licenseMode: 'desktop', plan: 'monthly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
     ok('whitelabel quota 403', r.status === 403 && r.data?.error === 'License limit reached (1/1). Contact the administrator to raise your limit.', r.raw);
     r = await get('/api/whitelabel/list', { token: T });
     ok('whitelabel list usage', r.status === 200 && r.data?.[0] && r.data[0].usedLicenses === 1 && r.data[0].remainingLicenses === 0, r.raw);
