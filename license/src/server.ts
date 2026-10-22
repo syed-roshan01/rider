@@ -1015,36 +1015,32 @@ async function handlePanel(req: IncomingMessage, res: ServerResponse, url: URL, 
         const session = gate.session as PanelSession;
         const b = parseJsonStrict(await readRawBody(req, res));
         const {
-            clientName,
-            clientPhone,
-            clientEmail,
             machineId,
             plan,
-            deviceLimit,
             customDays,
             notes,
             price,
             discountedPrice,
-            features,
+            // Optional bookkeeping only — never required and no longer
+            // collected by the generate form.
+            clientName,
+            clientPhone,
+            clientEmail,
             businessCategory,
             website,
             affiliateId,
             affiliateName,
             reviewAccess,
         } = b as Record<string, any>;
-        const licenseMode = (b.licenseMode as string) ?? 'desktop';
 
-        // Cloud licenses use no device identity at all instead of a real
-        // device — every other mode (desktop, app) is bound to one specific
-        // device's code and requires it up front (weaker zyqora rule kept:
-        // presence only; binding hashes with hashDeviceCode).
-        if (
-            !(LICENSE_MODES as string[]).includes(licenseMode) ||
-            (licenseMode !== 'cloud' && !String(machineId ?? '').trim()) ||
-            !plan ||
-            !String(clientName ?? '').trim()
-        ) {
-            json(res, 400, { error: 'clientName, license mode and plan are required' });
+        // Accepter-app generation contract: always `app`, one device, no
+        // feature flags. A client-sent licenseMode is ignored; the key is
+        // pre-bound to the one submitted device code (binding hashes with
+        // hashDeviceCode).
+        const licenseMode = 'app';
+
+        if (!String(machineId ?? '').trim() || !plan) {
+            json(res, 400, { error: 'machineId and plan are required' });
             return;
         }
 
@@ -1086,28 +1082,23 @@ async function handlePanel(req: IncomingMessage, res: ServerResponse, url: URL, 
             }
         }
 
-        const dl = Math.max(1, Math.min(255, parseInt(deviceLimit) || 1));
-        if (whitelabel) {
-            const maxDevices = resolveWlMaxDevices(whitelabel);
-            if (dl > maxDevices) {
-                json(res, 403, { error: `Device limit ${dl} exceeds your maximum of ${maxDevices} per key` });
-                return;
-            }
-        }
+        // No device-limit input: an Accepter app licence is always bound to
+        // exactly the one device code it was minted for.
+        const dl = 1;
 
         // ADMIN-PORT.md §2 engine mapping (zyqora label -> planType/durationDays)
         const isLifetime = plan === 'lifetime';
         const e = enginePlan(plan, customDays);
         const issuedAt = Math.floor(Date.now() / 1000);
         const expiryTs = metaExpiryTs(plan, customDays, issuedAt);
-        const boundCode = licenseMode === 'cloud' ? '' : String(machineId ?? '').trim();
+        const boundCode = String(machineId ?? '').trim();
         const created = mintEngineKey(`admin:${session.username}`, {
             planType: e.planType,
             durationDays: e.durationDays,
-            // desktop/app: pre-bound to exactly the codes it was minted for
-            // (engine maxDevices 1); cloud: no binding, engine cap 10
-            maxDevices: licenseMode === 'cloud' ? Math.min(10, Math.max(1, dl)) : 1,
-            deviceCodes: licenseMode === 'cloud' ? [] : [boundCode],
+            // app: pre-bound to exactly the code it was minted for
+            // (engine maxDevices 1)
+            maxDevices: 1,
+            deviceCodes: [boundCode],
             note: String(notes ?? '').trim(),
         });
 
@@ -1126,14 +1117,15 @@ async function handlePanel(req: IncomingMessage, res: ServerResponse, url: URL, 
             discountedPrice: discountedNum,
             discountAmount,
             licenseMode,
-            machineId: licenseMode === 'cloud' ? null : displayDeviceCode(boundCode),
-            clientName: String(clientName).trim(),
+            machineId: displayDeviceCode(boundCode),
+            clientName: String(clientName ?? '').trim(),
             clientPhone: String(clientPhone || '').trim(),
             clientEmail: String(clientEmail || '').trim(),
             businessCategory: String(businessCategory || '').trim(),
             website: String(website || '').trim() || 'No website',
             notes: String(notes || '').trim(),
-            features: features || DEFAULT_FEATURES,
+            // No feature flags on Accepter licences (client input is ignored).
+            features: {} as Record<string, unknown>,
             affiliateId: affiliateId || null,
             affiliateName: affiliateName || null,
             affiliateCommissionAmount: null, // filled below

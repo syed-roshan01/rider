@@ -1,22 +1,28 @@
 /**
  * POST /api/licenses/generate
+ *   body: { machineId, plan, customDays?, notes?, price?, discountedPrice?,
+ *           affiliateId?, affiliateName?, reviewAccess?,
+ *           clientName?, clientPhone?, clientEmail?, businessCategory?, website? }
  *   200 -> { success: true, key, license }
- *   400 -> { error: 'clientName, license mode and plan are required' }
+ *   400 -> { error: 'machineId and plan are required' }
  *   403 -> { error: 'Whitelabel account is inactive' |
  *              'Your whitelabel partnership has expired. Contact the administrator to renew.' |
- *              'License type "<mode>" is not allowed for this account' |
+ *              'License type "app" is not allowed for this account' |
  *              'Key duration "<plan>" is not allowed for this account' |
  *              'Affiliate attribution is not available for whitelabel accounts' |
- *              'License limit reached (<used>/<limit>). Contact the administrator to raise your limit.' |
- *              'Device limit <dl> exceeds your maximum of <max> per key' }
+ *              'License limit reached (<used>/<limit>). Contact the administrator to raise your limit.' }
  *
  * ANY authenticated role (whitelabel restrictions enforced against the live
  * record). The key is a REAL AcceptPro RA- licence minted through the engine
  * (`create_license` rpc, ADMIN-PORT §2) -- the ZYQ-HMAC format does not exist.
- * "Machine ID"/"Android ID" = the app's Device ID (ADMIN-PORT §2.1): weak
- * zyqora input rule kept (required unless cloud, trimmed), binding is
+ *
+ * Accepter-app generation contract (deliberately minimal): the only required
+ * inputs are the app's Device ID ("Machine ID", ADMIN-PORT §2.1 -- binding is
  * hashDeviceCode(input), license_meta.machineId stores the re-hyphenated
- * display form. Money math = spec §4 clamp (panelMath.priceClamp). Logs
+ * display form) and the plan. Licences are ALWAYS `app` type, carry NO feature
+ * flags and are bound to exactly ONE device -- client-sent licenseMode,
+ * deviceLimit and features are ignored. Client/business details are optional
+ * bookkeeping only. Money math = spec §4 clamp (panelMath.priceClamp). Logs
  * LICENSE_GENERATED with the generate meta shape.
  */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
@@ -28,18 +34,14 @@ import { commissionFor, priceClamp } from '../../_lib/panelMath.js';
 import {
     boundHashOf,
     countIssuedLicenses,
-    DEFAULT_FEATURES,
     deviceIdDisplay,
     engineMaxDevices,
-    LICENSE_MODES,
     mintRaKey,
     planDurationDays,
     planEngineType,
     planExpiryTs,
-    resolveWlMaxDevices,
     resolveWlPlans,
     saveLicenseMeta,
-    surfaceDeviceLimit,
     type PanelLicense,
 } from '../../_lib/panelLicense.js';
 import { getAffiliate, getWhitelabel, saveLog, type PanelLog, type WhitelabelRecord } from '../../_lib/panelStore.js';
@@ -58,34 +60,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         const session = gate.session;
 
         const b = bodyOf(req);
-        const clientName = b.clientName;
-        const clientPhone = b.clientPhone;
-        const clientEmail = b.clientEmail;
         const machineId = b.machineId;
-        const licenseMode = b.licenseMode === undefined ? 'desktop' : String(b.licenseMode);
         const plan = b.plan;
-        const deviceLimit = b.deviceLimit;
         const customDays = b.customDays;
         const notes = b.notes;
         const price = b.price;
         const discountedPrice = b.discountedPrice;
-        const features = b.features;
+        // Optional bookkeeping only -- never required and no longer collected
+        // by the generate form.
+        const clientName = b.clientName;
+        const clientPhone = b.clientPhone;
+        const clientEmail = b.clientEmail;
         const businessCategory = b.businessCategory;
         const website = b.website;
         const affiliateId = b.affiliateId;
         const affiliateName = b.affiliateName;
         const reviewAccess = b.reviewAccess;
 
-        // Cloud licenses use no device binding at all -- every other mode
-        // (desktop, app) is bound to one specific device's ID and requires it
-        // up front.
-        if (
-            !LICENSE_MODES.includes(licenseMode) ||
-            (licenseMode !== 'cloud' && !String(machineId ?? '').trim()) ||
-            !plan ||
-            !String(clientName ?? '').trim()
-        ) {
-            json(res, 400, { error: 'clientName, license mode and plan are required' });
+        // Accepter-app generation contract: always `app`, one device, no
+        // feature flags. A client-sent licenseMode is ignored.
+        const licenseMode = 'app';
+
+        if (!String(machineId ?? '').trim() || !plan) {
+            json(res, 400, { error: 'machineId and plan are required' });
             return;
         }
 
@@ -125,22 +122,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             }
         }
 
-        const dl = surfaceDeviceLimit(deviceLimit);
-        if (whitelabel) {
-            const maxDevices = resolveWlMaxDevices(whitelabel);
-            if (dl > maxDevices) {
-                json(res, 403, { error: `Device limit ${dl} exceeds your maximum of ${maxDevices} per key` });
-                return;
-            }
-        }
+        // No device-limit input: an Accepter app licence is always bound to
+        // exactly the one device code it was minted for.
+        const dl = 1;
 
         const isLifetime = plan === 'lifetime';
         const issuedAt = Math.floor(Date.now() / 1000);
         let expiryTs = planExpiryTs(issuedAt, String(plan), customDays);
 
-        // ADMIN-PORT §2/§2.1: desktop/app keys are pre-bound to the submitted
-        // device code (hashDeviceCode); cloud keys are unbound.
-        const bound = licenseMode === 'cloud' ? [] : boundHashOf(String(machineId ?? ''));
+        // ADMIN-PORT §2/§2.1: app keys are pre-bound to the submitted device
+        // code (hashDeviceCode) and the engine locks them to exactly that code.
+        const bound = boundHashOf(String(machineId ?? ''));
         // Same-second collision guard (zyqora nudge loop) lives inside mintRaKey.
         const mint = await mintRaKey({
             planType: planEngineType(String(plan)),
@@ -166,14 +158,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
             discountedPrice: discountedNum,
             discountAmount,
             licenseMode,
-            machineId: licenseMode === 'cloud' ? null : deviceIdDisplay(String(machineId ?? '')),
+            machineId: deviceIdDisplay(String(machineId ?? '')),
             clientName: String(clientName ?? '').trim(),
             clientPhone: String(clientPhone || '').trim(),
             clientEmail: String(clientEmail || '').trim(),
             businessCategory: String(businessCategory || '').trim(),
             website: String(website || '').trim() || 'No website',
             notes: String(notes || '').trim(),
-            features: (features || DEFAULT_FEATURES) as Record<string, unknown>,
+            // No feature flags on Accepter licences (client input is ignored).
+            features: {} as Record<string, unknown>,
             affiliateId: affiliateId ? String(affiliateId) : null,
             affiliateName: affiliateName ? String(affiliateName) : null,
             affiliateCommissionAmount: null, // filled below

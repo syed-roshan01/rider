@@ -32,14 +32,11 @@ const FEATURE_OPTIONS = [
 
 const DEFAULT_FEATURES = { mobile: true, trustBuilder: true, autoReply: true, chatbot: true, liveChat: true, groupGrabber: true, aiAutomation: true, forms: true };
 
+// Generate form (Accepter app): Machine ID + plan/duration ONLY. The key is
+// always an `app` licence bound to that one device, with no feature flags,
+// no device-limit input and no client/business details.
 const DEFAULT_FORM = {
-    clientName: '', clientPhone: '', clientEmail: '',
-    businessCategory: '', website: '',
-    licenseMode: 'desktop', machineId: '', plan: 'monthly', deviceLimit: '1',
-    customDays: '', notes: '', price: '', discountedPrice: '',
-    features: { ...DEFAULT_FEATURES },
-    affiliateId: '', affiliateName: '',
-    reviewAccess: false,
+    machineId: '', plan: 'monthly', customDays: '',
 };
 
 // Whitelabel resellers — label + color for each allowed license type
@@ -160,7 +157,7 @@ export default function LicensesPage() {
     const [delBusy,  setDelBusy]  = useState(false);
     const [showDetail,setShowDetail]= useState(null);   // license object
     const [showEdit,  setShowEdit]  = useState(null);   // license object
-    const [editForm,  setEditForm]  = useState({ clientName: '', clientPhone: '', clientEmail: '', businessCategory: '', website: '', price: '', notes: '', affiliateId: '', affiliateName: '', features: { ...DEFAULT_FEATURES } });
+    const [editForm,  setEditForm]  = useState({ clientName: '', clientPhone: '', clientEmail: '', price: '', notes: '', affiliateId: '', affiliateName: '', features: { ...DEFAULT_FEATURES } });
     const [editBusy,  setEditBusy]  = useState(false);
     const [editErr,   setEditErr]   = useState('');
     const [exportFormat, setExportFormat] = useState('csv');
@@ -344,25 +341,17 @@ export default function LicensesPage() {
         return () => { stopped = true; clearInterval(t); };
     }, [user?.role]);
 
-    // Keep the generate form's license type and plan inside the live
-    // allow-lists, and the device limit under the live per-key cap
+    // Keep the generate form's plan inside the live allow-list. The licence
+    // type is always `app` and there is no device-limit input any more.
     useEffect(() => {
         if (user?.role !== 'whitelabel' || !wlInfo) return;
-        const allowed = Array.isArray(wlInfo.allowedModes) ? wlInfo.allowedModes : [];
-        if (allowed.length && !allowed.includes(form.licenseMode)) {
-            setForm(f => ({ ...f, licenseMode: allowed[0], machineId: allowed[0] === 'cloud' ? '' : f.machineId }));
-        }
         const allowedPlans = Array.isArray(wlInfo.allowedPlans) && wlInfo.allowedPlans.length
             ? wlInfo.allowedPlans.filter(p => PLANS.some(x => x.value === p))
             : PLANS.filter(p => WL_ALL_PLANS.includes(p.value)).map(p => p.value);
         if (allowedPlans.length && !allowedPlans.includes(form.plan)) {
             setForm(f => ({ ...f, plan: allowedPlans[0], customDays: allowedPlans[0] === 'custom' ? f.customDays : '' }));
         }
-        const maxDevices = Number(wlInfo.maxDevices) > 0 ? Math.floor(Number(wlInfo.maxDevices)) : 255;
-        if (Number(form.deviceLimit) > maxDevices) {
-            setForm(f => ({ ...f, deviceLimit: String(maxDevices) }));
-        }
-    }, [user?.role, wlInfo, form.licenseMode, form.plan, form.deviceLimit]);
+    }, [user?.role, wlInfo, form.plan]);
 
     const wlAllowedModes = user?.role === 'whitelabel'
         ? (wlInfo?.allowedModes || [])
@@ -455,14 +444,6 @@ export default function LicensesPage() {
     const safePage = Math.min(page, totalPages);
     const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-    const formPrice = toAmountNumber(form.price);
-    const formDiscounted = form.discountedPrice === ''
-        ? formPrice
-        : Math.min(formPrice, toAmountNumber(form.discountedPrice));
-    const formDiscount = Math.max(0, formPrice - formDiscounted);
-    const formDiscountPercent = formPrice > 0 ? (formDiscount / formPrice) * 100 : 0;
-    const formDiscountPercentRounded = Math.round(formDiscountPercent);
-
     const copyKey = (key) => {
         navigator.clipboard.writeText(key);
         setCopied(key);
@@ -474,13 +455,11 @@ export default function LicensesPage() {
         setGenErr('');
         // Loose client-side check only (the server validates strictly): the
         // Device ID is accepted with any hyphenation and normalized to its
-        // 15 alphanumeric characters. Reviewer keys keep any placeholder.
-        if (form.licenseMode !== 'cloud' && !form.reviewAccess) {
-            const deviceId = String(form.machineId || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
-            if (deviceId.length !== 15) {
-                setGenErr('Machine ID must be the 15-character Device ID shown in the app');
-                return;
-            }
+        // 15 alphanumeric characters.
+        const deviceId = String(form.machineId || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+        if (deviceId.length !== 15) {
+            setGenErr('Machine ID must be the 15-character Device ID shown in the app');
+            return;
         }
         setGenBusy(true);
         const r = await apiFetch('/api/licenses/generate', { method: 'POST', body: form });
@@ -489,7 +468,7 @@ export default function LicensesPage() {
         setGenKey(r.data.key);
         setGeneratedLicense(r.data.license || null);
         setGenBusy(false);
-        toast.success(`License generated for ${r.data.license?.clientName || 'client'}`);
+        toast.success('License generated');
         load();
         if (user?.role === 'whitelabel') refreshWhitelabel();
     };
@@ -522,10 +501,6 @@ export default function LicensesPage() {
             const subtotalAmount = fmtMoney(baseAmount);
             const discountPercentText = `${discountPercentRounded}%`;
             const totalAmount = fmtMoney(paidAmount);
-            const activeFeatures = FEATURE_OPTIONS
-                .filter(f => (l.features ? l.features[f.key] !== false : true))
-                .map(f => f.label)
-                .join(', ') || '-';
 
             // Header band
             doc.setFillColor(12, 36, 74);
@@ -573,8 +548,6 @@ export default function LicensesPage() {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(10);
             doc.text(`Issued By: ${l.issuedByName || '-'}`, pageWidth - 250, 156);
-            doc.text(`Business: ${l.businessCategory || '-'}`, pageWidth - 250, 172);
-            doc.text(`Website: ${l.website || 'No website'}`, pageWidth - 250, 188);
 
             autoTable(doc, {
                 startY: 224,
@@ -586,7 +559,6 @@ export default function LicensesPage() {
                     ['Device Limit', String(l.deviceLimit || 1), ''],
                     ['License Key', l.key || '-', ''],
                     ['Machine ID', l.machineId || '-', ''],
-                    ['Features Included', activeFeatures, ''],
                     ...(hasDiscount ? [['Discounted Price', 'Final payable amount after discount', totalAmount]] : []),
                 ],
                 theme: 'grid',
@@ -736,7 +708,7 @@ export default function LicensesPage() {
         e.preventDefault();
         setEditBusy(true);
         setEditErr('');
-        const r = await apiFetch('/api/licenses/update', { method: 'POST', body: { key: showEdit.key, clientName: editForm.clientName, clientPhone: editForm.clientPhone, clientEmail: editForm.clientEmail, businessCategory: editForm.businessCategory, website: editForm.website, price: editForm.price, notes: editForm.notes, affiliateId: editForm.affiliateId, affiliateName: editForm.affiliateName, features: editForm.features } });
+        const r = await apiFetch('/api/licenses/update', { method: 'POST', body: { key: showEdit.key, clientName: editForm.clientName, clientPhone: editForm.clientPhone, clientEmail: editForm.clientEmail, price: editForm.price, notes: editForm.notes, affiliateId: editForm.affiliateId, affiliateName: editForm.affiliateName, features: editForm.features } });
         if (!r?.ok) { setEditErr(r?.data?.error || 'Failed to update'); setEditBusy(false); return; }
         setShowEdit(null);
         setEditBusy(false);
@@ -747,7 +719,7 @@ export default function LicensesPage() {
     const downloadCsv = () => {
         const nowTs = Math.floor(Date.now() / 1000);
         const headers = [
-            'Client Name', 'Phone', 'Email', 'Business Category', 'Website',
+            'Client Name', 'Phone', 'Email',
             'Type', 'Plan', 'Price', 'Discounted Price', 'Discount Amount', 'Device Limit', 'Machine ID', 'Key',
             'Issued By', 'Issued At', 'Expiry', 'Status',
             'Revoked By', 'Revoked At', 'Revoked Reason',
@@ -764,8 +736,6 @@ export default function LicensesPage() {
                 l.clientName || '',
                 l.clientPhone || '',
                 l.clientEmail || '',
-                l.businessCategory || '',
-                l.website || '',
                 l.licenseMode === 'cloud' ? 'Cloud' : l.licenseMode === 'app' ? 'App' : 'Desktop',
                 l.plan || '',
                 toAmountNumber(l.price),
@@ -821,8 +791,6 @@ export default function LicensesPage() {
             const details = [
                 `Phone: ${l.clientPhone || '-'}`,
                 `Email: ${l.clientEmail || '-'}`,
-                `Category: ${l.businessCategory || '-'}`,
-                `Website: ${l.website || '-'}`,
                 `Type: ${l.licenseMode === 'cloud' ? 'Cloud' : l.licenseMode === 'app' ? 'App' : 'Desktop'}`,
                 `Machine: ${l.licenseMode === 'cloud' ? 'N/A' : (l.machineId || '-')}`,
                 `Key: ${l.key || '-'}`,
@@ -1152,7 +1120,7 @@ export default function LicensesPage() {
                                                 <div style={{ display: 'flex', gap: 6 }}>
                                                     <button
                                                         className="btn btn-ghost btn-sm"
-                                                        onClick={() => { setShowEdit(l); setEditForm({ clientName: l.clientName || '', clientPhone: l.clientPhone || '', clientEmail: l.clientEmail || '', businessCategory: l.businessCategory || '', website: l.website || '', price: l.price ?? '', notes: l.notes || '', affiliateId: l.affiliateId || '', affiliateName: l.affiliateName || '', features: { ...DEFAULT_FEATURES, ...(l.features || {}) } }); setEditErr(''); }}
+                                                        onClick={() => { setShowEdit(l); setEditForm({ clientName: l.clientName || '', clientPhone: l.clientPhone || '', clientEmail: l.clientEmail || '', price: l.price ?? '', notes: l.notes || '', affiliateId: l.affiliateId || '', affiliateName: l.affiliateName || '', features: { ...DEFAULT_FEATURES, ...(l.features || {}) } }); setEditErr(''); }}
                                                         title="Edit price & notes"
                                                     >Edit</button>
                                                     {!l.revoked && (
@@ -1252,7 +1220,7 @@ export default function LicensesPage() {
                             <div className="modal-body">
                                 <div className="gen-head">
                                     <div className="gen-title">License generated</div>
-                                    <div className="gen-sub">Send this key to {generatedLicense?.clientName || 'your client'}. It activates on first use.</div>
+                                    <div className="gen-sub">Send this key to your customer. It activates on first use.</div>
                                 </div>
                                 <div className="gen-key-box">
                                     <div className="gen-key-label">LICENSE KEY</div>
@@ -1261,9 +1229,7 @@ export default function LicensesPage() {
                                 {generatedLicense && (
                                     <div className="gen-meta">
                                         {[
-                                            generatedLicense.licenseMode === 'cloud' ? 'Cloud' : generatedLicense.licenseMode === 'app' ? 'App' : 'Desktop',
                                             generatedLicense.plan,
-                                            `${generatedLicense.deviceLimit} device${generatedLicense.deviceLimit !== 1 ? 's' : ''}`,
                                             generatedLicense.isLifetime ? 'Lifetime' : (generatedLicense.expiryTs ? `valid until ${fmtDate(generatedLicense.expiryTs)}` : null),
                                         ].filter(Boolean).join('  ·  ')}
                                     </div>
@@ -1295,90 +1261,22 @@ export default function LicensesPage() {
                             <form onSubmit={generate}>
                                 <div className="modal-body">
                                     <div className="form-section">
-                                        <div className="form-section-title">Client</div>
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label className="form-label">Client Name *</label>
-                                                <input className="form-input" required value={form.clientName}
-                                                    onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} placeholder="e.g. John Doe" />
-                                            </div>
-                                            <div className="form-group">
-                                                <label className="form-label">WhatsApp / Phone</label>
-                                                <input className="form-input" value={form.clientPhone}
-                                                    onChange={e => setForm(f => ({ ...f, clientPhone: e.target.value }))} placeholder="+91 9876543210" />
-                                            </div>
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Email</label>
-                                            <input className="form-input" type="email" value={form.clientEmail}
-                                                onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} placeholder="client@email.com" />
-                                        </div>
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label className="form-label">Business Category</label>
-                                                <input className="form-input" value={form.businessCategory}
-                                                    onChange={e => setForm(f => ({ ...f, businessCategory: e.target.value }))} placeholder="e.g. E-commerce, Real Estate" />
-                                            </div>
-                                            <div className="form-group">
-                                                <label className="form-label">Website</label>
-                                                <input className="form-input" value={form.website}
-                                                    onChange={e => setForm(f => ({ ...f, website: e.target.value }))} placeholder="https://example.com" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-section">
                                         <div className="form-section-title">License</div>
                                         <div className="form-group">
-                                            <label className="form-label">License Type *</label>
-                                            <select className="form-select" value={form.licenseMode}
-                                            onChange={e => setForm(f => ({ ...f, licenseMode: e.target.value, machineId: e.target.value === 'cloud' ? '' : f.machineId }))}>
-                                            {[
-                                                { value: 'desktop', label: 'Desktop License (Machine ID)' },
-                                                { value: 'app',     label: 'App License (Android ID)' },
-                                                { value: 'cloud',   label: 'Cloud License (No Machine ID)' },
-                                            ]
-                                                .filter(o => user?.role !== 'whitelabel' || wlAllowedModes.includes(o.value))
-                                                .map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                                        </select>
-                                        {user?.role === 'whitelabel' && wlAllowedModes.length === 0 && (
-                                            <span style={{ fontSize: 11, color: '#ef4444' }}>
-                                                No license types are currently allowed on your account — contact the administrator.
+                                            <label className="form-label">Machine ID (Device ID) *</label>
+                                            <input className="form-input" required value={form.machineId}
+                                                onChange={e => setForm(f => ({ ...f, machineId: e.target.value }))}
+                                                placeholder="e.g. 7QK2M-3XW8H-PTD4R"
+                                                style={{ fontFamily: 'Courier New, monospace', fontSize: 12 }} />
+                                            <span style={{ fontSize: 11, color: '#3a4560' }}>
+                                                The 15-character Device ID from the Accepter app's device activation screen — unique per device, so every phone needs its own key.
                                             </span>
+                                        </div>
+                                        {user?.role === 'whitelabel' && wlAllowedModes.length > 0 && !wlAllowedModes.includes('app') && (
+                                            <div className="form-error">
+                                                App licenses are not allowed on your account — contact the administrator.
+                                            </div>
                                         )}
-                                    </div>
-                                    {form.licenseMode === 'desktop' && <div className="form-group">
-                                        <label className="form-label">Machine ID *</label>
-                                        <input className="form-input" required value={form.machineId}
-                                            onChange={e => setForm(f => ({ ...f, machineId: e.target.value }))}
-                                            placeholder="Paste from AcceptPro app Device ID"
-                                            style={{ fontFamily: 'Courier New, monospace', fontSize: 12 }} />
-                                        <span style={{ fontSize: 11, color: '#3a4560' }}>Found in the AcceptPro desktop app → License screen → bottom</span>
-                                    </div>}
-                                    {form.licenseMode === 'app' && <div className="form-group">
-                                        <label className="form-label">Android ID *</label>
-                                        <input className="form-input" required value={form.machineId}
-                                            onChange={e => setForm(f => ({ ...f, machineId: e.target.value }))}
-                                            placeholder={form.reviewAccess ? 'e.g. PLAYSTORE-REVIEWER (not actually checked)' : 'Paste from AcceptPro mobile app Device ID'}
-                                            style={{ fontFamily: 'Courier New, monospace', fontSize: 12 }} />
-                                        <span style={{ fontSize: 11, color: '#3a4560' }}>
-                                            {form.reviewAccess
-                                                ? 'Not actually validated for a Reviewer/Test Access key — any placeholder text works'
-                                                : 'Found in the AcceptPro Android app → Device activation screen — unique per device, so a new phone always needs a new key'}
-                                        </span>
-                                    </div>}
-                                    {user?.role === 'super' && (
-                                    <div className="form-group">
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#c9d2e8', cursor: 'pointer' }}>
-                                            <input type="checkbox" checked={form.reviewAccess}
-                                                onChange={e => setForm(f => ({ ...f, reviewAccess: e.target.checked }))} />
-                                            Reviewer / Test Access (bypasses device binding)
-                                        </label>
-                                        <span style={{ fontSize: 11, color: '#3a4560' }}>
-                                            Works on any device — for Play Store review only. Super admin only. Revoke it from the table below once review is done.
-                                        </span>
-                                    </div>
-                                    )}
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label className="form-label">Plan *</label>
@@ -1388,14 +1286,6 @@ export default function LicensesPage() {
                                             </select>
                                             {user?.role === 'whitelabel' && (
                                                 <span style={{ fontSize: 11, color: '#3a4560' }}>Available durations are set by the administrator.</span>
-                                            )}
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Device Limit *</label>
-                                            <input className="form-input" type="number" min={1} max={user?.role === 'whitelabel' ? wlMaxDevices : 255} required value={form.deviceLimit}
-                                                onChange={e => setForm(f => ({ ...f, deviceLimit: e.target.value }))} />
-                                            {user?.role === 'whitelabel' && (
-                                                <span style={{ fontSize: 11, color: '#3a4560' }}>Up to {wlMaxDevices} device{wlMaxDevices !== 1 ? 's' : ''} per key (set by the administrator).</span>
                                             )}
                                         </div>
                                     </div>
@@ -1408,69 +1298,7 @@ export default function LicensesPage() {
                                     )}
                                     </div>
 
-                                    <div className="form-section">
-                                        <div className="form-section-title">Pricing</div>
-                                        <div className="form-row">
-                                            <div className="form-group">
-                                                <label className="form-label">Price (₹)</label>
-                                            <input className="form-input" type="number" min="0" step="0.01" value={form.price}
-                                                onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                                                placeholder="e.g. 999" />
-                                            <label className="form-label" style={{ marginTop: 8 }}>Discounted Price (₹)</label>
-                                            <input className="form-input" type="number" min="0" step="0.01" value={form.discountedPrice}
-                                                onChange={e => setForm(f => ({ ...f, discountedPrice: e.target.value }))}
-                                                placeholder="Leave blank for no discount" />
-                                            <span style={{ fontSize: 11, color: '#4a5980', marginTop: 6 }}>
-                                                Auto Discount: <span style={{ color: '#22c55e', fontWeight: 700 }}>{fmtMoney(formDiscount)}</span>
-                                                <span style={{ color: '#4a9eff', fontWeight: 700 }}> ({formDiscountPercentRounded}%)</span>
-                                            </span>
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Notes</label>
-                                            <textarea className="form-textarea" value={form.notes}
-                                                onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                                                placeholder="Internal note" style={{ minHeight: 42 }} />
-                                        </div>
-                                    </div>
-                                    {/* Affiliate */}
-                                    {user?.role !== 'whitelabel' && affiliates.length > 0 && (
-                                        <div className="form-group">
-                                            <label className="form-label">Referred by Affiliate</label>
-                                            <select className="form-select" value={form.affiliateId}
-                                                onChange={e => {
-                                                    const chosen = affiliates.find(a => a.id === e.target.value);
-                                                    setForm(f => ({ ...f, affiliateId: e.target.value, affiliateName: chosen?.name || '' }));
-                                                }}>
-                                                <option value="">— None / Direct Sale —</option>
-                                                {affiliates.map(a => (
-                                                    <option key={a.id} value={a.id}>{a.name} ({a.commission}%)</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
-                                    </div>
 
-                                    <div className="form-section">
-                                        <div className="form-section-title">Features</div>
-                                        <div className="form-group">
-                                            <label className="form-label" style={{ marginBottom: 8 }}>Features Included</label>
-                                        <div className="feature-grid">
-                                            {FEATURE_OPTIONS.map(({ key, label, sub }) => (
-                                                <label key={key} className={`feature-tile${form.features[key] ? ' on' : ''}`}>
-                                                    <input type="checkbox" checked={form.features[key] ?? true}
-                                                        onChange={e => setForm(f => ({ ...f, features: { ...f.features, [key]: e.target.checked } }))} />
-                                                    <span className="feature-tile-text">
-                                                        <span className="feature-tile-label">{label}</span>
-                                                        <span className="feature-tile-sub">{sub}</span>
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                        <button type="button" className="feature-reset" onClick={() => setForm(f => ({ ...f, features: { ...DEFAULT_FEATURES } }))}>
-                                            Select all
-                                        </button>
-                                        </div>
-                                    </div>
                                     {user?.role === 'whitelabel' && wlInfo?.usage && (
                                         <div style={{ fontSize: 12, color: '#94a3b8', background: '#161c2d', border: '1px solid #252d42', borderRadius: 8, padding: '8px 12px' }}>
                                             Quota:{' '}
@@ -1711,14 +1539,6 @@ export default function LicensesPage() {
                                     <div style={{ fontSize: 13, color: '#e2e8f0' }}>{showDetail.clientEmail || '—'}</div>
                                 </div>
                                 <div>
-                                    <div style={{ fontSize: 10, color: '#4a5980', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Business Category</div>
-                                    <div style={{ fontSize: 13, color: '#e2e8f0' }}>{showDetail.businessCategory || '—'}</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: 10, color: '#4a5980', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Website</div>
-                                    <div style={{ fontSize: 13, color: '#e2e8f0' }}>{showDetail.website || 'No website'}</div>
-                                </div>
-                                <div>
                                     <div style={{ fontSize: 10, color: '#4a5980', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Plan</div>
                                     <div><span className={`badge badge-plan-${showDetail.plan}`}>{showDetail.plan}</span></div>
                                 </div>
@@ -1861,7 +1681,7 @@ export default function LicensesPage() {
                             <button className="btn btn-ghost" onClick={() => downloadInvoiceForLicense(showDetail)} disabled={invoiceBusy}>
                                 {invoiceBusy ? 'Preparing Invoice…' : 'Download Invoice'}
                             </button>
-                            <button className="btn btn-primary" onClick={() => { setShowEdit(showDetail); setEditForm({ clientName: showDetail.clientName || '', clientPhone: showDetail.clientPhone || '', clientEmail: showDetail.clientEmail || '', businessCategory: showDetail.businessCategory || '', website: showDetail.website || '', price: showDetail.price ?? '', notes: showDetail.notes || '', affiliateId: showDetail.affiliateId || '', affiliateName: showDetail.affiliateName || '', features: { ...DEFAULT_FEATURES, ...(showDetail.features || {}) } }); setEditErr(''); setShowDetail(null); }}>✎ Edit</button>
+                            <button className="btn btn-primary" onClick={() => { setShowEdit(showDetail); setEditForm({ clientName: showDetail.clientName || '', clientPhone: showDetail.clientPhone || '', clientEmail: showDetail.clientEmail || '', price: showDetail.price ?? '', notes: showDetail.notes || '', affiliateId: showDetail.affiliateId || '', affiliateName: showDetail.affiliateName || '', features: { ...DEFAULT_FEATURES, ...(showDetail.features || {}) } }); setEditErr(''); setShowDetail(null); }}>✎ Edit</button>
                         </div>
                 </Modal>
             )}
@@ -1890,20 +1710,6 @@ export default function LicensesPage() {
                                     <input className="form-input" type="email" value={editForm.clientEmail}
                                         onChange={e => setEditForm(f => ({ ...f, clientEmail: e.target.value }))}
                                         placeholder="client@email.com" />
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label className="form-label">Business Category</label>
-                                        <input className="form-input" value={editForm.businessCategory}
-                                            onChange={e => setEditForm(f => ({ ...f, businessCategory: e.target.value }))}
-                                            placeholder="e.g. E-commerce, Real Estate" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Website</label>
-                                        <input className="form-input" value={editForm.website}
-                                            onChange={e => setEditForm(f => ({ ...f, website: e.target.value }))}
-                                            placeholder="https://example.com" />
-                                    </div>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Price (₹)</label>
