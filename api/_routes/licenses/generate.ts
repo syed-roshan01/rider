@@ -4,7 +4,7 @@
  *           affiliateId?, affiliateName?, reviewAccess?,
  *           clientName?, clientPhone?, clientEmail?, businessCategory?, website? }
  *   200 -> { success: true, key, license }
- *   400 -> { error: 'machineId and plan are required' }
+ *   400 -> { error: 'clientName, machineId and plan are required' }
  *   403 -> { error: 'Whitelabel account is inactive' |
  *              'Your whitelabel partnership has expired. Contact the administrator to renew.' |
  *              'License type "app" is not allowed for this account' |
@@ -66,11 +66,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         const notes = b.notes;
         const price = b.price;
         const discountedPrice = b.discountedPrice;
-        // Optional bookkeeping only -- never required and no longer collected
-        // by the generate form.
+        // Customer + sale bookkeeping -- the generate form records the name and
+        // phone for sales tracking. clientName is required; the rest optional.
         const clientName = b.clientName;
         const clientPhone = b.clientPhone;
         const clientEmail = b.clientEmail;
+        // Legacy fields, no longer collected by the generate form.
         const businessCategory = b.businessCategory;
         const website = b.website;
         const affiliateId = b.affiliateId;
@@ -81,8 +82,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
         // feature flags. A client-sent licenseMode is ignored.
         const licenseMode = 'app';
 
-        if (!String(machineId ?? '').trim() || !plan) {
-            json(res, 400, { error: 'machineId and plan are required' });
+        if (!String(clientName ?? '').trim() || !String(machineId ?? '').trim() || !plan) {
+            json(res, 400, { error: 'clientName, machineId and plan are required' });
             return;
         }
 

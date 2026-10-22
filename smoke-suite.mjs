@@ -200,11 +200,11 @@ try {
     ok('generate is always app/1 device/no features', r.status === 200 && r.data?.license?.licenseMode === 'app'
         && r.data?.license?.deviceLimit === 1 && Object.keys(r.data?.license?.features ?? {}).length === 0, r.raw);
     r = await post('/api/licenses/generate', { plan: 'monthly' }, { token: T });
-    ok('generate missing machineId 400', r.status === 400 && r.data?.error === 'machineId and plan are required', r.raw);
+    ok('generate missing clientName+machineId 400', r.status === 400 && r.data?.error === 'clientName, machineId and plan are required', r.raw);
     r = await post('/api/licenses/generate', {
-        plan: 'trial', machineId: CODE, price: 0,
+        clientName: 'Smoke Trial', plan: 'trial', machineId: CODE, price: 0,
     }, { token: T });
-    ok('generate trial RA- key (client fields optional)', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
+    ok('generate trial RA- key', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
     const trialKey = r.data?.key;
     r = await get('/api/licenses/list', { token: T });
     ok('licenses list array', r.status === 200 && Array.isArray(r.data) && r.data.length >= 2, r.raw);
@@ -295,15 +295,15 @@ try {
     const wlT = r.data?.token;
     r = await get('/api/auth/me', { token: wlT });
     ok('whitelabel me has usage+partnership', r.status === 200 && r.data?.usage && r.data?.partnership, r.raw);
-    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { clientName: 'WL', plan: 'monthly', machineId: CODE }, { token: wlT });
     ok('whitelabel disallowed mode 403', r.status === 403 && r.data?.error === 'License type "app" is not allowed for this account', r.raw);
     r = await post(`/api/whitelabel/${wlId}/update`, { allowedModes: ['app'] }, { token: T });
     ok('whitelabel mode allow-list update', r.status === 200 && r.data?.success === true, r.raw);
-    r = await post('/api/licenses/generate', { plan: 'yearly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { clientName: 'WL', plan: 'yearly', machineId: CODE }, { token: wlT });
     ok('whitelabel disallowed plan 403', r.status === 403 && r.data?.error === 'Key duration "yearly" is not allowed for this account', r.raw);
-    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { clientName: 'WL', plan: 'monthly', machineId: CODE }, { token: wlT });
     ok('whitelabel generate within quota', r.status === 200 && /^RA-/.test(r.data?.key ?? ''), r.raw);
-    r = await post('/api/licenses/generate', { plan: 'monthly', machineId: CODE }, { token: wlT });
+    r = await post('/api/licenses/generate', { clientName: 'WL', plan: 'monthly', machineId: CODE }, { token: wlT });
     ok('whitelabel quota 403', r.status === 403 && r.data?.error === 'License limit reached (1/1). Contact the administrator to raise your limit.', r.raw);
     r = await get('/api/whitelabel/list', { token: T });
     ok('whitelabel list usage', r.status === 200 && r.data?.[0] && r.data[0].usedLicenses === 1 && r.data[0].remainingLicenses === 0, r.raw);

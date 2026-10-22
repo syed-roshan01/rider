@@ -1021,11 +1021,12 @@ async function handlePanel(req: IncomingMessage, res: ServerResponse, url: URL, 
             notes,
             price,
             discountedPrice,
-            // Optional bookkeeping only — never required and no longer
-            // collected by the generate form.
+            // Customer + sale bookkeeping — the generate form records the name
+            // and phone for sales tracking. clientName is required; rest optional.
             clientName,
             clientPhone,
             clientEmail,
+            // Legacy fields, no longer collected by the generate form.
             businessCategory,
             website,
             affiliateId,
@@ -1039,8 +1040,8 @@ async function handlePanel(req: IncomingMessage, res: ServerResponse, url: URL, 
         // hashDeviceCode).
         const licenseMode = 'app';
 
-        if (!String(machineId ?? '').trim() || !plan) {
-            json(res, 400, { error: 'machineId and plan are required' });
+        if (!String(clientName ?? '').trim() || !String(machineId ?? '').trim() || !plan) {
+            json(res, 400, { error: 'clientName, machineId and plan are required' });
             return;
         }
 
